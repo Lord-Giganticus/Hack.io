@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Text;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Drawing;
 using Hack.io.Util;
 
@@ -81,7 +80,7 @@ namespace Hack.io
         [DebuggerStepThrough]
         public static string ReadString(this FileStream FS)
         {
-            List<byte> bytes = new List<byte>();
+            List<byte> bytes = new();
             int strCount = 0;
             while (FS.ReadByte() != 0)
             {
@@ -116,7 +115,7 @@ namespace Hack.io
         [DebuggerStepThrough]
         public static string ReadString(this FileStream FS, Encoding Encoding)
         {
-            List<byte> bytes = new List<byte>();
+            List<byte> bytes = new();
             int strCount = 0;
             while (FS.ReadByte() != 0)
             {
@@ -284,7 +283,7 @@ namespace Hack.io
         [DebuggerStepThrough]
         public static string ReadString(this MemoryStream FS)
         {
-            List<byte> bytes = new List<byte>();
+            List<byte> bytes = new();
             int strCount = 0;
             while (FS.ReadByte() != 0)
             {
@@ -319,7 +318,7 @@ namespace Hack.io
         [DebuggerStepThrough]
         public static string ReadString(this MemoryStream FS, Encoding Encoding)
         {
-            List<byte> bytes = new List<byte>();
+            List<byte> bytes = new();
             int strCount = 0;
             while (FS.ReadByte() != 0)
             {
@@ -487,7 +486,7 @@ namespace Hack.io
         [DebuggerStepThrough]
         public static string ReadString(this Stream FS)
         {
-            List<byte> bytes = new List<byte>();
+            List<byte> bytes = new();
             int strCount = 0;
             while (FS.ReadByte() != 0)
             {
@@ -522,7 +521,7 @@ namespace Hack.io
         [DebuggerStepThrough]
         public static string ReadString(this Stream FS, Encoding Encoding)
         {
-            List<byte> bytes = new List<byte>();
+            List<byte> bytes = new();
             int ByteCount = Encoding.GetStride();
             byte[] Checker = new byte[ByteCount];
             bool IsDone = false;
@@ -550,7 +549,7 @@ namespace Hack.io
         [DebuggerStepThrough]
         public static string ReadString(this Stream FS, int StringLength, Encoding Encoding)
         {
-            StringLength = StringLength * Encoding.GetStride();
+            StringLength *= Encoding.GetStride();
             byte[] bytes = new byte[StringLength];
             FS.Read(bytes, 0, StringLength);
             return Encoding.GetString(bytes, 0, StringLength);

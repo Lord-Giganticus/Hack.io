@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Hack.io.BMD
 {
@@ -29,8 +26,8 @@ namespace Hack.io.BMD
     {
         public static (string Vert, string Frag) GenerateShader(BMD.MAT3.Material Material, BMD.SHP1.Shape shape)
         {
-            CultureInfo forceusa = new CultureInfo("en-US");
-            StringBuilder Vert = new StringBuilder(), Frag = new StringBuilder();
+            CultureInfo forceusa = new("en-US");
+            StringBuilder Vert = new(), Frag = new();
 
             #region Vertex Shader
             Vert.AppendLine("#version 330");
@@ -263,41 +260,41 @@ namespace Hack.io.BMD
             return (Vert.ToString(), Frag.ToString());
         }
 
-        static string[] texgensrc = { "normalize(gl_Vertex)", "vec4(gl_Normal,1.0)", "argh", "argh",
+        static readonly string[] texgensrc = { "normalize(gl_Vertex)", "vec4(gl_Normal,1.0)", "argh", "argh",
                                      "gl_MultiTexCoord0", "gl_MultiTexCoord1", "gl_MultiTexCoord2", "gl_MultiTexCoord3",
                                      "gl_MultiTexCoord4", "gl_MultiTexCoord5", "gl_MultiTexCoord6", "gl_MultiTexCoord7" };
 
-        static string[] outputregs = { "rprev", "r0", "r1", "r2" };
+        static readonly string[] outputregs = { "rprev", "r0", "r1", "r2" };
 
-        static string[] c_inputregs = { "truncc3(rprev.rgb)", "truncc3(rprev.aaa)", "truncc3(r0.rgb)", "truncc3(r0.aaa)",
+        static readonly string[] c_inputregs = { "truncc3(rprev.rgb)", "truncc3(rprev.aaa)", "truncc3(r0.rgb)", "truncc3(r0.aaa)",
                                         "truncc3(r1.rgb)", "truncc3(r1.aaa)", "truncc3(r2.rgb)", "truncc3(r2.aaa)",
                                        "texcolor.rgb", "texcolor.aaa", "rascolor.rgb", "rascolor.aaa",
                                        "vec3(1.0,1.0,1.0)", "vec3(0.5,0.5,0.5)", "konst.rgb", "vec3(0.0,0.0,0.0)" };
-        static string[] c_inputregsD = { "rprev.rgb", "rprev.aaa", "r0.rgb", "r0.aaa",
+        static readonly string[] c_inputregsD = { "rprev.rgb", "rprev.aaa", "r0.rgb", "r0.aaa",
                                         "r1.rgb", "r1.aaa", "r2.rgb", "r2.aaa",
                                        "texcolor.rgb", "texcolor.aaa", "rascolor.rgb", "rascolor.aaa",
                                        "vec3(1.0,1.0,1.0)", "vec3(0.5,0.5,0.5)", "konst.rgb", "vec3(0.0,0.0,0.0)" };
-        static string[] c_konstsel = { "vec3(1.0,1.0,1.0)", "vec3(0.875,0.875,0.875)", "vec3(0.75,0.75,0.75)", "vec3(0.625,0.625,0.625)",
+        static readonly string[] c_konstsel = { "vec3(1.0,1.0,1.0)", "vec3(0.875,0.875,0.875)", "vec3(0.75,0.75,0.75)", "vec3(0.625,0.625,0.625)",
                                       "vec3(0.5,0.5,0.5)", "vec3(0.375,0.375,0.375)", "vec3(0.25,0.25,0.25)", "vec3(0.125,0.125,0.125)",
                                       "", "", "", "", "k0.rgb", "k1.rgb", "k2.rgb", "k3.rgb",
                                       "k0.rrr", "k1.rrr", "k2.rrr", "k3.rrr", "k0.ggg", "k1.ggg", "k2.ggg", "k3.ggg",
                                       "k0.bbb", "k1.bbb", "k2.bbb", "k3.bbb", "k0.aaa", "k1.aaa", "k2.aaa", "k3.aaa" };
 
-        static string[] a_inputregs = { "truncc1(rprev.a)", "truncc1(r0.a)", "truncc1(r1.a)", "truncc1(r2.a)",
+        static readonly string[] a_inputregs = { "truncc1(rprev.a)", "truncc1(r0.a)", "truncc1(r1.a)", "truncc1(r2.a)",
                                        "texcolor.a", "rascolor.a", "konst.a", "0.0" };
-        static string[] a_inputregsD = { "rprev.a", "r0.a", "r1.a", "r2.a",
+        static readonly string[] a_inputregsD = { "rprev.a", "r0.a", "r1.a", "r2.a",
                                        "texcolor.a", "rascolor.a", "konst.a", "0.0" };
-        static string[] a_konstsel = { "1.0", "0.875", "0.75", "0.625", "0.5", "0.375", "0.25", "0.125",
+        static readonly string[] a_konstsel = { "1.0", "0.875", "0.75", "0.625", "0.5", "0.375", "0.25", "0.125",
                                       "", "", "", "", "", "", "", "",
                                       "k0.r", "k1.r", "k2.r", "k3.r", "k0.g", "k1.g", "k2.g", "k3.g",
                                       "k0.b", "k1.b", "k2.b", "k3.b", "k0.a", "k1.a", "k2.a", "k3.a" };
 
-        static string[] tevbias = { "0.0", "0.5", "-0.5","0.0" };
-        static string[] tevscale = { "1.0", "2.0", "4.0", "0.5" };
+        static readonly string[] tevbias = { "0.0", "0.5", "-0.5","0.0" };
+        static readonly string[] tevscale = { "1.0", "2.0", "4.0", "0.5" };
 
-        static string[] alphacompare = { "{0} != {0}", "{0} < {1}", "{0} == {1}", "{0} <= {1}", "{0} > {1}", "{0} != {1}", "{0} >= {1}", "{0} == {0}" };
+        static readonly string[] alphacompare = { "{0} != {0}", "{0} < {1}", "{0} == {1}", "{0} <= {1}", "{0} > {1}", "{0} != {1}", "{0} >= {1}", "{0} == {0}" };
         //static  string[] alphacombine = { "all(bvec2({0},{1}))", "any(bvec2({0},{1}))", "any(bvec2(all(bvec2({0},!{1})),all(bvec2(!{0},{1}))))", "any(bvec2(all(bvec2({0},{1})),all(bvec2(!{0},!{1}))))" };
-        static string[] alphacombine = { "({0}) && ({1})", "({0}) || ({1})", "(({0}) && (!({1}))) || ((!({0})) && ({1}))", "(({0}) && ({1})) || ((!({0})) && (!({1})))" };
+        static readonly string[] alphacombine = { "({0}) && ({1})", "({0}) || ({1})", "(({0}) && (!({1}))) || ((!({0})) && ({1}))", "(({0}) && ({1})) || ((!({0})) && (!({1})))" };
 
         // yes, oldstyle shaders
         // I would use version 130 or above but there are certain

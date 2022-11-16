@@ -5,9 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections;
 using System.Reflection;
 using System.ComponentModel;
@@ -24,9 +21,9 @@ namespace Hack.io.KCL
         /// Filename of this KCL file.
         /// </summary>
         public string FileName { get; set; } = null;
-        public List<Vector3> Positions = new List<Vector3>();
-        public List<Vector3> Normals = new List<Vector3>();
-        public List<KCLFace> Triangles = new List<KCLFace>();
+        public List<Vector3> Positions = new();
+        public List<Vector3> Normals = new();
+        public List<KCLFace> Triangles = new();
         public Octree[] OctreeRoots;
         public Vector3 MinCoords;
 
@@ -34,25 +31,24 @@ namespace Hack.io.KCL
 
         public KCL(string file, BackgroundWorker bgw = null)
         {
-            FileStream FS = new FileStream(file, FileMode.Open);
+            FileStream FS = new(file, FileMode.Open);
             Read(FS, bgw);
             FS.Close();
             FileName = file;
         }
-        public KCL(WavefrontObj obj, BCSV.BCSV CollisionCodes, int MaxTrianglesPerCube, int MinCubeWidth, BackgroundWorker bgw = null)
+        public KCL(WavefrontObj obj, int MaxTrianglesPerCube, int MinCubeWidth, BackgroundWorker bgw = null)
         {
             bgw?.ReportProgress(0, 0);
             if (obj.Count > 0xFFFE)
                 throw new GeometryOverflowException(obj.Count, 0xFFFE);
 
             float min_x = 0, min_y = 0, min_z = 0, max_x = 0, max_y = 0, max_z = 0;
-            Dictionary<string, int> positionTable = new Dictionary<string, int>();
-            Dictionary<string, int> normalTable = new Dictionary<string, int>();
-            List<KCLFace> faces = new List<KCLFace>();
-            Dictionary<ushort, Triangle> triangledict = new Dictionary<ushort, Triangle>();
+            Dictionary<string, int> positionTable = new();
+            Dictionary<string, int> normalTable = new();
+            Dictionary<ushort, Triangle> triangledict = new();
             for (int i = 0; i < obj.Count; i++)
             {
-                KCLFace face = new KCLFace();
+                KCLFace face = new();
                 Triangle triangle = obj[i];
 
                 Vector3 direction = Vector3.Cross(
@@ -86,18 +82,18 @@ namespace Hack.io.KCL
                 //Vector3 normalB = Vector3.Cross(triangle[1] - triangle[0], triangle[3]).Unit();
                 //Vector3 normalC = Vector3.Cross(triangle[2] - triangle[1], triangle[3]).Unit();
                 face.Length = Vector3.Dot(triangle[1] - triangle[0], normalC);
-                face.PositionIndex = (ushort)IndexOfVertex(triangle[0], Positions, positionTable);
-                face.DirectionIndex = (ushort)IndexOfVertex(triangle[3], Normals, normalTable);
-                face.NormalAIndex = (ushort)IndexOfVertex(normalA, Normals, normalTable);
-                face.NormalBIndex = (ushort)IndexOfVertex(normalB, Normals, normalTable);
-                face.NormalCIndex = (ushort)IndexOfVertex(normalC, Normals, normalTable);
+                face.PositionIndex = (ushort)KCL.IndexOfVertex(triangle[0], Positions, positionTable);
+                face.DirectionIndex = (ushort)KCL.IndexOfVertex(triangle[3], Normals, normalTable);
+                face.NormalAIndex = (ushort)KCL.IndexOfVertex(normalA, Normals, normalTable);
+                face.NormalBIndex = (ushort)KCL.IndexOfVertex(normalB, Normals, normalTable);
+                face.NormalCIndex = (ushort)KCL.IndexOfVertex(normalC, Normals, normalTable);
                 face.GroupIndex = (ushort)triangle.GroupIndex;
                 Triangles.Add(face);
                 triangledict.Add((ushort)triangledict.Count, triangle);
 
                 bgw?.ReportProgress((int)GetPercentOf(i, obj.Count), 0);
             }
-            Vector3 Max = new Vector3(max_x, max_y, max_z);
+            Vector3 Max = new(max_x, max_y, max_z);
             MinCoords = new Vector3(min_x, min_y, min_z);
             bgw?.ReportProgress(100, 0);
 
@@ -152,7 +148,7 @@ namespace Hack.io.KCL
                         if (index >= OctreeRoots.Length)
                         {
                             //Something went REALLY WRONG for this to happen...
-                            throw new Exception($"Octree Failure: count={OctreeRoots.Length} z={CubeCountZ} y={CubeCountY} x={CubeCountX} cube={cubeSize} size={size.ToString()} min={MinCoords.ToString()} max={Max.ToString()}");
+                            throw new Exception($"Octree Failure: count={OctreeRoots.Length} z={CubeCountZ} y={CubeCountY} x={CubeCountX} cube={cubeSize} size={size} min={MinCoords} max={Max}");
                         }
                         OctreeRoots[index++] = new Octree(triangledict, cubePosition, cubeSize, MaxTrianglesPerCube, 1048576, MinCubeWidth, cubeBlow, 10);
                         bgw?.ReportProgress((int)GetPercentOf(index, OctreeRoots.Length), 1);
@@ -164,7 +160,7 @@ namespace Hack.io.KCL
 
         public void Save(string file, BackgroundWorker bgw = null)
         {
-            FileStream FS = new FileStream(file, FileMode.Create);
+            FileStream FS = new(file, FileMode.Create);
             Write(FS, bgw);
             FS.Close();
             FileName = file;
@@ -172,7 +168,7 @@ namespace Hack.io.KCL
         
         private void Read(Stream KCLFile, BackgroundWorker bgw)
         {
-            int MaxItemsForPogress = 0;
+            int MaxItemsForPogress;
             bgw?.ReportProgress(0, 0);
             long FileStart = KCLFile.Position;
             //Header - There's no magic so we'll just have to hope the user inputted a real KCL file...
@@ -180,7 +176,7 @@ namespace Hack.io.KCL
             int NormalsOffset = BitConverter.ToInt32(KCLFile.ReadReverse(0, 4), 0);
             int TrianglesOffset = BitConverter.ToInt32(KCLFile.ReadReverse(0, 4), 0)+0x10; //Why...?
             int OctreeOffset = BitConverter.ToInt32(KCLFile.ReadReverse(0, 4), 0);
-            float Thickness = BitConverter.ToSingle(KCLFile.ReadReverse(0, 4), 0);
+            _ = BitConverter.ToSingle(KCLFile.ReadReverse(0, 4), 0);
             MinCoords = new Vector3(BitConverter.ToSingle(KCLFile.ReadReverse(0, 4), 0), BitConverter.ToSingle(KCLFile.ReadReverse(0, 4), 0), BitConverter.ToSingle(KCLFile.ReadReverse(0, 4), 0));
             MaskX = BitConverter.ToUInt32(KCLFile.ReadReverse(0, 4), 0);
             MaskY = BitConverter.ToUInt32(KCLFile.ReadReverse(0, 4), 0);
@@ -237,7 +233,7 @@ namespace Hack.io.KCL
         private void Write(Stream KCLFile, BackgroundWorker bgw)
         {
             int OctreeNodeCount = GetNodeCount(OctreeRoots);
-            Queue<Octree[]> queuedNodes = new Queue<Octree[]>();
+            Queue<Octree[]> queuedNodes = new();
             Dictionary<ushort[], int> indexPool = CreateIndexBuffer(queuedNodes);
 
             int MaxItemsForPogress = Positions.Count + Normals.Count + Triangles.Count + OctreeNodeCount;
@@ -330,7 +326,7 @@ namespace Hack.io.KCL
             bgw?.ReportProgress(100, 2);
         }
 
-        private int IndexOfVertex(Vector3 value, List<Vector3> valueList, Dictionary<string, int> lookupTable)
+        private static int IndexOfVertex(Vector3 value, List<Vector3> valueList, Dictionary<string, int> lookupTable)
         {
             //Correct all -0's... no idea why they appear
             //if (value.X == -0)
@@ -383,7 +379,7 @@ namespace Hack.io.KCL
         //Create an index buffer to find matching index lists
         private Dictionary<ushort[], int> CreateIndexBuffer(Queue<Octree[]> queuedNodes)
         {
-            Dictionary<ushort[], int> indexPool = new Dictionary<ushort[], int>(new IndexEqualityComparer());
+            Dictionary<ushort[], int> indexPool = new(new IndexEqualityComparer());
             int offset = 0;
             queuedNodes.Enqueue(OctreeRoots);
             int index = 0;
@@ -410,7 +406,7 @@ namespace Hack.io.KCL
                 }
             }
             //Empty values are last in the buffer using the last terminator
-            indexPool.Add(new ushort[0], offset - sizeof(ushort));
+            indexPool.Add(Array.Empty<ushort>(), offset - sizeof(ushort));
             return indexPool;
         }
 
@@ -535,7 +531,7 @@ namespace Hack.io.KCL
                 Vector3 newPosition = cubeCenter - new Vector3(newsize / 2f, newsize / 2f, newsize / 2f);
 
                 // Go through all triangles and remember them if they overlap with the region of this cube.
-                Dictionary<ushort, Triangle> containedTriangles = new Dictionary<ushort, Triangle>();
+                Dictionary<ushort, Triangle> containedTriangles = new();
                 foreach (KeyValuePair<ushort, Triangle> triangle in triangles)
                 {
                     if (TriangleCubeOverlap(triangle.Value, newPosition, newsize))
@@ -546,7 +542,7 @@ namespace Hack.io.KCL
 
                 float halfWidth = cubeSize / 2f;
 
-                bool isTriangleList = cubeSize <= maxCubeSize && containedTriangles.Count <= maxTrianglesInCube || cubeSize <= minCubeSize || depth > maxDepth;
+                _ = cubeSize <= maxCubeSize && containedTriangles.Count <= maxTrianglesInCube || cubeSize <= minCubeSize || depth > maxDepth;
 
                 if (containedTriangles.Count > maxTrianglesInCube && halfWidth >= minCubeSize)
                 {
@@ -820,7 +816,7 @@ namespace Hack.io.KCL
                         continue;
 
                     BCSVEntry entry = x[i];
-                    PaEntry newentry = new PaEntry
+                    PaEntry newentry = new()
                     {
                         Data = entry.Data
                     };
@@ -830,13 +826,13 @@ namespace Hack.io.KCL
 
             public static BCSV.BCSV CreateBCSV(WavefrontObj obj)
             {
-                BCSV.BCSV bcsv = new BCSV.BCSV();
+                BCSV.BCSV bcsv = new();
 
-                BCSVField Cam = new BCSVField(CAMERA_ID, DataTypes.INT32, CAMERA_ID_MASK, CAMERA_ID_SHIFT, false);
-                BCSVField Sound = new BCSVField(SOUND_CODE, DataTypes.INT32, SOUND_CODE_MASK, SOUND_CODE_SHIFT, false);
-                BCSVField Floor = new BCSVField(FLOOR_CODE, DataTypes.INT32, FLOOR_CODE_MASK, FLOOR_CODE_SHIFT, false);
-                BCSVField Wall = new BCSVField(WALL_CODE, DataTypes.INT32, WALL_CODE_MASK, WALL_CODE_SHIFT, false);
-                BCSVField CamCol = new BCSVField(CAMERA_THROUGH, DataTypes.INT32, CAMERA_THROUGH_MASK, CAMERA_THROUGH_SHIFT, false);
+                BCSVField Cam = new(CAMERA_ID, DataTypes.INT32, CAMERA_ID_MASK, CAMERA_ID_SHIFT, false);
+                BCSVField Sound = new(SOUND_CODE, DataTypes.INT32, SOUND_CODE_MASK, SOUND_CODE_SHIFT, false);
+                BCSVField Floor = new(FLOOR_CODE, DataTypes.INT32, FLOOR_CODE_MASK, FLOOR_CODE_SHIFT, false);
+                BCSVField Wall = new(WALL_CODE, DataTypes.INT32, WALL_CODE_MASK, WALL_CODE_SHIFT, false);
+                BCSVField CamCol = new(CAMERA_THROUGH, DataTypes.INT32, CAMERA_THROUGH_MASK, CAMERA_THROUGH_SHIFT, false);
 
                 bcsv.Add(Cam, Sound, Floor, Wall, CamCol);
 
@@ -852,29 +848,29 @@ namespace Hack.io.KCL
 
     public class GeometryOverflowException : Exception
     {
-        public GeometryOverflowException(int count, int max, string item = "Triangles") : base($"Too Many {item}! The Max {item} count is {max} (0x{max.ToString("X4")}). You have {count - max} {item.ToLower()} too many.") { }
+        public GeometryOverflowException(int count, int max, string item = "Triangles") : base($"Too Many {item}! The Max {item} count is {max} (0x{max:X4}). You have {count - max} {item.ToLower()} too many.") { }
     }
 
     public class WavefrontObj : List<Triangle>
     {
-        public List<string> GroupNames = new List<string>();
+        public List<string> GroupNames = new();
         public WavefrontObj() : base() { }
 
         public static WavefrontObj OpenWavefront(string OBJFile)
         {
-            List<Vector3> Verticies = new List<Vector3>();
-            Dictionary<string, int> GroupTable = new Dictionary<string, int>();
+            List<Vector3> Verticies = new();
+            Dictionary<string, int> GroupTable = new();
             string[] Lines = File.ReadAllLines(OBJFile);
             string GroupName = null;
             int GroupID = 0;
-            WavefrontObj Triangles = new WavefrontObj();
+            WavefrontObj Triangles = new();
 
             for (int i = 0; i < Lines.Length; i++)
             {
                 if (string.IsNullOrWhiteSpace(Lines[i]) || Lines[i].StartsWith("#"))
                     continue;
 
-                string[] args = Lines[i].Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+                string[] args = Lines[i].Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
 
                 if (args[0].Equals("usemtl"))
                 {
@@ -914,16 +910,16 @@ namespace Hack.io.KCL
 
         public static WavefrontObj CreateWavefront(KCL kcl, BCSV.BCSV CollisionCodes = null)
         {
-            WavefrontObj Triangles = new WavefrontObj();
+            WavefrontObj Triangles = new();
             int LastGroup = -1;
-            Dictionary<int, string> Groups = new Dictionary<int, string>();
+            Dictionary<int, string> Groups = new();
             for (int i = 0; i < kcl.Triangles.Count; i++)
             {
                 Triangles.Add(kcl.GetTriangle(kcl.Triangles[i]));
 
-                if (Triangles[Triangles.Count-1].GroupIndex != LastGroup)
+                if (Triangles[^1].GroupIndex != LastGroup)
                 {
-                    LastGroup = Triangles[Triangles.Count - 1].GroupIndex;
+                    LastGroup = Triangles[^1].GroupIndex;
 
                     if (CollisionCodes is null)
                     {
@@ -962,12 +958,12 @@ namespace Hack.io.KCL
             bgw?.ReportProgress(0, 0);
             Version version = Assembly.GetEntryAssembly().GetName().Version;
             string result =
-$@"#KCL dumped with Hack.io.KCL version {version.ToString()}
+$@"#KCL dumped with Hack.io.KCL version {version}
 #https://github.com/SuperHackio/Hack.io
 o {new FileInfo(OBJFile).Name}
 ";
-            List<string> Verts = new List<string>();
-            List<string> Norms = new List<string>();
+            List<string> Verts = new();
+            List<string> Norms = new();
             int Counter = (obj.Count * 3) + obj.Count;
             for (int i = 0; i < obj.Count; i++)
             {
@@ -1035,12 +1031,14 @@ o {new FileInfo(OBJFile).Name}
     internal class VertexWelder
     {
         // Three randomly chosen large primes. Just like the good 'ol days
-        const uint MAGIC_X = 0x8DA6B343;
-        const uint MAGIC_Y = 0xD8163841;
-        const uint MAGIC_Z = 0x61B40079;
+        public const uint MAGIC_X = 0x8DA6B343;
+        public const uint MAGIC_Y = 0xD8163841;
+        public const uint MAGIC_Z = 0x61B40079;
+#pragma warning disable IDE0052 // Remove unread private members
         private readonly float Threshold, CellWidth;
-        //public List<List<int>> Buckets = new List<List<int>>();
-        public List<Vector3> Verticies = new List<Vector3>();
+#pragma warning restore IDE0052 // Remove unread private members
+                               //public List<List<int>> Buckets = new List<List<int>>();
+        public List<Vector3> Verticies = new();
 
         public VertexWelder(float threshold)
         {
@@ -1109,19 +1107,14 @@ o {new FileInfo(OBJFile).Name}
         {
             get
             {
-                switch (index)
+                return index switch
                 {
-                    case 0:
-                        return Vertex1;
-                    case 1:
-                        return Vertex2;
-                    case 2:
-                        return Vertex3;
-                    case 3:
-                        return Normal;
-                    default:
-                        return Vector3.Zero;
-                }
+                    0 => Vertex1,
+                    1 => Vertex2,
+                    2 => Vertex3,
+                    3 => Normal,
+                    _ => Vector3.Zero,
+                };
             }
         }
 

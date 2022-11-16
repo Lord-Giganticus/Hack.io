@@ -1,10 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Hack.io.J3D.JUtility;
-using System.Drawing;
 
 //Heavily based on the SuperBMD Library.
 namespace Hack.io.BMD
@@ -26,7 +22,7 @@ namespace Hack.io.BMD
         public BMD() { }
         public BMD(string Filename)
         {
-            FileStream FS = new FileStream(Filename, FileMode.Open);
+            FileStream FS = new(Filename, FileMode.Open);
             Read(FS);
             FS.Close();
             FileName = Filename;
@@ -35,7 +31,7 @@ namespace Hack.io.BMD
 
         public static bool CheckFile(string Filename)
         {
-            FileStream FS = new FileStream(Filename, FileMode.Open);
+            FileStream FS = new(Filename, FileMode.Open);
             bool result = FS.ReadString(8).Equals(Magic);
             FS.Close();
             return result;
@@ -44,7 +40,7 @@ namespace Hack.io.BMD
 
         public virtual void Save(string Filename)
         {
-            FileStream FS = new FileStream(Filename, FileMode.Create);
+            FileStream FS = new(Filename, FileMode.Create);
             Write(FS);
             FS.Close();
             FileName = Filename;
@@ -134,11 +130,11 @@ namespace Hack.io.BMD
         }
         public enum GXDataType
         {
-            Unsigned8, RGB565 = 0x0,
-            Signed8, RGB8 = 0x1,
-            Unsigned16, RGBX8 = 0x2,
-            Signed16, RGBA4 = 0x3,
-            Float32, RGBA6 = 0x4,
+            RGB565 = 0x0,
+            RGB8 = 0x1,
+            RGBX8 = 0x2,
+            RGBA4 = 0x3,
+            RGBA6 = 0x4,
             RGBA8 = 0x5
         }
         public enum GXComponentCount
@@ -146,14 +142,14 @@ namespace Hack.io.BMD
             Position_XY = 0,
             Position_XYZ,
 
-            Normal_XYZ = 0,
+            Normal_XYZ = 2,
             Normal_NBT,
             Normal_NBT3,
 
-            Color_RGB = 0,
+            Color_RGB = 5,
             Color_RGBA,
 
-            TexCoord_S = 0,
+            TexCoord_S = 7,
             TexCoord_ST
         }
         public enum Vtx1OffsetIndex
@@ -213,56 +209,40 @@ namespace Hack.io.BMD
         }
         public static OpenTK.Graphics.OpenGL.PrimitiveType FromGXToOpenTK(GXPrimitiveType Type)
         {
-            switch (Type)
+            return Type switch
             {
-                case GXPrimitiveType.Points:
-                    return OpenTK.Graphics.OpenGL.PrimitiveType.Points;
-                case GXPrimitiveType.Lines:
-                    return OpenTK.Graphics.OpenGL.PrimitiveType.Lines;
-                case GXPrimitiveType.LineStrip:
-                    return OpenTK.Graphics.OpenGL.PrimitiveType.LineStrip;
-                case GXPrimitiveType.Triangles:
-                    return OpenTK.Graphics.OpenGL.PrimitiveType.Triangles;
-                case GXPrimitiveType.TriangleStrip:
-                    return OpenTK.Graphics.OpenGL.PrimitiveType.TriangleStrip;
-                case GXPrimitiveType.TriangleFan:
-                    return OpenTK.Graphics.OpenGL.PrimitiveType.TriangleFan;
-                case GXPrimitiveType.Quads:
-                    return OpenTK.Graphics.OpenGL.PrimitiveType.Quads;
-            }
-            throw new Exception("Bruh moment!!");
+                GXPrimitiveType.Points => OpenTK.Graphics.OpenGL.PrimitiveType.Points,
+                GXPrimitiveType.Lines => OpenTK.Graphics.OpenGL.PrimitiveType.Lines,
+                GXPrimitiveType.LineStrip => OpenTK.Graphics.OpenGL.PrimitiveType.LineStrip,
+                GXPrimitiveType.Triangles => OpenTK.Graphics.OpenGL.PrimitiveType.Triangles,
+                GXPrimitiveType.TriangleStrip => OpenTK.Graphics.OpenGL.PrimitiveType.TriangleStrip,
+                GXPrimitiveType.TriangleFan => OpenTK.Graphics.OpenGL.PrimitiveType.TriangleFan,
+                GXPrimitiveType.Quads => OpenTK.Graphics.OpenGL.PrimitiveType.Quads,
+                _ => throw new Exception("Bruh moment!!"),
+            };
         }
         public static OpenTK.Graphics.OpenGL.TextureWrapMode FromGXToOpenTK(GXWrapMode Type)
         {
-            switch (Type)
+            return Type switch
             {
-                case GXWrapMode.CLAMP:
-                    return OpenTK.Graphics.OpenGL.TextureWrapMode.Clamp;
-                case GXWrapMode.REPEAT:
-                    return OpenTK.Graphics.OpenGL.TextureWrapMode.Repeat;
-                case GXWrapMode.MIRRORREAPEAT:
-                    return OpenTK.Graphics.OpenGL.TextureWrapMode.MirroredRepeat;
-            }
-            throw new Exception("Bruh moment!!");
+                GXWrapMode.CLAMP => OpenTK.Graphics.OpenGL.TextureWrapMode.Clamp,
+                GXWrapMode.REPEAT => OpenTK.Graphics.OpenGL.TextureWrapMode.Repeat,
+                GXWrapMode.MIRRORREAPEAT => OpenTK.Graphics.OpenGL.TextureWrapMode.MirroredRepeat,
+                _ => throw new Exception("Bruh moment!!"),
+            };
         }
         public static OpenTK.Graphics.OpenGL.TextureMinFilter FromGXToOpenTK_Min(GXFilterMode Type)
         {
-            switch (Type)
+            return Type switch
             {
-                case GXFilterMode.Nearest:
-                    return OpenTK.Graphics.OpenGL.TextureMinFilter.Nearest;
-                case GXFilterMode.Linear:
-                    return OpenTK.Graphics.OpenGL.TextureMinFilter.Linear;
-                case GXFilterMode.NearestMipmapNearest:
-                    return OpenTK.Graphics.OpenGL.TextureMinFilter.NearestMipmapNearest;
-                case GXFilterMode.NearestMipmapLinear:
-                    return OpenTK.Graphics.OpenGL.TextureMinFilter.NearestMipmapLinear;
-                case GXFilterMode.LinearMipmapNearest:
-                    return OpenTK.Graphics.OpenGL.TextureMinFilter.LinearMipmapNearest;
-                case GXFilterMode.LinearMipmapLinear:
-                    return OpenTK.Graphics.OpenGL.TextureMinFilter.LinearMipmapLinear;
-            }
-            throw new Exception("Bruh moment!!");
+                GXFilterMode.Nearest => OpenTK.Graphics.OpenGL.TextureMinFilter.Nearest,
+                GXFilterMode.Linear => OpenTK.Graphics.OpenGL.TextureMinFilter.Linear,
+                GXFilterMode.NearestMipmapNearest => OpenTK.Graphics.OpenGL.TextureMinFilter.NearestMipmapNearest,
+                GXFilterMode.NearestMipmapLinear => OpenTK.Graphics.OpenGL.TextureMinFilter.NearestMipmapLinear,
+                GXFilterMode.LinearMipmapNearest => OpenTK.Graphics.OpenGL.TextureMinFilter.LinearMipmapNearest,
+                GXFilterMode.LinearMipmapLinear => OpenTK.Graphics.OpenGL.TextureMinFilter.LinearMipmapLinear,
+                _ => throw new Exception("Bruh moment!!"),
+            };
         }
         public static OpenTK.Graphics.OpenGL.TextureMagFilter FromGXToOpenTK_Mag(GXFilterMode Type)
         {
@@ -282,18 +262,14 @@ namespace Hack.io.BMD
         }
         public static OpenTK.Graphics.OpenGL.CullFaceMode? FromGXToOpenTK(MAT3.CullMode Type)
         {
-            switch (Type)
+            return Type switch
             {
-                case MAT3.CullMode.None:
-                    return null;
-                case MAT3.CullMode.Front:
-                    return OpenTK.Graphics.OpenGL.CullFaceMode.Back;
-                case MAT3.CullMode.Back:
-                    return OpenTK.Graphics.OpenGL.CullFaceMode.Front;
-                case MAT3.CullMode.All:
-                    return OpenTK.Graphics.OpenGL.CullFaceMode.FrontAndBack;
-            }
-            throw new Exception("Bruh moment!!");
+                MAT3.CullMode.None => null,
+                MAT3.CullMode.Front => (OpenTK.Graphics.OpenGL.CullFaceMode?)OpenTK.Graphics.OpenGL.CullFaceMode.Back,
+                MAT3.CullMode.Back => (OpenTK.Graphics.OpenGL.CullFaceMode?)OpenTK.Graphics.OpenGL.CullFaceMode.Front,
+                MAT3.CullMode.All => (OpenTK.Graphics.OpenGL.CullFaceMode?)OpenTK.Graphics.OpenGL.CullFaceMode.FrontAndBack,
+                _ => throw new Exception("Bruh moment!!"),
+            };
         }
         public static OpenTK.Graphics.OpenGL.BlendingFactor FromGXToOpenTK(MAT3.Material.BlendMode.BlendModeControl Factor)
         {
@@ -323,31 +299,21 @@ namespace Hack.io.BMD
         }
         public static OpenTK.Graphics.OpenGL.PixelInternalFormat FromGXToOpenTK_InternalFormat(GXImageFormat imageformat)
         {
-            switch (imageformat)
+            return imageformat switch
             {
-                case GXImageFormat.I4:
-                case GXImageFormat.I8:
-                    return OpenTK.Graphics.OpenGL.PixelInternalFormat.Intensity;
-                case GXImageFormat.IA4:
-                case GXImageFormat.IA8:
-                    return OpenTK.Graphics.OpenGL.PixelInternalFormat.Luminance8Alpha8;
-                default:
-                    return OpenTK.Graphics.OpenGL.PixelInternalFormat.Four;
-            }
+                GXImageFormat.I4 or GXImageFormat.I8 => OpenTK.Graphics.OpenGL.PixelInternalFormat.Intensity,
+                GXImageFormat.IA4 or GXImageFormat.IA8 => OpenTK.Graphics.OpenGL.PixelInternalFormat.Luminance8Alpha8,
+                _ => OpenTK.Graphics.OpenGL.PixelInternalFormat.Four,
+            };
         }
         public static OpenTK.Graphics.OpenGL.PixelFormat FromGXToOpenTK_PixelFormat(GXImageFormat imageformat)
         {
-            switch (imageformat)
+            return imageformat switch
             {
-                case GXImageFormat.I4:
-                case GXImageFormat.I8:
-                    return OpenTK.Graphics.OpenGL.PixelFormat.Luminance;
-                case GXImageFormat.IA4:
-                case GXImageFormat.IA8:
-                    return OpenTK.Graphics.OpenGL.PixelFormat.LuminanceAlpha;
-                default:
-                    return OpenTK.Graphics.OpenGL.PixelFormat.Bgra;
-            }
+                GXImageFormat.I4 or GXImageFormat.I8 => OpenTK.Graphics.OpenGL.PixelFormat.Luminance,
+                GXImageFormat.IA4 or GXImageFormat.IA8 => OpenTK.Graphics.OpenGL.PixelFormat.LuminanceAlpha,
+                _ => OpenTK.Graphics.OpenGL.PixelFormat.Bgra,
+            };
         }
 
         //=====================================================================
@@ -356,7 +322,7 @@ namespace Hack.io.BMD
         /// Cast a RARCFile to a BMD
         /// </summary>
         /// <param name="x"></param>
-        public static implicit operator BMD(RARC.RARC.File x) => new BMD((MemoryStream)x) { FileName = x.Name };
+        public static implicit operator BMD(RARC.RARC.File x) => new((MemoryStream)x) { FileName = x.Name };
 
         //=====================================================================
     }

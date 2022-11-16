@@ -31,7 +31,7 @@ namespace Hack.io.BMD
                 int internTableOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
                 int nameTableOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
 
-                List<string> names = new List<string>();
+                List<string> names = new();
 
                 BMD.Seek(ChunkStart + nameTableOffset, SeekOrigin.Begin);
 
@@ -51,7 +51,7 @@ namespace Hack.io.BMD
                 }
 
                 int highestRemap = 0;
-                List<int> remapTable = new List<int>();
+                List<int> remapTable = new();
                 BMD.Seek(ChunkStart + internTableOffset, SeekOrigin.Begin);
                 for (int i = 0; i < jointCount; i++)
                 {
@@ -62,7 +62,7 @@ namespace Hack.io.BMD
                         highestRemap = test;
                 }
 
-                List<JNT1.Bone> tempList = new List<JNT1.Bone>();
+                List<JNT1.Bone> tempList = new();
                 BMD.Seek(ChunkStart + jointDataOffset, SeekOrigin.Begin);
                 for (int i = 0; i <= highestRemap; i++)
                 {
@@ -93,7 +93,7 @@ namespace Hack.io.BMD
                 writer.Write(new byte[4] { 0xDD, 0xDD, 0xDD, 0xDD }, 0, 4); // Placeholder for remap data offset
                 writer.Write(new byte[4] { 0xDD, 0xDD, 0xDD, 0xDD }, 0, 4); // Placeholder for name table offset
 
-                List<string> names = new List<string>();
+                List<string> names = new();
                 foreach (JNT1.Bone bone in FlatSkeleton)
                 {
                     byte[] BoneData = bone.ToBytes();
@@ -132,7 +132,7 @@ namespace Hack.io.BMD
 
             public void InitBoneFamilies(INF1 Scenegraph)
             {
-                List<JNT1.Bone> processedJoints = new List<JNT1.Bone>();
+                List<JNT1.Bone> processedJoints = new();
                 IterateHierarchyForSkeletonRecursive(Scenegraph.Root, processedJoints, -1);
             }
             private void IterateHierarchyForSkeletonRecursive(INF1.Node curNode, List<JNT1.Bone> processedJoints, int parentIndex)
@@ -196,8 +196,8 @@ namespace Hack.io.BMD
                 public Matrix4 TransformationMatrix => SRTToMatrix();
                 public SHP1.BoundingVolume Bounds { get; private set; }
 
-                private short m_MatrixType;
-                private bool InheritParentScale;
+                private readonly short m_MatrixType;
+                private readonly bool InheritParentScale;
                 private Vector3 m_Scale;
                 public Vector3 Scale => m_Scale;
                 private Vector3 m_Rotation;
@@ -257,15 +257,15 @@ namespace Hack.io.BMD
 
                 public byte[] ToBytes()
                 {
-                    List<byte> outList = new List<byte>();
+                    List<byte> outList = new();
 
-                    using (MemoryStream writer = new MemoryStream())
+                    using (MemoryStream writer = new())
                     {
                         writer.WriteReverse(BitConverter.GetBytes(m_MatrixType), 0, 2);
                         writer.WriteByte((byte)(InheritParentScale ? 0x00 : 0x01));
                         writer.WriteByte(0xFF);
 
-                        Vector3 Euler = new Vector3();
+                        Vector3 Euler = new();
 
                         float ysqr = m_Rotation.Y * m_Rotation.Y;
                         //TODO: Fix this! It expects a Quaternion m_Rotation.W * m_Rotation.X...
@@ -285,9 +285,9 @@ namespace Hack.io.BMD
 
                         Euler.Z = (float)Math.Atan2(t3, t4);
 
-                        Euler.X = Euler.X * (float)(180.0 / Math.PI);
-                        Euler.Y = Euler.Y * (float)(180.0 / Math.PI);
-                        Euler.Z = Euler.Z * (float)(180.0 / Math.PI);
+                        Euler.X *= (float)(180.0 / Math.PI);
+                        Euler.Y *= (float)(180.0 / Math.PI);
+                        Euler.Z *= (float)(180.0 / Math.PI);
 
                         short[] compressRot = new short[3];
 

@@ -43,7 +43,7 @@ namespace Hack.io.BTP
         /// <param name="filename"></param>
         public BTP(string filename)
         {
-            FileStream BTPFile = new FileStream(filename, FileMode.Open);
+            FileStream BTPFile = new(filename, FileMode.Open);
             Read(BTPFile);
             BTPFile.Close();
             Name = filename;
@@ -69,7 +69,7 @@ namespace Hack.io.BTP
             else if (Filename != null)
                 Name = Filename;
 
-            FileStream BTPFile = new FileStream(Filename, FileMode.Create);
+            FileStream BTPFile = new(Filename, FileMode.Create);
 
             Write(BTPFile);
 
@@ -81,7 +81,7 @@ namespace Hack.io.BTP
         /// <returns></returns>
         public MemoryStream Save()
         {
-            MemoryStream MS = new MemoryStream();
+            MemoryStream MS = new();
             Write(MS);
             return MS;
         }
@@ -95,8 +95,7 @@ namespace Hack.io.BTP
         {
             if (BTPFile.ReadString(8) != Magic)
                 throw new Exception($"Invalid Identifier. Expected \"{Magic}\"");
-
-            uint Filesize = BitConverter.ToUInt32(BTPFile.ReadReverse(0, 4), 0);
+            _ = BitConverter.ToUInt32(BTPFile.ReadReverse(0, 4), 0);
             uint SectionCount = BitConverter.ToUInt32(BTPFile.ReadReverse(0, 4), 0);
             if (SectionCount != 1)
                 throw new Exception(SectionCount > 1 ? "More than 1 section is in this BTP! Please send it to Super Hackio for investigation" : "There are no sections in this BTP!");
@@ -105,18 +104,17 @@ namespace Hack.io.BTP
             uint TPT1Start = (uint)BTPFile.Position;
             if (BTPFile.ReadString(4) != Magic2)
                 throw new Exception($"Invalid Identifier. Expected \"{Magic2}\"");
-
-            uint TPT1Length = BitConverter.ToUInt32(BTPFile.ReadReverse(0, 4), 0);
+            _ = BitConverter.ToUInt32(BTPFile.ReadReverse(0, 4), 0);
             Loop = (LoopMode)BTPFile.ReadByte();
             BTPFile.ReadByte();
             Time = BitConverter.ToUInt16(BTPFile.ReadReverse(0, 2), 0);
-
-            ushort MaterialAnimTableCount = BitConverter.ToUInt16(BTPFile.ReadReverse(0, 2), 0), TexIDTableCount = BitConverter.ToUInt16(BTPFile.ReadReverse(0, 2), 0);
+            ushort MaterialAnimTableCount = BitConverter.ToUInt16(BTPFile.ReadReverse(0, 2), 0);
+            _ = BitConverter.ToUInt16(BTPFile.ReadReverse(0, 2), 0);
             uint MaterialAnimTableOffset = BitConverter.ToUInt32(BTPFile.ReadReverse(0, 4), 0) + TPT1Start, TexIDTableOffset = BitConverter.ToUInt32(BTPFile.ReadReverse(0, 4), 0) + TPT1Start,
                 RemapTableOffset = BitConverter.ToUInt32(BTPFile.ReadReverse(0, 4), 0) + TPT1Start, NameSTOffset = BitConverter.ToUInt32(BTPFile.ReadReverse(0, 4), 0) + TPT1Start;
 
             BTPFile.Seek(NameSTOffset, SeekOrigin.Begin);
-            List<KeyValuePair<ushort, string>> MaterialNames = new List<KeyValuePair<ushort, string>>();
+            List<KeyValuePair<ushort, string>> MaterialNames = new();
             ushort StringCount = BitConverter.ToUInt16(BTPFile.ReadReverse(0, 2), 0);
             BTPFile.Seek(2, SeekOrigin.Current);
             for (int i = 0; i < StringCount; i++)
@@ -129,14 +127,14 @@ namespace Hack.io.BTP
             }
 
             BTPFile.Seek(RemapTableOffset, SeekOrigin.Begin);
-            List<ushort> RemapTable = new List<ushort>();
+            List<ushort> RemapTable = new();
             for (int i = 0; i < MaterialAnimTableCount; i++)
                 RemapTable.Add(BitConverter.ToUInt16(BTPFile.ReadReverse(0, 2), 0));
 
             ushort TextureFrameCount, TextureFirstID;
             for (int i = 0; i < MaterialAnimTableCount; i++)
             {
-                Animation Anim = new Animation() { MaterialName = MaterialNames[i].Value, RemapIndex = RemapTable[i] };
+                Animation Anim = new() { MaterialName = MaterialNames[i].Value, RemapIndex = RemapTable[i] };
 
                 BTPFile.Seek(MaterialAnimTableOffset + (i * 0x08), SeekOrigin.Begin);
                 TextureFrameCount = BitConverter.ToUInt16(BTPFile.ReadReverse(0, 2), 0);
@@ -167,28 +165,25 @@ namespace Hack.io.BTP
             BTPFile.WriteReverse(BitConverter.GetBytes(Time), 0, 2);
 
             BTPFile.WriteReverse(BitConverter.GetBytes((ushort)TextureAnimations.Count), 0, 2);
-            List<ushort> FullTexIDList = new List<ushort>();
+            List<ushort> FullTexIDList = new();
             for (int i = 0; i < TextureAnimations.Count; i++)
-                FindMatch(ref FullTexIDList, TextureAnimations[i].TextureFrames);
+                BTP.FindMatch(ref FullTexIDList, TextureAnimations[i].TextureFrames);
             BTPFile.WriteReverse(BitConverter.GetBytes((ushort)FullTexIDList.Count), 0, 2);
-
-            long MatAnimTableOffsetPos = BTPFile.Position;
+            _ = BTPFile.Position;
             int offs = 0x20;
             BTPFile.WriteReverse(BitConverter.GetBytes(offs), 0, 4);
-
-            long TexIDTableOffsetPos = BTPFile.Position;
+            _ = BTPFile.Position;
             offs += TextureAnimations.Count * 8;
             BTPFile.WriteReverse(BitConverter.GetBytes(offs), 0, 4);
-
-            long RemapTableOffsetPos = BTPFile.Position;
+            _ = BTPFile.Position;
             offs += FullTexIDList.Count * 2;
             #region Padding
             while (offs % 4 != 0)
                 offs++;
             #endregion
             BTPFile.WriteReverse(BitConverter.GetBytes(offs), 0, 4);
-
-            long NameSTOffsetPos = BTPFile.Position;
+            
+            _ = BTPFile.Position;
             offs += TextureAnimations.Count * 2;
             #region Padding
             while (offs % 4 != 0)
@@ -196,18 +191,18 @@ namespace Hack.io.BTP
             #endregion
             BTPFile.WriteReverse(BitConverter.GetBytes(offs), 0, 4);
 
-            List<byte> Remaps = new List<byte>();
+            List<byte> Remaps = new();
             string[] matnames = new string[TextureAnimations.Count];
             for (int i = 0; i < TextureAnimations.Count; i++)
             {
                 BTPFile.WriteReverse(BitConverter.GetBytes((ushort)TextureAnimations[i].TextureFrames.Count), 0, 2);
-                BTPFile.WriteReverse(BitConverter.GetBytes((ushort)FindMatch(ref FullTexIDList, TextureAnimations[i].TextureFrames)), 0, 2);
+                BTPFile.WriteReverse(BitConverter.GetBytes((ushort)BTP.FindMatch(ref FullTexIDList, TextureAnimations[i].TextureFrames)), 0, 2);
                 BTPFile.WriteByte(TextureAnimations[i].TexMapIndex);
                 BTPFile.WriteByte(0xFF);
                 BTPFile.WriteByte(0xFF);
                 BTPFile.WriteByte(0xFF);
                 byte[] temp = BitConverter.GetBytes(TextureAnimations[i].RemapIndex);
-                temp.Reverse();
+                Array.Reverse(temp);
                 Remaps.AddRange(temp);
                 matnames[i] = TextureAnimations[i].MaterialName;
             }
@@ -232,7 +227,7 @@ namespace Hack.io.BTP
             BTPFile.WriteReverse(BitConverter.GetBytes((ushort)matnames.Length), 0, 2);
             BTPFile.Write(new byte[2] { 0xFF, 0xFF }, 0, 2);
             ushort stringofffset = (ushort)(4 + (4 * matnames.Length));
-            List<byte> bytestrings = new List<byte>();
+            List<byte> bytestrings = new();
             for (int i = 0; i < matnames.Length; i++)
             {
                 BTPFile.WriteReverse(BitConverter.GetBytes(StringToHash(matnames[i])), 0, 2);
@@ -306,7 +301,7 @@ namespace Hack.io.BTP
             return (ushort)Hash;
         }
 
-        private short FindMatch(ref List<ushort> FullList, List<ushort> currentSequence)
+        private static short FindMatch(ref List<ushort> FullList, List<ushort> currentSequence)
         {
             if (!FullList.ContainsSubsequence(currentSequence))
             {

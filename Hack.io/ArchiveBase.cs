@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Hack.io.Util
 {
@@ -50,7 +49,7 @@ namespace Hack.io.Util
         public void Save(string filepath)
         {
             FileName = filepath;
-            FileStream fs = new FileStream(filepath, FileMode.Create);
+            FileStream fs = new(filepath, FileMode.Create);
             Save(fs);
             fs.Close();
         }
@@ -84,13 +83,13 @@ namespace Hack.io.Util
                 if (Root is null || Path is null)
                     return null;
                 if (Path.StartsWith(Root.Name + "/"))
-                    Path = Path.Substring(Root.Name.Length + 1);
+                    Path = Path[(Root.Name.Length + 1)..];
                 return Root[Path];
             }
             set
             {
                 if (!(value is ArchiveFile || value is ArchiveDirectory || value is null))
-                    throw new Exception($"Invalid object type of {value.GetType().ToString()}");
+                    throw new Exception($"Invalid object type of {value.GetType()}");
 
                 if (Root is null)
                 {
@@ -99,7 +98,7 @@ namespace Hack.io.Util
                 }
 
                 if (Path.StartsWith(Root.Name + "/"))
-                    Path = Path.Substring(Root.Name.Length + 1);
+                    Path = Path[(Root.Name.Length + 1)..];
 
                 OnItemSet(value, Path);
                 Root[Path] = value;
@@ -123,7 +122,7 @@ namespace Hack.io.Util
         public bool ItemExists(string Path, bool IgnoreCase = false)
         {
             if (Path.StartsWith(Root.Name + "/"))
-                Path = Path.Substring(Root.Name.Length + 1);
+                Path = Path[(Root.Name.Length + 1)..];
             return Root.ItemExists(Path, IgnoreCase);
         }
         /// <summary>
@@ -134,7 +133,7 @@ namespace Hack.io.Util
         public string GetItemKeyFromNoCase(string Path)
         {
             if (Path.ToLower().StartsWith(Root.Name.ToLower() + "/"))
-                Path = Path.Substring(Root.Name.Length + 1);
+                Path = Path[(Root.Name.Length + 1)..];
             return Root.GetItemKeyFromNoCase(Path, true);
         }
         /// <summary>
@@ -149,7 +148,7 @@ namespace Hack.io.Util
         public void MoveItem(string OriginalPath, string NewPath)
         {
             if (OriginalPath.StartsWith(Root.Name + "/"))
-                OriginalPath = OriginalPath.Substring(Root.Name.Length + 1);
+                OriginalPath = OriginalPath[(Root.Name.Length + 1)..];
             if (OriginalPath.Equals(NewPath))
                 return;
             if (ItemExists(NewPath))
@@ -158,7 +157,7 @@ namespace Hack.io.Util
 
             dynamic dest = this[OriginalPath];
             string[] split = NewPath.Split('/');
-            dest.Name = split[split.Length - 1];
+            dest.Name = split[^1];
             this[OriginalPath] = null;
             this[NewPath] = dest;
         }
@@ -204,21 +203,21 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <returns></returns>
-        protected virtual ArchiveDirectory NewDirectory() => new ArchiveDirectory();
+        protected virtual ArchiveDirectory NewDirectory() => new();
         /// <summary>
         /// 
         /// </summary>
         /// <param name="Owner"></param>
         /// <param name="parent"></param>
         /// <returns></returns>
-        protected virtual ArchiveDirectory NewDirectory(Archive Owner, ArchiveDirectory parent) => new ArchiveDirectory(Owner, parent);
+        protected virtual ArchiveDirectory NewDirectory(Archive Owner, ArchiveDirectory parent) => new(Owner, parent);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="Owner"></param>
         /// <returns></returns>
-        protected virtual ArchiveDirectory NewDirectory(string filename, Archive Owner) => new ArchiveDirectory(filename, Owner);
+        protected virtual ArchiveDirectory NewDirectory(string filename, Archive Owner) => new(filename, Owner);
 
     }
 
@@ -261,7 +260,7 @@ namespace Hack.io.Util
         /// <param name="Owner"></param>
         public ArchiveDirectory(string FolderPath, Archive Owner)
         {
-            DirectoryInfo DI = new DirectoryInfo(FolderPath);
+            DirectoryInfo DI = new(FolderPath);
             Name = DI.Name;
             CreateFromFolder(FolderPath);
             OwnerArchive = Owner;
@@ -300,12 +299,12 @@ namespace Hack.io.Util
                 string[] PathSplit = Path.Split('/');
                 if (!ItemKeyExists(PathSplit[0]))
                     return null;
-                return (PathSplit.Length > 1 && Items[PathSplit[0]] is ArchiveDirectory dir) ? dir[Path.Substring(PathSplit[0].Length + 1)] : Items[PathSplit[0]];
+                return (PathSplit.Length > 1 && Items[PathSplit[0]] is ArchiveDirectory dir) ? dir[Path[(PathSplit[0].Length + 1)..]] : Items[PathSplit[0]];
             }
             set
             {
                 string[] PathSplit = Path.Split('/');
-                if (!ItemKeyExists(PathSplit[0]) && !(value is null))
+                if (!ItemKeyExists(PathSplit[0]) && value is not null)
                 {
                     ((dynamic)value).Parent = this;
                     if (PathSplit.Length == 1)
@@ -325,7 +324,7 @@ namespace Hack.io.Util
                         ArchiveDirectory dir = NewDirectory(OwnerArchive, this);
                         dir.Name = PathSplit[0];
                         Items.Add(PathSplit[0], dir);
-                        ((ArchiveDirectory)Items[PathSplit[0]])[Path.Substring(PathSplit[0].Length + 1)] = value;
+                        ((ArchiveDirectory)Items[PathSplit[0]])[Path[(PathSplit[0].Length + 1)..]] = value;
                     }
                 }
                 else
@@ -351,7 +350,7 @@ namespace Hack.io.Util
                         }
                     }
                     else if (Items[PathSplit[0]] is ArchiveDirectory dir)
-                        dir[Path.Substring(PathSplit[0].Length + 1)] = value;
+                        dir[Path[(PathSplit[0].Length + 1)..]] = value;
                 }
             }
         }
@@ -365,7 +364,7 @@ namespace Hack.io.Util
         {
             string[] PathSplit = Path.Split('/');
             if (PathSplit.Length > 1 && ItemKeyExists(PathSplit[0]) && Items[PathSplit[0]] is ArchiveDirectory dir)
-                return dir.ItemExists(Path.Substring(PathSplit[0].Length + 1), IgnoreCase);
+                return dir.ItemExists(Path[(PathSplit[0].Length + 1)..], IgnoreCase);
             else if (PathSplit.Length > 1)
                 return false;
             else
@@ -402,7 +401,7 @@ namespace Hack.io.Util
                 if (result == null)
                     return null;
                 else
-                    result = ((ArchiveDirectory)Items[result]).GetItemKeyFromNoCase(Path.Substring(PathSplit[0].Length + 1), true);
+                    result = ((ArchiveDirectory)Items[result]).GetItemKeyFromNoCase(Path[(PathSplit[0].Length + 1)..], true);
                 return result == null ? null : (AttachRootName ? Name + "/" : "") + result;
             }
             else if (PathSplit.Length > 1)
@@ -438,7 +437,7 @@ namespace Hack.io.Util
             {
                 if (OwnerArchive != null)
                 {
-                    StringBuilder path = new StringBuilder();
+                    StringBuilder path = new();
                     GetFullPath(path);
                     return path.ToString();
                 }
@@ -491,7 +490,7 @@ namespace Hack.io.Util
         {
             if (NewItemOrder.Length != Items.Count)
                 throw new Exception("Missing Items that exist in this Directory, but not in the provided Item Order");
-            Dictionary<string, object> NewItems = new Dictionary<string, object>();
+            Dictionary<string, object> NewItems = new();
             for (int i = 0; i < NewItemOrder.Length; i++)
             {
                 if (!Items.ContainsKey(NewItemOrder[i]))
@@ -536,7 +535,7 @@ namespace Hack.io.Util
         /// <returns>List of Item Keys</returns>
         public List<string> FindItems(string Pattern, bool TopLevelOnly = false, bool IgnoreCase = false)
         {
-            List<string> results = new List<string>();
+            List<string> results = new();
             StringComparison sc = IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             RegexOptions ro = (IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None) | RegexOptions.Singleline;
             foreach (KeyValuePair<string, object> item in Items)
@@ -544,7 +543,7 @@ namespace Hack.io.Util
                 if (item.Value is ArchiveFile File)
                 {
                     //Performance Enhancement
-                    if ((Pattern.StartsWith("*") && File.Name.EndsWith(Pattern.Substring(1), sc)) || (Pattern.EndsWith("*") && File.Name.StartsWith(Pattern.Substring(Pattern.Length - 1), sc)))
+                    if ((Pattern.StartsWith("*") && File.Name.EndsWith(Pattern[1..], sc)) || (Pattern.EndsWith("*") && File.Name.StartsWith(Pattern[^1..], sc)))
                     {
                         goto Success;
                     }
@@ -580,7 +579,7 @@ namespace Hack.io.Util
             string[] Found = Directory.GetFiles(FolderPath, "*.*", SearchOption.TopDirectoryOnly);
             for (int i = 0; i < Found.Length; i++)
             {
-                ArchiveFile temp = new ArchiveFile(Found[i]);
+                ArchiveFile temp = new(Found[i]);
                 Items[temp.Name] = temp;
             }
 
@@ -595,21 +594,21 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <returns></returns>
-        protected virtual ArchiveDirectory NewDirectory() => new ArchiveDirectory();
+        protected virtual ArchiveDirectory NewDirectory() => new();
         /// <summary>
         /// 
         /// </summary>
         /// <param name="Owner"></param>
         /// <param name="parent"></param>
         /// <returns></returns>
-        protected virtual ArchiveDirectory NewDirectory(Archive Owner, ArchiveDirectory parent) => new ArchiveDirectory(Owner, parent);
+        protected virtual ArchiveDirectory NewDirectory(Archive Owner, ArchiveDirectory parent) => new(Owner, parent);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="Owner"></param>
         /// <returns></returns>
-        protected virtual ArchiveDirectory NewDirectory(string filename, Archive Owner) => new ArchiveDirectory(filename, Owner);
+        protected virtual ArchiveDirectory NewDirectory(string filename, Archive Owner) => new(filename, Owner);
     }
 
     /// <summary>
@@ -633,7 +632,7 @@ namespace Hack.io.Util
                 string[] parts = Name.Split('.');
                 if (parts.Length == 1)
                     return "";
-                return "." + parts[parts.Length - 1].ToLower();
+                return "." + parts[^1].ToLower();
             }
         }
         /// <summary>
@@ -707,17 +706,14 @@ namespace Hack.io.Util
         /// <returns></returns>
         public override int GetHashCode()
         {
-            var hashCode = -138733157;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Extension);
-            hashCode = hashCode * -1521134295 + EqualityComparer<byte[]>.Default.GetHashCode(FileData);
-            return hashCode;
+            return HashCode.Combine(Name, Extension, FileData);
         }
+
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => $"{Name} [0x{FileData.Length.ToString("X8")}]";
+        public override string ToString() => $"{Name} [0x{FileData.Length:X8}]";
 
         /// <summary>
         /// The full path of this file. Cannot be used if this file doesn't belong to a RARC object somehow
@@ -728,7 +724,7 @@ namespace Hack.io.Util
             {
                 if (Parent?.HasOwnerArchive ?? false)
                 {
-                    StringBuilder path = new StringBuilder();
+                    StringBuilder path = new();
                     GetFullPath(path);
                     return path.ToString();
                 }
@@ -760,6 +756,6 @@ namespace Hack.io.Util
         /// Cast a File to a MemoryStream
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator MemoryStream(ArchiveFile x) => new MemoryStream(x.FileData);
+        public static explicit operator MemoryStream(ArchiveFile x) => new(x.FileData);
     }
 }

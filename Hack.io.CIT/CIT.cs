@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Hack.io;
 
 namespace Hack.io.CIT
 {
@@ -35,7 +32,7 @@ namespace Hack.io.CIT
         /// <param name="file"></param>
         public CIT(string file)
         {
-            FileStream FS = new FileStream(file, FileMode.Open);
+            FileStream FS = new(file, FileMode.Open);
             Read(FS);
             FS.Close();
         }
@@ -50,7 +47,7 @@ namespace Hack.io.CIT
         /// <param name="file"></param>
         public void Save(string file)
         {
-            FileStream FS = new FileStream(file, FileMode.Create);
+            FileStream FS = new(file, FileMode.Create);
             Write(FS);
             FS.Close();
         }
@@ -67,7 +64,7 @@ namespace Hack.io.CIT
             if (!CITFile.ReadString(4).Equals(Magic))
                 throw new Exception($"Invalid Identifier. Expected \"{Magic}\"");
 
-            uint FileSize = BitConverter.ToUInt32(CITFile.ReadReverse(0, 4), 0);
+            _ = BitConverter.ToUInt32(CITFile.ReadReverse(0, 4), 0);
             ushort ChordCount = BitConverter.ToUInt16(CITFile.ReadReverse(0, 2), 0), ScaleCount = BitConverter.ToUInt16(CITFile.ReadReverse(0, 2), 0);
             int[] ChordPointers = new int[ChordCount], ScalePairPointers = new int[ScaleCount];
             for (int i = 0; i < ChordCount; i++)
@@ -86,9 +83,9 @@ namespace Hack.io.CIT
                 int OffsetA = BitConverter.ToInt32(CITFile.ReadReverse(0, 4), 0);
                 int OffsetB = BitConverter.ToInt32(CITFile.ReadReverse(0, 4), 0);
                 CITFile.Position = OffsetA;
-                Scale ScaleA = new Scale((Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte());
+                Scale ScaleA = new((Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte());
                 CITFile.Position = OffsetB;
-                Scale ScaleB = new Scale((Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte());
+                Scale ScaleB = new((Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte(), (Note)CITFile.ReadByte());
                 Scales.Add(new Tuple<Scale, Scale>(ScaleA, ScaleB));
                 CITFile.Position = PausePosition;
             }
@@ -102,7 +99,7 @@ namespace Hack.io.CIT
             CITFile.WriteReverse(BitConverter.GetBytes((ushort)Chords.Count), 0, 2);
             CITFile.WriteReverse(BitConverter.GetBytes((ushort)Scales.Count), 0, 2);
             int TableOffset = 0x10 + (Chords.Count * 4) + (Scales.Count * 4);
-            List<byte> ChordBytes = new List<byte>();
+            List<byte> ChordBytes = new();
             for (int i = 0; i < Chords.Count; i++)
             {
                 CITFile.WriteReverse(BitConverter.GetBytes(TableOffset), 0, 4);
@@ -116,7 +113,7 @@ namespace Hack.io.CIT
                 ChordBytes.Add((byte)Chords[i].Extension.Note3);
                 ChordBytes.Add((byte)Chords[i].Extension.Note4);
             }
-            List<byte> ScaleBytes = new List<byte>();
+            List<byte> ScaleBytes = new();
             for (int i = 0; i < Scales.Count; i++)
             {
                 CITFile.WriteReverse(BitConverter.GetBytes(TableOffset), 0, 4);
@@ -194,7 +191,7 @@ namespace Hack.io.CIT
             /// 
             /// </summary>
             /// <returns></returns>
-            public override string ToString() => $"RootNote: {RootNote.ToString().PadRight(2,' ')}, Triad: {Triad.Note1.ToString().PadRight(2, ' ')} {Triad.Note2.ToString().PadRight(2, ' ')} {Triad.Note3.ToString().PadRight(2, ' ')}, Extensions: {Extension.Note1.ToString().PadRight(2, ' ')} {Extension.Note2.ToString().PadRight(2, ' ')} {Extension.Note3.ToString().PadRight(2, ' ')} {Extension.Note4.ToString().PadRight(2, ' ')}";
+            public override string ToString() => $"RootNote: {RootNote,-2}, Triad: {Triad.Note1,-2} {Triad.Note2,-2} {Triad.Note3,-2}, Extensions: {Extension.Note1,-2} {Extension.Note2,-2} {Extension.Note3,-2} {Extension.Note4,-2}";
         }
         /// <summary>
         /// A Chord Triad used by CIT Files
@@ -349,12 +346,12 @@ namespace Hack.io.CIT
             /// Creates a copy of this Scale
             /// </summary>
             /// <returns></returns>
-            public Scale Copy() => new Scale(Note1, Note2, Note3, Note4, Note5, Note6, Note7, Note8, Note9, Note10, Note11, Note12);
+            public Scale Copy() => new(Note1, Note2, Note3, Note4, Note5, Note6, Note7, Note8, Note9, Note10, Note11, Note12);
             /// <summary>
             /// 
             /// </summary>
             /// <returns></returns>
-            public override string ToString() => $"Components: {Note1.ToString()} {Note2.ToString()} {Note3.ToString()} {Note4.ToString()} {Note5.ToString()} {Note6.ToString()} {Note7.ToString()} {Note8.ToString()} {Note9.ToString()} {Note10.ToString()} {Note11.ToString()} {Note12.ToString()}";
+            public override string ToString() => $"Components: {Note1} {Note2} {Note3} {Note4} {Note5} {Note6} {Note7} {Note8} {Note9} {Note10} {Note11} {Note12}";
             /// <summary>
             /// Compares this Scale to another object (Preferably another Scale object)
             /// </summary>
@@ -362,7 +359,7 @@ namespace Hack.io.CIT
             /// <returns></returns>
             public override bool Equals(object obj)
             {
-                if (!(obj is Scale))
+                if (obj is not Scale)
                 {
                     return false;
                 }
@@ -387,21 +384,22 @@ namespace Hack.io.CIT
             /// <returns></returns>
             public override int GetHashCode()
             {
-                var hashCode = -1148755155;
-                hashCode = hashCode * -1521134295 + Note1.GetHashCode();
-                hashCode = hashCode * -1521134295 + Note2.GetHashCode();
-                hashCode = hashCode * -1521134295 + Note3.GetHashCode();
-                hashCode = hashCode * -1521134295 + Note4.GetHashCode();
-                hashCode = hashCode * -1521134295 + Note5.GetHashCode();
-                hashCode = hashCode * -1521134295 + Note6.GetHashCode();
-                hashCode = hashCode * -1521134295 + Note7.GetHashCode();
-                hashCode = hashCode * -1521134295 + Note8.GetHashCode();
-                hashCode = hashCode * -1521134295 + Note9.GetHashCode();
-                hashCode = hashCode * -1521134295 + Note10.GetHashCode();
-                hashCode = hashCode * -1521134295 + Note11.GetHashCode();
-                hashCode = hashCode * -1521134295 + Note12.GetHashCode();
-                return hashCode;
+                HashCode hash = new();
+                hash.Add(Note1);
+                hash.Add(Note2);
+                hash.Add(Note3);
+                hash.Add(Note4);
+                hash.Add(Note5);
+                hash.Add(Note6);
+                hash.Add(Note7);
+                hash.Add(Note8);
+                hash.Add(Note9);
+                hash.Add(Note10);
+                hash.Add(Note11);
+                hash.Add(Note12);
+                return hash.ToHashCode();
             }
+
             /// <summary>
             /// 
             /// </summary>

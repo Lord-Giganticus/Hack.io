@@ -54,8 +54,8 @@ namespace Hack.io.BMD
                     BMD.Position += 0x03;
                     long curPos = BMD.Position;
 
-                    int attribOffset = GetAttributeDataOffset(attribDataOffsets, ChunkSize, attrib, VertexCount, out int attribDataSize);
-                    int attribCount = GetAttributeDataCount(attribDataSize, attrib, componentType, componentCount);
+                    int attribOffset = VTX1.GetAttributeDataOffset(attribDataOffsets, ChunkSize, attrib, VertexCount, out int attribDataSize);
+                    int attribCount = VTX1.GetAttributeDataCount(attribDataSize, attrib, componentType, componentCount);
                     Attributes.SetAttributeData(attrib, LoadAttributeData(BMD, (int)(ChunkStart + attribOffset), attribCount, fractionalBitCount, attrib, componentType, componentCount));
 
                     BMD.Position = curPos;
@@ -75,10 +75,10 @@ namespace Hack.io.BMD
                         switch (compCount)
                         {
                             case GXComponentCount.Position_XY:
-                                final = LoadVec2Data(BMD, frac, count, dataType);
+                                final = VTX1.LoadVec2Data(BMD, frac, count, dataType);
                                 break;
                             case GXComponentCount.Position_XYZ:
-                                final = LoadVec3Data(BMD, frac, count, dataType);
+                                final = VTX1.LoadVec3Data(BMD, frac, count, dataType);
                                 break;
                         }
                         break;
@@ -86,7 +86,7 @@ namespace Hack.io.BMD
                         switch (compCount)
                         {
                             case GXComponentCount.Normal_XYZ:
-                                final = LoadVec3Data(BMD, frac, count, dataType);
+                                final = VTX1.LoadVec3Data(BMD, frac, count, dataType);
                                 break;
                             case GXComponentCount.Normal_NBT:
                                 break;
@@ -96,7 +96,7 @@ namespace Hack.io.BMD
                         break;
                     case GXVertexAttribute.Color0:
                     case GXVertexAttribute.Color1:
-                        final = LoadColorData(BMD, count, dataType);
+                        final = VTX1.LoadColorData(BMD, count, dataType);
                         break;
                     case GXVertexAttribute.Tex0:
                     case GXVertexAttribute.Tex1:
@@ -109,10 +109,10 @@ namespace Hack.io.BMD
                         switch (compCount)
                         {
                             case GXComponentCount.TexCoord_S:
-                                final = LoadSingleFloat(BMD, frac, count, dataType);
+                                final = VTX1.LoadSingleFloat(BMD, frac, count, dataType);
                                 break;
                             case GXComponentCount.TexCoord_ST:
-                                final = LoadVec2Data(BMD, frac, count, dataType);
+                                final = VTX1.LoadVec2Data(BMD, frac, count, dataType);
                                 break;
                         }
                         break;
@@ -121,9 +121,9 @@ namespace Hack.io.BMD
                 return final;
             }
 
-            private List<float> LoadSingleFloat(Stream BMD, byte frac, int count, GXDataType dataType)
+            private static List<float> LoadSingleFloat(Stream BMD, byte frac, int count, GXDataType dataType)
             {
-                List<float> floatList = new List<float>();
+                List<float> floatList = new();
 
                 for (int i = 0; i < count; i++)
                 {
@@ -158,9 +158,9 @@ namespace Hack.io.BMD
                 return floatList;
             }
 
-            private List<Vector2> LoadVec2Data(Stream BMD, byte frac, int count, GXDataType dataType)
+            private static List<Vector2> LoadVec2Data(Stream BMD, byte frac, int count, GXDataType dataType)
             {
-                List<Vector2> vec2List = new List<Vector2>();
+                List<Vector2> vec2List = new();
 
                 for (int i = 0; i < count; i++)
                 {
@@ -203,9 +203,9 @@ namespace Hack.io.BMD
                 return vec2List;
             }
 
-            private List<Vector3> LoadVec3Data(Stream BMD, byte frac, int count, GXDataType dataType)
+            private static List<Vector3> LoadVec3Data(Stream BMD, byte frac, int count, GXDataType dataType)
             {
-                List<Vector3> vec3List = new List<Vector3>();
+                List<Vector3> vec3List = new();
 
                 for (int i = 0; i < count; i++)
                 {
@@ -256,9 +256,9 @@ namespace Hack.io.BMD
                 return vec3List;
             }
 
-            private List<Color4> LoadColorData(Stream BMD, int count, GXDataType dataType)
+            private static List<Color4> LoadColorData(Stream BMD, int count, GXDataType dataType)
             {
-                List<Color4> colorList = new List<Color4>();
+                List<Color4> colorList = new();
 
                 for (int i = 0; i < count; i++)
                 {
@@ -313,7 +313,7 @@ namespace Hack.io.BMD
                 return colorList;
             }
 
-            private int GetAttributeDataOffset(int[] offsets, int vtx1Size, GXVertexAttribute attribute, int VertexCount, out int size)
+            private static int GetAttributeDataOffset(int[] offsets, int vtx1Size, GXVertexAttribute attribute, int VertexCount, out int size)
             {
                 int offset = 0;
                 size = 0;
@@ -395,7 +395,7 @@ namespace Hack.io.BMD
                 return offset;
             }
 
-            private int GetAttributeDataCount(int size, GXVertexAttribute attribute, GXDataType dataType, GXComponentCount compCount)
+            private static int GetAttributeDataCount(int size, GXVertexAttribute attribute, GXDataType dataType, GXComponentCount compCount)
             {
                 int compCnt = 0;
                 int compStride = 0;
@@ -691,11 +691,11 @@ namespace Hack.io.BMD
             internal void StipUnused(SHP1 Shapes)
             {
                 List<SHP1.Vertex> UsedVerticies = Shapes.GetAllUsedVertices();
-                SortedDictionary<uint, Vector3> NewPositions = new SortedDictionary<uint, Vector3>(), NewNormals = new SortedDictionary<uint, Vector3>();
-                SortedDictionary<uint, Color4> NewColours0 = new SortedDictionary<uint, Color4>(), NewColours1 = new SortedDictionary<uint, Color4>();
-                SortedDictionary<uint, Vector2> NewTexCoord0 = new SortedDictionary<uint, Vector2>(), NewTexCoord1 = new SortedDictionary<uint, Vector2>(),
-                    NewTexCoord2 = new SortedDictionary<uint, Vector2>(), NewTexCoord3 = new SortedDictionary<uint, Vector2>(), NewTexCoord4 = new SortedDictionary<uint, Vector2>(),
-                    NewTexCoord5 = new SortedDictionary<uint, Vector2>(), NewTexCoord6 = new SortedDictionary<uint, Vector2>(), NewTexCoord7 = new SortedDictionary<uint, Vector2>();
+                SortedDictionary<uint, Vector3> NewPositions = new(), NewNormals = new();
+                SortedDictionary<uint, Color4> NewColours0 = new(), NewColours1 = new();
+                SortedDictionary<uint, Vector2> NewTexCoord0 = new(), NewTexCoord1 = new(),
+                    NewTexCoord2 = new(), NewTexCoord3 = new(), NewTexCoord4 = new(),
+                    NewTexCoord5 = new(), NewTexCoord6 = new(), NewTexCoord7 = new();
 
                 bool HasPosition = Attributes.ContainsAttribute(GXVertexAttribute.Position), HasNormal = Attributes.ContainsAttribute(GXVertexAttribute.Normal),
                     HasColour0 = Attributes.ContainsAttribute(GXVertexAttribute.Color0), HasColour1 = Attributes.ContainsAttribute(GXVertexAttribute.Color1),
@@ -784,7 +784,7 @@ namespace Hack.io.BMD
 
             public class VertexData
             {
-                private List<GXVertexAttribute> m_Attributes = new List<GXVertexAttribute>();
+                private List<GXVertexAttribute> m_Attributes = new();
 
                 public List<Vector3> Positions { get; set; } = new List<Vector3>();
                 public List<Vector3> Normals { get; set; } = new List<Vector3>();
@@ -808,35 +808,22 @@ namespace Hack.io.BMD
                     if (!ContainsAttribute(attribute))
                         return null;
 
-                    switch (attribute)
+                    return attribute switch
                     {
-                        case GXVertexAttribute.Position:
-                            return Positions;
-                        case GXVertexAttribute.Normal:
-                            return Normals;
-                        case GXVertexAttribute.Color0:
-                            return Color_0;
-                        case GXVertexAttribute.Color1:
-                            return Color_1;
-                        case GXVertexAttribute.Tex0:
-                            return TexCoord_0;
-                        case GXVertexAttribute.Tex1:
-                            return TexCoord_1;
-                        case GXVertexAttribute.Tex2:
-                            return TexCoord_2;
-                        case GXVertexAttribute.Tex3:
-                            return TexCoord_3;
-                        case GXVertexAttribute.Tex4:
-                            return TexCoord_4;
-                        case GXVertexAttribute.Tex5:
-                            return TexCoord_5;
-                        case GXVertexAttribute.Tex6:
-                            return TexCoord_6;
-                        case GXVertexAttribute.Tex7:
-                            return TexCoord_7;
-                        default:
-                            throw new ArgumentException("attribute");
-                    }
+                        GXVertexAttribute.Position => Positions,
+                        GXVertexAttribute.Normal => Normals,
+                        GXVertexAttribute.Color0 => Color_0,
+                        GXVertexAttribute.Color1 => Color_1,
+                        GXVertexAttribute.Tex0 => TexCoord_0,
+                        GXVertexAttribute.Tex1 => TexCoord_1,
+                        GXVertexAttribute.Tex2 => TexCoord_2,
+                        GXVertexAttribute.Tex3 => TexCoord_3,
+                        GXVertexAttribute.Tex4 => TexCoord_4,
+                        GXVertexAttribute.Tex5 => TexCoord_5,
+                        GXVertexAttribute.Tex6 => TexCoord_6,
+                        GXVertexAttribute.Tex7 => TexCoord_7,
+                        _ => throw new ArgumentException("attribute"),
+                    };
                 }
 
                 public void SetAttributeData(GXVertexAttribute attribute, object data)
@@ -928,7 +915,7 @@ namespace Hack.io.BMD
 
                 internal Dictionary<GXVertexAttribute, object> FetchDataForShapeVertex(SHP1.Vertex Source)
                 {
-                    Dictionary<GXVertexAttribute, object> Values = new Dictionary<GXVertexAttribute, object>();
+                    Dictionary<GXVertexAttribute, object> Values = new();
                     foreach (GXVertexAttribute Attribute in m_Attributes)
                     {
                         switch (Attribute)

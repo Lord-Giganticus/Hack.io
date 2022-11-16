@@ -95,7 +95,7 @@ namespace Hack.io.BMD
                             return;
                         }
                     }
-                    if (!(value is null))
+                    if (value is not null)
                         Textures.Add(value);
                 }
             }
@@ -109,15 +109,15 @@ namespace Hack.io.BMD
                 int ChunkStart = (int)BMDFile.Position;
                 if (!BMDFile.ReadString(4).Equals(Magic))
                     throw new Exception($"Invalid Identifier. Expected \"{Magic}\"");
-
-                int tex1Size = BitConverter.ToInt32(BMDFile.ReadReverse(0, 4), 0);
+                int tex1Size;
+                _ = BitConverter.ToInt32(BMDFile.ReadReverse(0, 4), 0);
                 short texCount = BitConverter.ToInt16(BMDFile.ReadReverse(0, 2), 0);
                 BMDFile.Position += 0x02;
 
                 int textureHeaderOffset = BitConverter.ToInt32(BMDFile.ReadReverse(0, 4), 0);
                 int textureNameTableOffset = BitConverter.ToInt32(BMDFile.ReadReverse(0, 4), 0);
 
-                List<string> names = new List<string>();
+                List<string> names = new();
 
                 BMDFile.Seek(ChunkStart + textureNameTableOffset, System.IO.SeekOrigin.Begin);
 
@@ -143,7 +143,7 @@ namespace Hack.io.BMD
                 {
                     BMDFile.Seek((ChunkStart + 0x20 + (0x20 * i)), SeekOrigin.Begin);
 
-                    BTI.BTI img = new BTI.BTI(BMDFile) { FileName = names[i] };
+                    BTI.BTI img = new(BMDFile) { FileName = names[i] };
                     Textures.Add(img);
                 }
             }
@@ -161,8 +161,8 @@ namespace Hack.io.BMD
 
                 AddPadding(writer, 32);
 
-                List<string> names = new List<string>();
-                Dictionary<BTI.BTI, long> WrittenImages = new Dictionary<BTI.BTI, long>();
+                List<string> names = new();
+                Dictionary<BTI.BTI, long> WrittenImages = new();
 
                 long ImageDataOffset = start + (writer.Position - start) + (0x20 * Textures.Count);
                 for (int i = 0; i < Textures.Count; i++)
@@ -215,7 +215,7 @@ namespace Hack.io.BMD
 
             public static List<KeyValuePair<int, BTI.BTI>?> FetchUsedTextures(TEX1 Textures, MAT3.Material Material)
             {
-                List<KeyValuePair<int, BTI.BTI>?> UsedTextures = new List<KeyValuePair<int, BTI.BTI>?>();
+                List<KeyValuePair<int, BTI.BTI>?> UsedTextures = new();
                 for (int i = 0; i < 8; i++)
                 {
                     if (Material.TextureIndices[i] != -1 && Material.TextureIndices[i] < Textures.Count)

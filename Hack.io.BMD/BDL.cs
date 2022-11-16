@@ -345,7 +345,7 @@ namespace Hack.io.BMD
         /// Cast a RARCFile to a BDL
         /// </summary>
         /// <param name="x"></param>
-        public static implicit operator BDL(RARC.RARC.File x) => new BDL((MemoryStream)x) { FileName = x.Name };
+        public static implicit operator BDL(RARC.RARC.File x) => new((MemoryStream)x) { FileName = x.Name };
 
         //=====================================================================
     }

@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Hack.io.YAY0
@@ -24,7 +22,7 @@ namespace Hack.io.YAY0
         /// </summary>
         /// <param name="Data"></param>
         /// <returns></returns>
-        public static MemoryStream Decompress(MemoryStream Data) => new MemoryStream(Decomp(Data.ToArray()));
+        public static MemoryStream Decompress(MemoryStream Data) => new(Decomp(Data.ToArray()));
         /// <summary>
         /// Decompress a byte[]
         /// </summary>
@@ -41,15 +39,15 @@ namespace Hack.io.YAY0
         /// Compress a MemoryStream
         /// </summary>
         /// <param name="YAZ0">MemoryStream to compress</param>
-        /// <param name="Quick">The Algorithm to use. True to use YAZ0 Fast</param>
-        public static MemoryStream Compress(MemoryStream YAZ0, bool Quick = false) => new MemoryStream(DoCompression(YAZ0.ToArray()));
+        /// 
+        public static MemoryStream Compress(MemoryStream YAZ0) => new(DoCompression(YAZ0.ToArray()));
         /// <summary>
         /// Compress a byte[]
         /// </summary>
         /// <param name="Data">The data to compress</param>
-        /// <param name="Quick">The Algorithm to use. True to use YAZ0 Fast</param>
+        /// 
         /// <returns></returns>
-        public static byte[] Compress(byte[] Data, bool Quick = false) => DoCompression(Data);
+        public static byte[] Compress(byte[] Data) => DoCompression(Data);
         /// <summary>
         /// Checks a given file for Yay0 Encoding
         /// </summary>
@@ -57,7 +55,7 @@ namespace Hack.io.YAY0
         /// <returns>true if the file is Yaz0 Encoded</returns>
         public static bool Check(string Filename)
         {
-            FileStream YAY0 = new FileStream(Filename, FileMode.Open);
+            FileStream YAY0 = new(Filename, FileMode.Open);
             bool Check = YAY0.ReadString(4) == Magic;
             YAY0.Close();
             return Check;
@@ -67,16 +65,16 @@ namespace Hack.io.YAY0
         /// </summary>
         /// <param name="Filename">The file to decode into a MemoryStream</param>
         /// <returns>The decoded MemoryStream</returns>
-        public static MemoryStream DecompressToMemoryStream(string Filename) => new MemoryStream(Decomp(File.ReadAllBytes(Filename)));
+        public static MemoryStream DecompressToMemoryStream(string Filename) => new(Decomp(File.ReadAllBytes(Filename)));
 
         //Based on https://github.com/Daniel-McCarthy/Mr-Peeps-Compressor/blob/master/PeepsCompress/PeepsCompress/Algorithm%20Classes/YAY0.cs
         public static byte[] DoCompression(byte[] file)
         {
-            List<byte> layoutBits = new List<byte>();
-            List<byte> dictionary = new List<byte>();
+            List<byte> layoutBits = new();
+            List<byte> dictionary = new();
 
-            List<byte> uncompressedData = new List<byte>();
-            List<int[]> compressedData = new List<int[]>();
+            List<byte> uncompressedData = new();
+            List<int[]> compressedData = new();
 
             int maxDictionarySize = 4096;
             int maxMatchLength = 255 + 0x12;
@@ -137,7 +135,7 @@ namespace Hack.io.YAY0
 
         private static int[] FindAllMatches(ref List<byte> dictionary, byte match)
         {
-            List<int> matchPositons = new List<int>();
+            List<int> matchPositons = new();
 
             for (int i = 0; i < dictionary.Count; i++)
                 if (dictionary[i] == match)
@@ -185,10 +183,10 @@ namespace Hack.io.YAY0
 
         public static byte[] BuildYAY0CompressedBlock(ref List<byte> layoutBits, ref List<byte> uncompressedData, ref List<int[]> offsetLengthPairs, int decompressedSize, int offset)
         {
-            List<byte> finalYAY0Block = new List<byte>();
-            List<byte> layoutBytes = new List<byte>();
-            List<byte> compressedDataBytes = new List<byte>();
-            List<byte> extendedLengthBytes = new List<byte>();
+            List<byte> finalYAY0Block = new();
+            List<byte> layoutBytes = new();
+            List<byte> compressedDataBytes = new();
+            List<byte> extendedLengthBytes = new();
 
             int compressedOffset = 16 + offset; //header size
             int uncompressedOffset;
@@ -279,7 +277,7 @@ namespace Hack.io.YAY0
             {
                 for (int i = 0; i < layoutBytes.Count; i++)
                 {
-                    BitArray arrayOfBits = new BitArray(new byte[1] { layoutBytes[i] });
+                    BitArray arrayOfBits = new(new byte[1] { layoutBytes[i] });
 
                     for (int j = 7; ((j > -1) && ((uncompressedData.Count > 0) || (compressedDataBytes.Count > 0))); j--)
                     {
@@ -314,7 +312,7 @@ namespace Hack.io.YAY0
         //Based on https://github.com/LordNed/WArchive-Tools/blob/master/ArchiveToolsLib/Compression/Yay0Decoder.cs
         private static byte[] Decomp(byte[] Data)
         {
-            MemoryStream YAY0 = new MemoryStream(Data);
+            MemoryStream YAY0 = new(Data);
             if (YAY0.ReadString(4) != Magic)
                 throw new Exception($"Invalid Identifier. Expected \"{Magic}\"");
 

@@ -1,11 +1,7 @@
-﻿using Hack.io.RARC;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Hack.io.J3D.JUtility;
 
 namespace Hack.io.TPL
@@ -32,14 +28,14 @@ namespace Hack.io.TPL
             TPLFile.Position = ImageTableOffset;
             //Key = ImageDataOffset
             //Value = PalleteDataOffset
-            List<KeyValuePair<int, int>> ImageHeaderOffset = new List<KeyValuePair<int, int>>();
+            List<KeyValuePair<int, int>> ImageHeaderOffset = new();
             for (int i = 0; i < TotalImageCount; i++)
                 ImageHeaderOffset.Add(new KeyValuePair<int, int>(BitConverter.ToInt32(TPLFile.ReadReverse(0, 4), 0), BitConverter.ToInt32(TPLFile.ReadReverse(0, 4), 0)));
 
             for (int i = 0; i < ImageHeaderOffset.Count; i++)
             {
                 short PaletteCount = 0;
-                uint PaletteDataAddress = 0;
+                uint PaletteDataAddress;
                 byte[] PaletteData = null;
                 GXPaletteFormat PaletteFormat = GXPaletteFormat.IA8;
                 if (ImageHeaderOffset[i].Value != 0)
@@ -67,8 +63,8 @@ namespace Hack.io.TPL
                 bool EnableEdgeLOD = TPLFile.ReadByte() > 0;
                 byte MinLOD = (byte)TPLFile.ReadByte();
                 byte MaxLOD = (byte)TPLFile.ReadByte();
-                byte Unpacked = (byte)TPLFile.ReadByte();
-                TexEntry current = new TexEntry()
+                _ = (byte)TPLFile.ReadByte();
+                TexEntry current = new()
                 {
                     Format = Format,
                     PaletteFormat = PaletteFormat,
@@ -83,7 +79,7 @@ namespace Hack.io.TPL
                 };
 
                 TPLFile.Position = ImageDataAddress;
-                ushort ogwidth = ImageWidth, ogheight = ImageHeight;
+                
                 for (int x = 0; x <= MaxLOD; x++)
                 {
                     current.Add(DecodeImage(TPLFile, PaletteData, Format, PaletteFormat, PaletteCount, ImageWidth, ImageHeight, x));
@@ -106,15 +102,15 @@ namespace Hack.io.TPL
             //This will hold the information that we're gonna write back here
             //Key = ImageDataOffset
             //Value = PalleteDataOffset
-            List<KeyValuePair<int, int>> ImageHeaderOffset = new List<KeyValuePair<int, int>>();
+            List<KeyValuePair<int, int>> ImageHeaderOffset = new();
 
             //TPLFile.PadTo(32);
             for (int i = 0; i < Count; i++)
             {
                 bool IsPalette = this[i].Format.IsPaletteFormat();
                 int PaletteHeader = !IsPalette ? 0 : (int)(TPLFile.Position - HeaderStart);
-                List<byte> ImageData = new List<byte>();
-                List<byte> PaletteData = new List<byte>();
+                List<byte> ImageData = new();
+                List<byte> PaletteData = new();
                 List<Bitmap> mips = this[i];
                 GetImageAndPaletteData(ref ImageData, ref PaletteData, mips, this[i].Format, this[i].PaletteFormat);
                 if (IsPalette)
@@ -134,7 +130,7 @@ namespace Hack.io.TPL
                     TPLFile.PadTo(32);
                 }
 
-                int ImageHeader = ImageHeader = (int)(TPLFile.Position - HeaderStart);
+                int ImageHeader = (int)(TPLFile.Position - HeaderStart);
 
                 TPLFile.WriteReverse(BitConverter.GetBytes((ushort)this[i][0].Height), 0, 2);
                 TPLFile.WriteReverse(BitConverter.GetBytes((ushort)this[i][0].Width), 0, 2);
@@ -272,7 +268,7 @@ namespace Hack.io.TPL
         /// <returns></returns>
         public static TPL Create(Bitmap Image, GXImageFormat ImageFormat = GXImageFormat.CMPR, GXPaletteFormat PaletteFormat = GXPaletteFormat.IA8, GXWrapMode WrapS = GXWrapMode.CLAMP, GXWrapMode WrapT = GXWrapMode.CLAMP, GXFilterMode MagFilter = GXFilterMode.Linear, GXFilterMode MinFilter = GXFilterMode.Linear, float Bias = 0.0f, bool EdgeLoD = false)
         {
-            TPL NewTPL = new TPL
+            TPL NewTPL = new()
             {
                 new TexEntry((Bitmap)Image.Clone(), ImageFormat, PaletteFormat, WrapS, WrapT, MagFilter, MinFilter, Bias, EdgeLoD)
             };
@@ -293,7 +289,7 @@ namespace Hack.io.TPL
         /// <returns></returns>
         public static TPL Create(Bitmap[] Images, GXImageFormat ImageFormat = GXImageFormat.CMPR, GXPaletteFormat PaletteFormat = GXPaletteFormat.IA8, GXWrapMode WrapS = GXWrapMode.CLAMP, GXWrapMode WrapT = GXWrapMode.CLAMP, GXFilterMode MagFilter = GXFilterMode.Linear, GXFilterMode MinFilter = GXFilterMode.Linear, float Bias = 0.0f, bool EdgeLoD = false)
         {
-            TPL NewTPL = new TPL();
+            TPL NewTPL = new();
             for (int i = 0; i < Images.Length; i++)
                 NewTPL.Add(new TexEntry((Bitmap)Images[i].Clone(), ImageFormat, PaletteFormat, WrapS, WrapT, MagFilter, MinFilter, Bias, EdgeLoD));
             return NewTPL;
@@ -313,11 +309,11 @@ namespace Hack.io.TPL
         /// <returns></returns>
         public static TPL Create(Bitmap[][] Images, GXImageFormat ImageFormat = GXImageFormat.CMPR, GXPaletteFormat PaletteFormat = GXPaletteFormat.IA8, GXWrapMode WrapS = GXWrapMode.CLAMP, GXWrapMode WrapT = GXWrapMode.CLAMP, GXFilterMode MagFilter = GXFilterMode.Linear, GXFilterMode MinFilter = GXFilterMode.Linear, float Bias = 0.0f, bool EdgeLoD = false)
         {
-            TPL NewTPL = new TPL();
+            TPL NewTPL = new();
             
             for (int i = 0; i < Images.Length; i++)
             {
-                TexEntry temp = new TexEntry() { Format = ImageFormat, PaletteFormat = PaletteFormat, WrapS = WrapS, WrapT = WrapT, MagnificationFilter = MagFilter, MinificationFilter = MinFilter, LODBias = Bias, EnableEdgeLOD = EdgeLoD };
+                TexEntry temp = new() { Format = ImageFormat, PaletteFormat = PaletteFormat, WrapS = WrapS, WrapT = WrapT, MagnificationFilter = MagFilter, MinificationFilter = MinFilter, LODBias = Bias, EnableEdgeLOD = EdgeLoD };
                 for (int x = 0; x < Images[i].Length; x++)
                     temp.Add((Bitmap)Images[i][x].Clone());
                 NewTPL.Add(temp);
@@ -330,6 +326,6 @@ namespace Hack.io.TPL
         /// Cast a RARCFile to a TPL
         /// </summary>
         /// <param name="x"></param>
-        public static implicit operator TPL(RARC.RARC.File x) => new TPL((MemoryStream)x) { FileName = x.Name };
+        public static implicit operator TPL(RARC.RARC.File x) => new((MemoryStream)x) { FileName = x.Name };
     }
 }

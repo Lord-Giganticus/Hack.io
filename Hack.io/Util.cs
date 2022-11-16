@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace Hack.ConsoleEx
 {
@@ -135,7 +136,7 @@ namespace Hack.io.Util
         /// <returns></returns>
         public static List<T> SortBy<T>(this List<T> OriginalList, T[] sortref)
         {
-            List<T> FinalList = new List<T>();
+            List<T> FinalList = new();
 
             for (int i = 0; i < sortref.Length; i++)
                 if (OriginalList.Contains(sortref[i]))
@@ -239,8 +240,7 @@ namespace Hack.io.Util
             }
             finally
             {
-                if (stream != null)
-                    stream.Close();
+                stream?.Close();
             }
 
             //file is not locked
@@ -289,7 +289,7 @@ namespace Hack.io.Util
         /// <param name="value"></param>
         /// <param name="StartIndex"></param>
         /// <returns></returns>
-        public static Int24 ToInt24(byte[] value, int StartIndex) => new Int24(value[StartIndex] | value[StartIndex + 1] << 8 | value[StartIndex + 2] << 16);
+        public static Int24 ToInt24(byte[] value, int StartIndex) => new(value[StartIndex] | value[StartIndex + 1] << 8 | value[StartIndex + 2] << 16);
 
         /// <summary>
         /// 
@@ -304,7 +304,7 @@ namespace Hack.io.Util
         /// <param name="value"></param>
         /// <param name="StartIndex"></param>
         /// <returns></returns>
-        public static UInt24 ToUInt24(byte[] value, int StartIndex) => new UInt24((uint)(value[StartIndex] | value[StartIndex + 1] << 8 | value[StartIndex + 2] << 16));
+        public static UInt24 ToUInt24(byte[] value, int StartIndex) => new((uint)(value[StartIndex] | value[StartIndex + 1] << 8 | value[StartIndex + 2] << 16));
 
         /// <summary>
         /// 
@@ -422,6 +422,7 @@ namespace Hack.io.Util
     /// <summary>
     /// 
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public static class BitmapEx
     {
         /// <summary>
@@ -456,12 +457,12 @@ namespace Hack.io.Util
         /// <param name="data"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        /// <param name="stride"></param>
         /// <param name="format"></param>
+        /// 
         /// <returns></returns>
-        public static Bitmap FromByteArray(byte[] data, int width, int height, int stride, PixelFormat format)
+        public static Bitmap FromByteArray(byte[] data, int width, int height, PixelFormat format)
         {
-            Bitmap result = new Bitmap(width, height, format);
+            Bitmap result = new(width, height, format);
             BitmapData d = result.LockBits(new Rectangle(0, 0, result.Width, result.Height), ImageLockMode.ReadWrite, format);
             Marshal.Copy(data, 0, d.Scan0, data.Length);
             result.UnlockBits(d);
@@ -477,8 +478,8 @@ namespace Hack.io.Util
         /// <returns>The resized image.</returns>
         public static Bitmap ResizeImage(Image image, int width, int height, InterpolationMode InterpolationMode = InterpolationMode.HighQualityBicubic)
         {
-            Rectangle destRect = new Rectangle(0, 0, width, height);
-            Bitmap destImage = new Bitmap(width, height);
+            Rectangle destRect = new(0, 0, width, height);
+            Bitmap destImage = new(width, height);
 
             destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
 
@@ -490,11 +491,9 @@ namespace Hack.io.Util
                 graphics.SmoothingMode = SmoothingMode.HighQuality;
                 graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-                using (ImageAttributes wrapMode = new ImageAttributes())
-                {
-                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
-                }
+                using ImageAttributes wrapMode = new();
+                wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
             }
 
             return destImage;
@@ -528,7 +527,7 @@ namespace Hack.io.Util
             }
             imageARescale.Dispose();
             imageBRescale.Dispose();
-            return FromByteArray(resultbytes, width, height, 4, imageA.PixelFormat);
+            return FromByteArray(resultbytes, width, height, imageA.PixelFormat);
         }
     }
     /// <summary>
@@ -544,9 +543,7 @@ namespace Hack.io.Util
         /// <param name="Right">Our second contestant</param>
         public static void SwapValues<T>(ref T Left, ref T Right)
         {
-            T temp = Left;
-            Left = Right;
-            Right = temp;
+            (Right, Left) = (Left, Right);
         }
         /// <summary>
         /// Swaps two values using a Tuple
@@ -565,7 +562,7 @@ namespace Hack.io.Util
             T temp;
             if (Reverse)
             {
-                temp = Values[Values.Length - 1];
+                temp = Values[^1];
                 for (int i = Values.Length - 1; i >= 1; i--)
                     Values[i + 1] = Values[i];
                 Values[0] = temp;
@@ -575,7 +572,7 @@ namespace Hack.io.Util
                 temp = Values[0];
                 for (int i = 1; i < Values.Length; i++)
                     Values[i - 1] = Values[i];
-                Values[Values.Length - 1] = temp;
+                Values[^1] = temp;
             }
         }
 
@@ -644,7 +641,7 @@ namespace Hack.io.Util
         /// <returns></returns>
         public static Class NewICollection<Class, Type>(Type InitValue, int Size) where Class : ICollection<Type>, new()
         {
-            Class output = new Class();
+            Class output = new();
             for (int i = 0; i < Size; i++)
             {
                 output.Add(InitValue);

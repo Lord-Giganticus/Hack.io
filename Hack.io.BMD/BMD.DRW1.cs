@@ -55,7 +55,7 @@ namespace Hack.io.BMD
                 writer.Write(new byte[2] { 0xFF, 0xFF }, 0, 2);
 
                 writer.Write(new byte[4] { 0x00, 0x00, 0x00, 0x14 }, 0, 4); // Offset to weight type bools, always 20
-                long IndiciesOffset = writer.Position;
+                _ = writer.Position;
                 writer.WriteReverse(BitConverter.GetBytes(20 + IsPartialWeight.Count), 0, 4); // Offset to indices, always 20 + number of weight type bools
 
                 foreach (bool bol in IsPartialWeight)

@@ -23,9 +23,12 @@ namespace Hack.io.BMD
                 int mdl3Size = BitConverter.ToInt32(BDL.ReadReverse(0, 4), 0);
                 short EntryCount = BitConverter.ToInt16(BDL.ReadReverse(0, 2), 0);
                 BDL.Position += 0x02; //Skip the padding
-                uint PacketListingOffset = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0), SubPacketOffset = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0),
-                    MatrixIDOffset = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0), UnknownOffset = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0),
-                    IndiciesOffset = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0), StringTableOFfset = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0);
+                uint PacketListingOffset = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0);
+                _ = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0);
+                _ = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0);
+                _ = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0);
+                _ = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0);
+                _ = BitConverter.ToUInt32(BDL.ReadReverse(0, 4), 0);
 
                 BDL.Position = ChunkStart + PacketListingOffset;
                 for (int i = 0; i < EntryCount; i++)
@@ -75,7 +78,7 @@ namespace Hack.io.BMD
                     Value = BitConverterEx.ToUInt24(BDL.ReadReverse(0, 3), 0);
                 }
 
-                public override string ToString() => $"BP Command: {Register}, {Value.ToString()}";
+                public override string ToString() => $"BP Command: {Register}, {Value}";
 
                 public override int GetRegister() => (int)Register;
 
@@ -138,7 +141,6 @@ namespace Hack.io.BMD
                             (float)(Source.Scale.Y * sinR), (float)(Source.Scale.Y * cosR), (float)(Source.Translation.Y + Source.Center.Y + -Source.Scale.Y * (-sinR * Source.Center.X + cosR * Source.Center.Y)), 0.0f
                             );
 
-                        Matrix4 Test = Matrix4.Identity;
                         float[] temp = new float[4 * 4];
                         temp[0] = (float)(Source.Scale.X * cosR);
                         temp[4] = (float)(Source.Scale.X * -sinR);

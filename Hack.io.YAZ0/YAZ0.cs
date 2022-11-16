@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Hack.io.YAZ0
 {
@@ -24,7 +23,7 @@ namespace Hack.io.YAZ0
         /// </summary>
         /// <param name="Data"></param>
         /// <returns></returns>
-        public static MemoryStream Decompress(MemoryStream Data) => new MemoryStream(Decomp(Data.ToArray()));
+        public static MemoryStream Decompress(MemoryStream Data) => new(Decomp(Data.ToArray()));
         /// <summary>
         /// Decompress a byte[]
         /// </summary>
@@ -42,7 +41,7 @@ namespace Hack.io.YAZ0
         /// </summary>
         /// <param name="YAZ0">MemoryStream to compress</param>
         /// <param name="Quick">The Algorithm to use. True to use YAZ0 Fast</param>
-        public static MemoryStream Compress(MemoryStream YAZ0, bool Quick = false) => new MemoryStream(Quick ? QuickCompress(YAZ0.ToArray()) : DoCompression(YAZ0.ToArray()));
+        public static MemoryStream Compress(MemoryStream YAZ0, bool Quick = false) => new(Quick ? QuickCompress(YAZ0.ToArray()) : DoCompression(YAZ0.ToArray()));
         /// <summary>
         /// Compress a byte[]
         /// </summary>
@@ -57,7 +56,7 @@ namespace Hack.io.YAZ0
         /// <returns>true if the file is Yaz0 Encoded</returns>
         public static bool Check(string Filename)
         {
-            FileStream YAZ0 = new FileStream(Filename, FileMode.Open);
+            FileStream YAZ0 = new(Filename, FileMode.Open);
             bool Check = YAZ0.ReadString(4) == Magic;
             YAZ0.Close();
             return Check;
@@ -67,7 +66,7 @@ namespace Hack.io.YAZ0
         /// </summary>
         /// <param name="Filename">The file to decode into a MemoryStream</param>
         /// <returns>The decoded MemoryStream</returns>
-        public static MemoryStream DecompressToMemoryStream(string Filename) => new MemoryStream(Decomp(File.ReadAllBytes(Filename)));
+        public static MemoryStream DecompressToMemoryStream(string Filename) => new(Decomp(File.ReadAllBytes(Filename)));
         
         private static byte[] DoCompression(byte[] file) => Encode(file);
         /*{
@@ -380,17 +379,18 @@ namespace Hack.io.YAZ0
 
         private static byte[] Decomp(byte[] Data)
         {
-            MemoryStream YAZ0 = new MemoryStream(Data);
+            MemoryStream YAZ0 = new(Data);
             if (YAZ0.ReadString(4) != Magic)
                 throw new Exception($"Invalid Identifier. Expected \"{Magic}\"");
+            uint DecompressedSize = BitConverter.ToUInt32(YAZ0.ReadReverse(0, 4), 0);
+            _ = BitConverter.ToUInt32(YAZ0.ReadReverse(0, 4), 0);
+            _ = BitConverter.ToUInt32(YAZ0.ReadReverse(0, 4), 0);
 
-            uint DecompressedSize = BitConverter.ToUInt32(YAZ0.ReadReverse(0, 4), 0), CompressedDataOffset = BitConverter.ToUInt32(YAZ0.ReadReverse(0, 4), 0), UncompressedDataOffset = BitConverter.ToUInt32(YAZ0.ReadReverse(0, 4), 0);
-
-            List<byte> Decoding = new List<byte>();
+            List<byte> Decoding = new();
             while (Decoding.Count < DecompressedSize)
             {
                 byte FlagByte = (byte)YAZ0.ReadByte();
-                BitArray FlagSet = new BitArray(new byte[1] { FlagByte });
+                BitArray FlagSet = new(new byte[1] { FlagByte });
 
                 for (int i = 7; i > -1 && (Decoding.Count < DecompressedSize); i--)
                 {
@@ -403,7 +403,7 @@ namespace Hack.io.YAZ0
                             Length = (Tmp & 0xF0) == 0 ? YAZ0.ReadByte() + 0x12 : (byte)((Tmp & 0xF0) >> 4) + 2;
 
                         for (int j = 0; j < Length; j++)
-                            Decoding.Add(Decoding[Decoding.Count - Offset]);
+                            Decoding.Add(Decoding[^Offset]);
                     }
                 }
             }
@@ -463,8 +463,8 @@ namespace Hack.io.YAZ0
 
         private static uint EncodeAdvanced(byte[] src, int size, int pos, ref uint pMatchPos)
         {
-            int startPos = pos - 0x1000;
-            uint numBytes = 1;
+            _ = pos - 0x1000;
+            uint numBytes;
 
             // if prevFlag is set, it means that the previous position was determined by look-ahead try.
             // so just use it. this is not the best optimization, but nintendo's choice for speed.
@@ -498,10 +498,10 @@ namespace Hack.io.YAZ0
             ByteCountA = 0;
             MatchPos = 0;
             PrevFlag = 0;
-            List<byte> OutputFile = new List<byte>() { 0x59, 0x61, 0x7A, 0x30 };
+            List<byte> OutputFile = new() { 0x59, 0x61, 0x7A, 0x30 };
             OutputFile.AddRange(BitConverter.GetBytes(src.Length).Reverse());
             OutputFile.AddRange(new byte[8]);
-            Ret r = new Ret() { srcPos = 0, dstPos = 0 };
+            Ret r = new() { srcPos = 0, dstPos = 0 };
             byte[] dst = new byte[24];
             int dstSize = 0;
             //int percent = -1;
@@ -565,7 +565,7 @@ namespace Hack.io.YAZ0
                         OutputFile.Add(dst[i]);
                     dstSize += r.dstPos + 1;
 
-                    srcPosBak = (uint)r.srcPos;
+                    _ = (uint)r.srcPos;
                     currCodeByte = 0;
                     validBitCount = 0;
                     r.dstPos = 0;
@@ -580,10 +580,8 @@ namespace Hack.io.YAZ0
                 OutputFile.Add(currCodeByte);
                 for (int i = 0; i < r.dstPos; i++)
                     OutputFile.Add(dst[i]);
-                dstSize += r.dstPos + 1;
+                //dstSize += r.dstPos + 1;
 
-                currCodeByte = 0;
-                validBitCount = 0;
                 r.dstPos = 0;
             }
 

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Hack.io;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Hack.io.Util;
 
 namespace Hack.io.MSBT
@@ -22,7 +20,8 @@ namespace Hack.io.MSBT
         /// </summary>
         /// <returns></returns>
         public Encoding GetEncoding() => TextEncoding == EncodingByte.UTF8 ? Encoding.UTF8 : Encoding.BigEndianUnicode;
-        List<Label> Messages = new List<Label>();
+
+        readonly List<Label> Messages = new();
         public Label this[int LabelID]
         {
             get => Messages[LabelID];
@@ -36,7 +35,7 @@ namespace Hack.io.MSBT
 
         public MSBT(string file)
         {
-            FileStream FS = new FileStream(file, FileMode.Open);
+            FileStream FS = new(file, FileMode.Open);
             Read(FS);
             FS.Close();
             FileName = file;
@@ -44,14 +43,14 @@ namespace Hack.io.MSBT
         public MSBT(Stream Stream) => Read(Stream);
         public void Save(string file)
         {
-            FileStream FS = new FileStream(file, FileMode.Create);
+            FileStream FS = new(file, FileMode.Create);
             Write(FS);
             FS.Close();
             FileName = file;
         }
         public MemoryStream Save()
         {
-            MemoryStream ms = new MemoryStream();
+            MemoryStream ms = new();
             Write(ms);
             return ms;
         }
@@ -59,7 +58,7 @@ namespace Hack.io.MSBT
         {
             get
             {
-                List<Label> Result = new List<Label>();
+                List<Label> Result = new();
                 for (int i = 0; i < Messages.Count; i++)
                 {
                     Result.Add(Messages[i]);
@@ -86,14 +85,13 @@ namespace Hack.io.MSBT
 
             //Item1 = NumberOfLabels
             //Item2 = Offset
-            List<Tuple<uint, uint>> Groups = new List<Tuple<uint, uint>>();
-            SortedDictionary<string, Label> SortedLabels = new SortedDictionary<string, Label>();
-            List<Attribute> Attribs = new List<Attribute>();
+            List<Tuple<uint, uint>> Groups = new();
+            SortedDictionary<string, Label> SortedLabels = new();
 
             for (int i = 0; i < SectionCount; i++)
             {
                 long ChunkStart = FS.Position;
-                long ChunkOffset = 0;
+                long ChunkOffset;
                 string Header = FS.ReadString(4);
                 uint ChunkSize = BitConverter.ToUInt32(FS.ReadReverse(0, 4), 0);
                 ChunkOffset = 0x10;
@@ -113,7 +111,7 @@ namespace Hack.io.MSBT
                         Console.WriteLine("Group ID: "+ (uint)Groups.IndexOf(grp));
                         for (int z = 0; z < grp.Item1; z++)
                         {
-                            Label lbl = new Label { Length = Convert.ToUInt32(FS.ReadByte()) };
+                            Label lbl = new() { Length = Convert.ToUInt32(FS.ReadByte()) };
                             lbl.Name = FS.ReadString((int)lbl.Length);
                             lbl.Index = BitConverter.ToUInt32(FS.ReadReverse(0, 4), 0);
                             lbl.Checksum = (uint)Groups.IndexOf(grp);
@@ -126,7 +124,7 @@ namespace Hack.io.MSBT
                     foreach (KeyValuePair<string, Label> lbl in SortedLabels)
                     {
                         uint previousChecksum = lbl.Value.Checksum;
-                        lbl.Value.Checksum = LabelChecksum(lbl.Value.Name, (uint)Groups.Count);
+                        lbl.Value.Checksum = MSBT.LabelChecksum(lbl.Value.Name, (uint)Groups.Count);
 
                         if (previousChecksum != lbl.Value.Checksum)
                         {
@@ -138,11 +136,11 @@ namespace Hack.io.MSBT
                 else if (Header.Equals("ATR1"))
                 {
                     //Attributes
-                    long AttributeStart = FS.Position;
+                    _ = FS.Position;
                     uint EntryCount = BitConverter.ToUInt32(FS.ReadReverse(0, 4), 0);
                     FS.Position += 0x04;
                     for (int x = 0; x < EntryCount; x++)
-                        SortedLabels.ElementAt(x).Value.Attributes = new Attribute(FS, AttributeStart);
+                        SortedLabels.ElementAt(x).Value.Attributes = new Attribute(FS);
                 }
                 else if (Header.Equals("TXT2"))
                 {
@@ -173,11 +171,11 @@ namespace Hack.io.MSBT
             //Shoutouts to Penguin (the Japanese SMG2 hacker) who properly figured out how the LBL1 section is supposed to be written
             
             //Impressive one-liner is impressive.....I think...
-            SortedDictionary<string, Label> SortedLabels = new SortedDictionary<string, Label>(Messages.ToDictionary(prop => prop.Name, prop => prop));
+            SortedDictionary<string, Label> SortedLabels = new(Messages.ToDictionary(prop => prop.Name, prop => prop));
             //Item1 = NumberOfLabels
             //Item2 = Offset
-            List<(uint Hash, uint Offset)> Groups = new List<(uint, uint)>();
-            List<byte> WrittenLabels = new List<byte>();
+            List<(uint Hash, uint Offset)> Groups = new();
+            List<byte> WrittenLabels = new();
 
             FS.WriteString(Magic);
             FS.WriteByte(0xFE);
@@ -248,7 +246,7 @@ namespace Hack.io.MSBT
             FS.WriteReverse(BitConverter.GetBytes(Messages.Count), 0, 4);
             FS.Write(new byte[4] { 0x00, 0x00, 0x00, 0x0C }, 0, 4);
 
-            Dictionary<string, uint> AttributeStringOffsets = new Dictionary<string, uint>();
+            Dictionary<string, uint> AttributeStringOffsets = new();
 
             int StringOffset = (int)(FS.Position - 0x08) + 0xC * SortedLabels.Count;
             foreach (KeyValuePair<string, Label> item in SortedLabels)
@@ -272,7 +270,7 @@ namespace Hack.io.MSBT
             FS.Write(new byte[8], 0, 8);
             FS.WriteReverse(BitConverter.GetBytes(Messages.Count), 0, 4);
 
-            List<byte> MessageData = new List<byte>();
+            List<byte> MessageData = new();
             StringOffset = 4 + (4 * Messages.Count);
             foreach (KeyValuePair<string, Label> item in SortedLabels)
             {
@@ -300,14 +298,14 @@ namespace Hack.io.MSBT
             uint Offset = 4 + (8 * GroupCount);
             for (int i = 0; i < Messages.Count; i++)
             {
-                Groups.Add((LabelChecksum(Messages[i].Name, GroupCount), Offset));
+                Groups.Add((MSBT.LabelChecksum(Messages[i].Name, GroupCount), Offset));
                 Offset += (uint)(Messages[i].Name.Length + 1 + 4);
                 LabelData.Add((byte)Messages[i].Name.Length);
                 LabelData.AddRange(Encoding.UTF8.GetBytes(Messages[i].Name));
                 LabelData.AddRange(BitConverter.GetBytes(Messages[i].Index).Reverse());
             }
         }
-        private uint LabelChecksum(string label, uint GroupCount)
+        private static uint LabelChecksum(string label, uint GroupCount)
         {
             uint hash = 0;
             foreach (char c in label)
@@ -324,13 +322,13 @@ namespace Hack.io.MSBT
         /// Cast a MSBT to a ArchiveFile
         /// </summary>
         /// <param name="x"></param>
-        public static implicit operator ArchiveFile(MSBT x) => new ArchiveFile(x.FileName, x.Save());
+        public static implicit operator ArchiveFile(MSBT x) => new(x.FileName, x.Save());
 
         /// <summary>
         /// Cast a ArchiveFile to a MSBT
         /// </summary>
         /// <param name="x"></param>
-        public static implicit operator MSBT(ArchiveFile x) => new MSBT((MemoryStream)x) { FileName = x.Name };
+        public static implicit operator MSBT(ArchiveFile x) => new((MemoryStream)x) { FileName = x.Name };
 
         //=====================================================================
 
@@ -358,7 +356,7 @@ namespace Hack.io.MSBT
             public sbyte MessageAreaID { get; set; } = -1;
             public string SpecialText { get; set; }
 
-            public Attribute(Stream FS, long Start)
+            public Attribute(Stream FS)
             {
                 SoundID = (byte)FS.ReadByte();
                 CameraSetting = (byte)FS.ReadByte();
@@ -375,7 +373,7 @@ namespace Hack.io.MSBT
             }
             internal byte[] Write(Encoding Enc, ref Dictionary<string, uint> AttributeStringOffsets, ref int StringOffset)
             {
-                List<byte> Data = new List<byte>() { SoundID, CameraSetting, (byte)Trigger, (byte)MessageBox };
+                List<byte> Data = new() { SoundID, CameraSetting, (byte)Trigger, (byte)MessageBox };
                 Data.AddRange(BitConverter.GetBytes(Unknown3).Reverse());
                 Data.Add((byte)EventCameraID);
                 Data.Add((byte)MessageAreaID);
@@ -388,7 +386,7 @@ namespace Hack.io.MSBT
                 return Data.ToArray();
             }
 
-            public override string ToString() => $"Sound: {SoundID}, CameraSetting: {CameraSetting}, Trigger {Trigger.ToString()}, Box: {MessageBox.ToString()}";
+            public override string ToString() => $"Sound: {SoundID}, CameraSetting: {CameraSetting}, Trigger {Trigger}, Box: {MessageBox}";
         }
 
         public class Message
@@ -456,10 +454,10 @@ namespace Hack.io.MSBT
 
             internal byte[] Write(Encoding Enc)
             {
-                List<byte> MessageData = new List<byte>();
+                List<byte> MessageData = new();
                 for (int i = 0; i < Characters.Count; i++)
                 {
-                    if (!(Characters[i] is Character))
+                    if (Characters[i] is not Character)
                     {
                         MessageData.AddRange(Enc.GetBytes(new char[1] { (char)0x0E }));
                         MessageData.AddRange(Enc.GetBytes(new char[1] { (char)((FormatGroup)Characters[i]).Opcode }));
@@ -507,7 +505,9 @@ namespace Hack.io.MSBT
             public abstract class FormatGroup : IMessageObject
             {
                 public FormatGroup() { }
+#pragma warning disable IDE0060 // Remove unused parameter
                 public FormatGroup(Stream FS, Encoding Enc) { }
+#pragma warning restore IDE0060 // Remove unused parameter
 
                 public abstract byte[] Write(Encoding Enc);
                 internal abstract Opcode Opcode { get; }
@@ -544,7 +544,7 @@ namespace Hack.io.MSBT
                 public SystemGroup(Stream FS, Encoding Enc) : base(FS, Enc)
                 {
                     Action = (System)FS.ReadChar(Enc);
-                    int SkipLength = FS.ReadChar(Enc);
+                    _ = FS.ReadChar(Enc);
                     if (Action == System.COLOUR)
                         Colour = (TextColour)FS.ReadChar(Enc);
                     else
@@ -558,7 +558,7 @@ namespace Hack.io.MSBT
 
                 public override byte[] Write(Encoding Enc)
                 {
-                    List<byte> Data = new List<byte>();
+                    List<byte> Data = new();
                     Data.AddRange(BitConverter.GetBytes((ushort)Action).Reverse());
                     if (Action == System.COLOUR)
                     {
@@ -576,7 +576,7 @@ namespace Hack.io.MSBT
                     return Data.ToArray();
                 }
 
-                public override string ToString() => Action == System.RUBY ? $"{Action.ToString()} -> {RubyBottom}({RubyTop})" : $"{Action.ToString()} -> {Colour.ToString()}";
+                public override string ToString() => Action == System.RUBY ? $"{Action} -> {RubyBottom}({RubyTop})" : $"{Action} -> {Colour}";
                 public string ToRubyString()
                 {
                     if (Action == System.RUBY)
@@ -621,7 +621,7 @@ namespace Hack.io.MSBT
 
                 public override byte[] Write(Encoding Enc)
                 {
-                    List<byte> Data = new List<byte>();
+                    List<byte> Data = new();
                     Data.AddRange(BitConverter.GetBytes((ushort)Type).Reverse());
                     if (Type != DisplayAction.WAIT)
                     {
@@ -646,14 +646,14 @@ namespace Hack.io.MSBT
 
                 public SoundGroup(Stream FS, Encoding Enc) : base(FS, Enc)
                 {
-                    uint SkipLength = BitConverter.ToUInt32(FS.ReadReverse(0, 4), 0);
+                    _ = BitConverter.ToUInt32(FS.ReadReverse(0, 4), 0);
                     ushort StringLength = FS.ReadChar(Enc);
                     SoundID = FS.ReadString(StringLength, Enc);
                 }
 
                 public override byte[] Write(Encoding Enc)
                 {
-                    List<byte> Data = new List<byte>();
+                    List<byte> Data = new();
                     byte[] stringdata = Enc.GetBytes(SoundID);
                     Data.AddRange(new byte[2]);
                     Data.AddRange(BitConverter.GetBytes((ushort)(stringdata.Length + Enc.GetStride())).Reverse());
@@ -674,13 +674,13 @@ namespace Hack.io.MSBT
                 public PictureGroup(Stream FS, Encoding Enc) : base(FS, Enc)
                 {
                     GlyphIndex = FS.ReadChar(Enc);
-                    ushort Font = FS.ReadChar(Enc);
+                    _ = FS.ReadChar(Enc);
                     CharacterID = (char)(FS.ReadChar(Enc)+0x30);
                 }
 
                 public override byte[] Write(Encoding Enc)
                 {
-                    List<byte> Data = new List<byte>();
+                    List<byte> Data = new();
                     Data.AddRange(BitConverter.GetBytes((ushort)GlyphIndex).Reverse());
                     Data.AddRange(BitConverter.GetBytes((ushort)2).Reverse());
                     Data.AddRange(BitConverter.GetBytes((ushort)(CharacterID-0x30)).Reverse());
@@ -703,13 +703,13 @@ namespace Hack.io.MSBT
 
                 public override byte[] Write(Encoding Enc)
                 {
-                    List<byte> Data = new List<byte>();
+                    List<byte> Data = new();
                     Data.AddRange(BitConverter.GetBytes((ushort)Size).Reverse());
                     Data.AddRange(BitConverter.GetBytes((ushort)0x0000).Reverse());
                     return Data.ToArray();
                 }
 
-                public override string ToString() => $"Change size to {Size.ToString()}";
+                public override string ToString() => $"Change size to {Size}";
             }
             public class LocalizeGroup : FormatGroup
             {
@@ -742,7 +742,7 @@ namespace Hack.io.MSBT
 
                 public override byte[] Write(Encoding Enc)
                 {
-                    List<byte> Data = new List<byte>();
+                    List<byte> Data = new();
                     Data.AddRange(BitConverter.GetBytes(MaxWidth).Reverse());
                     Data.AddRange(BitConverter.GetBytes((ushort)Length).Reverse());
                     if (Length == NumberLength.ANY)
@@ -751,7 +751,7 @@ namespace Hack.io.MSBT
                     return Data.ToArray();
                 }
 
-                public override string ToString() => $"Number Variable: {Value.ToString()} ";
+                public override string ToString() => $"Number Variable: {Value} ";
             }
             public class StringGroup : FormatGroup
             {
@@ -761,13 +761,13 @@ namespace Hack.io.MSBT
 
                 public StringGroup(Stream FS, Encoding Enc) : base(FS, Enc)
                 {
-                    ushort Length = FS.ReadChar(Enc);
+                    _ = FS.ReadChar(Enc);
                     Value = FS.ReadString(Enc);
                 }
 
                 public override byte[] Write(Encoding Enc)
                 {
-                    List<byte> Data = new List<byte>();
+                    List<byte> Data = new();
                     Data.AddRange(BitConverter.GetBytes((ushort)Value.Length).Reverse());
                     Data.AddRange(Enc.GetBytes(Value));
                     return Data.ToArray();
@@ -796,13 +796,13 @@ namespace Hack.io.MSBT
                 public FontGroup(Stream FS, Encoding Enc) : base(FS, Enc)
                 {
                     ushort StringLength = FS.ReadChar(Enc);
-                    ushort stringpointer = FS.ReadChar(Enc);
+                    _ = FS.ReadChar(Enc);
                     Value = FS.ReadString(StringLength, Enc);
                 }
 
                 public override byte[] Write(Encoding Enc)
                 {
-                    List<byte> Data = new List<byte>();
+                    List<byte> Data = new();
                     Data.AddRange(BitConverter.GetBytes((ushort)4).Reverse());
                     Data.AddRange(BitConverter.GetBytes((ushort)(Value.Length * Enc.GetStride())).Reverse());
                     Data.AddRange(Enc.GetBytes(Value));

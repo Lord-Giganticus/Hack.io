@@ -39,7 +39,7 @@ namespace Hack.io.RARC
         /// <param name="filename">Archive full filepath</param>
         public RARC(string filename)
         {
-            FileStream RARCFile = new FileStream(filename, FileMode.Open);
+            FileStream RARCFile = new(filename, FileMode.Open);
             Read(RARCFile);
             RARCFile.Close();
             FileName = filename;
@@ -79,7 +79,7 @@ namespace Hack.io.RARC
             /// <param name="Owner"></param>
             public Directory(string FolderPath, RARC Owner)
             {
-                DirectoryInfo DI = new DirectoryInfo(FolderPath);
+                DirectoryInfo DI = new(FolderPath);
                 Name = DI.Name;
                 CreateFromFolder(FolderPath, Owner);
                 OwnerArchive = Owner;
@@ -102,7 +102,7 @@ namespace Hack.io.RARC
                 }
             }
             
-            internal string ToTypeString() => Name.ToUpper().PadRight(4, ' ').Substring(0, 4);
+            internal string ToTypeString() => Name.ToUpper().PadRight(4, ' ')[..4];
             /// <summary>
             /// 
             /// </summary>
@@ -115,7 +115,7 @@ namespace Hack.io.RARC
             /// <param name="OwnerArchive"></param>
             public new void CreateFromFolder(string FolderPath, Archive OwnerArchive = null)
             {
-                if (!(OwnerArchive is RARC r))
+                if (OwnerArchive is not RARC r)
                     throw new Exception();
 
                 if (Items.Count > 0)
@@ -123,14 +123,14 @@ namespace Hack.io.RARC
                 string[] Found = System.IO.Directory.GetFiles(FolderPath, "*.*", SearchOption.TopDirectoryOnly);
                 for (int i = 0; i < Found.Length; i++)
                 {
-                    File temp = new File(Found[i]);
+                    File temp = new(Found[i]);
                     Items[temp.Name] = temp;
                 }
 
                 string[] SubDirs = System.IO.Directory.GetDirectories(FolderPath, "*.*", SearchOption.TopDirectoryOnly);
                 for (int i = 0; i < SubDirs.Length; i++)
                 {
-                    Directory temp = new Directory(SubDirs[i], r);
+                    Directory temp = new(SubDirs[i], r);
                     Items[temp.Name] = temp;
                 }
             }
@@ -199,7 +199,7 @@ namespace Hack.io.RARC
             /// 
             /// </summary>
             /// <returns></returns>
-            public override string ToString() => $"{ID} - {Name} ({FileSettings.ToString()}) [0x{FileData.Length.ToString("X8")}]";
+            public override string ToString() => $"{ID} - {Name} ({FileSettings}) [0x{FileData.Length:X8}]";
 
             //=====================================================================
 
@@ -207,7 +207,7 @@ namespace Hack.io.RARC
             /// Cast a File to a MemoryStream
             /// </summary>
             /// <param name="x"></param>
-            public static explicit operator MemoryStream(File x) => new MemoryStream(x.FileData);
+            public static explicit operator MemoryStream(File x) => new(x.FileData);
         }
 
         #region Internals
@@ -241,12 +241,14 @@ namespace Hack.io.RARC
                 RARCFile.Position = pauseposition;
             }
 
-            internal void Write(Stream RARCFile, Dictionary<string, uint> StringLocations)
+#pragma warning disable IDE0060 // Remove unused parameter
+            internal static void Write(Stream RARCFile, Dictionary<string, uint> StringLocations)
+#pragma warning restore IDE0060 // Remove unused parameter
             {
 
             }
 
-            public override string ToString() => $"{Name} ({Type}) [0x{NameHash.ToString("X4")}] {FileCount} File(s)";
+            public override string ToString() => $"{Name} ({Type}) [0x{NameHash:X4}] {FileCount} File(s)";
         }
 
         /// <summary>
@@ -268,7 +270,7 @@ namespace Hack.io.RARC
             internal short NameHash;
             internal FileAttribute RARCFileType => (FileAttribute)((Type & 0xFF00) >> 8);
 
-            public override string ToString() => $"({FileID}) {Name}, {Type.ToString("X").PadLeft(4, '0')} ({RARCFileType.ToString()}), [{ModularA.ToString("X").PadLeft(8, '0')}][{ModularB.ToString("X").PadLeft(8, '0')}]";
+            public override string ToString() => $"({FileID}) {Name}, {Type.ToString("X").PadLeft(4, '0')} ({RARCFileType}), [{ModularA.ToString("X").PadLeft(8, '0')}][{ModularB.ToString("X").PadLeft(8, '0')}]";
         }
 
         /// <summary>
@@ -276,7 +278,7 @@ namespace Hack.io.RARC
         /// </summary>
         /// <param name="Input">string to convert</param>
         /// <returns>hashed string</returns>
-        internal ushort StringToHash(string Input)
+        internal static ushort StringToHash(string Input)
         {
             int Hash = 0;
             for (int i = 0; i < Input.Length; i++)
@@ -358,12 +360,12 @@ namespace Hack.io.RARC
             #region Directory Nodes
             RARCFile.Position = DirectoryTableOffset;
 
-            List<RARCDirEntry> FlatDirectoryList = new List<RARCDirEntry>();
+            List<RARCDirEntry> FlatDirectoryList = new();
 
             for (int i = 0; i < DirectoryCount; i++)
 #if DEBUG
             {
-                RARCDirEntry DEBUGTEMP = new RARCDirEntry(RARCFile, StringTableOffset);
+                RARCDirEntry DEBUGTEMP = new(RARCFile, StringTableOffset);
                 FlatDirectoryList.Add(DEBUGTEMP);
                 long pauseposition = RARCFile.Position;
                 RARCFile.Position = StringTableOffset + DEBUGTEMP.NameOffset;
@@ -377,7 +379,7 @@ namespace Hack.io.RARC
             #endregion
 
             #region File Nodes
-            List<RARCFileEntry> FlatFileList = new List<RARCFileEntry>();
+            List<RARCFileEntry> FlatFileList = new();
             RARCFile.Seek(FileEntryTableOffset, SeekOrigin.Begin);
             for (int i = 0; i < FileEntryCount; i++)
             {
@@ -388,12 +390,12 @@ namespace Hack.io.RARC
                     Type = BitConverter.ToInt16(RARCFile.ReadReverse(0, 2), 0)
                 });
                 ushort CurrentNameOffset = BitConverter.ToUInt16(RARCFile.ReadReverse(0, 2), 0);
-                FlatFileList[FlatFileList.Count - 1].ModularA = BitConverter.ToInt32(RARCFile.ReadReverse(0, 4), 0);
-                FlatFileList[FlatFileList.Count - 1].ModularB = BitConverter.ToInt32(RARCFile.ReadReverse(0, 4), 0);
+                FlatFileList[^1].ModularA = BitConverter.ToInt32(RARCFile.ReadReverse(0, 4), 0);
+                FlatFileList[^1].ModularB = BitConverter.ToInt32(RARCFile.ReadReverse(0, 4), 0);
                 RARCFile.Position += 0x04;
                 long Pauseposition = RARCFile.Position;
                 RARCFile.Seek(StringTableOffset + CurrentNameOffset, SeekOrigin.Begin);
-                FlatFileList[FlatFileList.Count - 1].Name = RARCFile.ReadString();
+                FlatFileList[^1].Name = RARCFile.ReadString();
                 RARCFile.Position = Pauseposition;
             }
 #if DEBUG
@@ -404,7 +406,7 @@ namespace Hack.io.RARC
 #endif
 
 
-            List<Directory> Directories = new List<Directory>();
+            List<Directory> Directories = new();
             for (int i = 0; i < FlatDirectoryList.Count; i++)
             {
                 Directories.Add(new Directory(this, i, FlatDirectoryList, FlatFileList, DataOffset, RARCFile));
@@ -412,7 +414,7 @@ namespace Hack.io.RARC
 
             for (int i = 0; i < Directories.Count; i++)
             {
-                List<KeyValuePair<string, object>> templist = new List<KeyValuePair<string, object>>();
+                List<KeyValuePair<string, object>> templist = new();
                 foreach (KeyValuePair<string, object> DirectoryItem in Directories[i].Items)
                 {
                     if (DirectoryItem.Value is RARCFileEntry fe)
@@ -450,7 +452,7 @@ namespace Hack.io.RARC
         /// <param name="RARCFile"></param>
         protected override void Write(Stream RARCFile)
         {
-            Dictionary<ArchiveFile, uint> FileOffsets = new Dictionary<ArchiveFile, uint>();
+            Dictionary<ArchiveFile, uint> FileOffsets = new();
             uint dataoffset = 0;
             uint MRAMSize = 0, ARAMSize = 0, DVDSize = 0;
             byte[] DataByteBuffer = GetDataBytes(Root, ref FileOffsets, ref dataoffset, ref MRAMSize, ref ARAMSize, ref DVDSize).ToArray();
@@ -459,9 +461,9 @@ namespace Hack.io.RARC
             List<RARCFileEntry> FlatFileList = GetFlatFileList(Root, FileOffsets, ref FileID, 0, ref NextFolderID, -1);
             uint FirstFileOffset = 0;
             List<RARCDirEntry> FlatDirectoryList = GetFlatDirectoryList(Root, ref FirstFileOffset);
-            FlatDirectoryList.Insert(0, new RARCDirEntry() { FileCount = (ushort)(Root.Items.Count + 2), FirstFileOffset = 0, Name = Root.Name, NameHash = StringToHash(Root.Name), NameOffset = 0, Type = "ROOT" });
-            Dictionary<string, uint> StringLocations = new Dictionary<string, uint>();
-            byte[] StringDataBuffer = GetStringTableBytes(FlatFileList, Root.Name, ref StringLocations).ToArray();
+            FlatDirectoryList.Insert(0, new RARCDirEntry() { FileCount = (ushort)(Root.Items.Count + 2), FirstFileOffset = 0, Name = Root.Name, NameHash = RARC.StringToHash(Root.Name), NameOffset = 0, Type = "ROOT" });
+            Dictionary<string, uint> StringLocations = new();
+            byte[] StringDataBuffer = RARC.GetStringTableBytes(FlatFileList, Root.Name, ref StringLocations).ToArray();
 
             #region File Writing
             RARCFile.WriteString(Magic);
@@ -503,7 +505,7 @@ namespace Hack.io.RARC
             for (int i = 0; i < FlatFileList.Count; i++)
             {
                 RARCFile.WriteReverse(BitConverter.GetBytes(FlatFileList[i].FileID), 0, 2);
-                RARCFile.WriteReverse(BitConverter.GetBytes(StringToHash(FlatFileList[i].Name)), 0, 2);
+                RARCFile.WriteReverse(BitConverter.GetBytes(RARC.StringToHash(FlatFileList[i].Name)), 0, 2);
                 RARCFile.WriteReverse(BitConverter.GetBytes(FlatFileList[i].Type), 0, 2);
                 RARCFile.WriteReverse(BitConverter.GetBytes((ushort)StringLocations[FlatFileList[i].Name]), 0, 2);
                 RARCFile.WriteReverse(BitConverter.GetBytes(FlatFileList[i].ModularA), 0, 4);
@@ -551,12 +553,12 @@ namespace Hack.io.RARC
         }
         private List<byte> GetDataBytes(ArchiveDirectory Root, ref Dictionary<ArchiveFile, uint> Offsets, ref uint LocalOffset, ref uint MRAMSize, ref uint ARAMSize, ref uint DVDSize)
         {
-            List<byte> DataBytesMRAM = new List<byte>();
-            List<byte> DataBytesARAM = new List<byte>();
-            List<byte> DataBytesDVD = new List<byte>();
+            List<byte> DataBytesMRAM = new();
+            List<byte> DataBytesARAM = new();
+            List<byte> DataBytesDVD = new();
             //First, we must sort the files in the correct order
             //MRAM First. ARAM Second, DVD Last
-            List<ArchiveFile> MRAM = new List<ArchiveFile>(), ARAM = new List<ArchiveFile>(), DVD = new List<ArchiveFile>();
+            List<ArchiveFile> MRAM = new(), ARAM = new(), DVD = new();
             SortFilesByLoadType(Root, ref MRAM, ref ARAM, ref DVD);
 
             for (int i = 0; i < MRAM.Count; i++)
@@ -580,7 +582,7 @@ namespace Hack.io.RARC
             for (int i = 0; i < ARAM.Count; i++)
             {
                 Offsets.Add(ARAM[i], LocalOffset);
-                List<byte> temp = new List<byte>();
+                List<byte> temp = new();
                 temp.AddRange(ARAM[i].FileData);
 
                 while (temp.Count % 32 != 0)
@@ -592,7 +594,7 @@ namespace Hack.io.RARC
             for (int i = 0; i < DVD.Count; i++)
             {
                 Offsets.Add(DVD[i], LocalOffset);
-                List<byte> temp = new List<byte>();
+                List<byte> temp = new();
                 temp.AddRange(DVD[i].FileData);
 
                 while (temp.Count % 32 != 0)
@@ -602,7 +604,7 @@ namespace Hack.io.RARC
             }
             DVDSize = LocalOffset - ARAMSize - MRAMSize;
 
-            List<byte> DataBytes = new List<byte>();
+            List<byte> DataBytes = new();
             DataBytes.AddRange(DataBytesMRAM);
             DataBytes.AddRange(DataBytesARAM);
             DataBytes.AddRange(DataBytesDVD);
@@ -631,14 +633,14 @@ namespace Hack.io.RARC
                         DVD.Add(file);
                     }
                     else
-                        throw new Exception($"File entry \"{file.ToString()}\" is not set as being loaded into any type of RAM, or from DVD.");
+                        throw new Exception($"File entry \"{file}\" is not set as being loaded into any type of RAM, or from DVD.");
                 }
             }
         }
         private List<RARCFileEntry> GetFlatFileList(ArchiveDirectory Root, Dictionary<ArchiveFile, uint> FileOffsets, ref short GlobalFileID, int CurrentFolderID, ref int NextFolderID, int BackwardsFolderID)
         {
-            List<RARCFileEntry> FileList = new List<RARCFileEntry>();
-            List<KeyValuePair<int, Directory>> Directories = new List<KeyValuePair<int, Directory>>();
+            List<RARCFileEntry> FileList = new();
+            List<KeyValuePair<int, Directory>> Directories = new();
             foreach (KeyValuePair<string, object> item in Root.Items)
             {
                 if (item.Value is File file)
@@ -664,7 +666,7 @@ namespace Hack.io.RARC
         }
         private List<ArchiveFile> GetFlatFileList(ArchiveDirectory Root)
         {
-            List<ArchiveFile> FileList = new List<ArchiveFile>();
+            List<ArchiveFile> FileList = new();
             foreach (KeyValuePair<string, object> item in Root.Items)
             {
                 if (item.Value is ArchiveFile file)
@@ -681,23 +683,23 @@ namespace Hack.io.RARC
         }
         private List<RARCDirEntry> GetFlatDirectoryList(ArchiveDirectory Root, ref uint FirstFileOffset)
         {
-            List<RARCDirEntry> FlatDirectoryList = new List<RARCDirEntry>();
-            List<RARCDirEntry> TemporaryList = new List<RARCDirEntry>();
+            List<RARCDirEntry> FlatDirectoryList = new();
+            List<RARCDirEntry> TemporaryList = new();
             FirstFileOffset += (uint)(Root.Items.Count + 2);
             foreach (KeyValuePair<string, object> item in Root.Items)
             {
                 if (item.Value is Directory Currentdir)
                 {
-                    FlatDirectoryList.Add(new RARCDirEntry() { FileCount = (ushort)(Currentdir.Items.Count + 2), FirstFileOffset = FirstFileOffset, Name = Currentdir.Name, NameHash = StringToHash(Currentdir.Name), NameOffset = 0xFFFFFFFF, Type = Currentdir.ToTypeString() });
+                    FlatDirectoryList.Add(new RARCDirEntry() { FileCount = (ushort)(Currentdir.Items.Count + 2), FirstFileOffset = FirstFileOffset, Name = Currentdir.Name, NameHash = RARC.StringToHash(Currentdir.Name), NameOffset = 0xFFFFFFFF, Type = Currentdir.ToTypeString() });
                     TemporaryList.AddRange(GetFlatDirectoryList(Currentdir, ref FirstFileOffset));
                 }
             }
             FlatDirectoryList.AddRange(TemporaryList);
             return FlatDirectoryList;
         }
-        private List<byte> GetStringTableBytes(List<RARCFileEntry> FlatFileList, string RootName, ref Dictionary<string, uint> Offsets)
+        private static List<byte> GetStringTableBytes(List<RARCFileEntry> FlatFileList, string RootName, ref Dictionary<string, uint> Offsets)
         {
-            List<byte> strings = new List<byte>();
+            List<byte> strings = new();
             Encoding enc = Encoding.GetEncoding(932);
             strings.AddRange(enc.GetBytes(RootName));
             strings.Add(0x00);
@@ -725,7 +727,7 @@ namespace Hack.io.RARC
         
         private short GetNextFreeID()
         {
-            List<short> AllIDs = new List<short>();
+            List<short> AllIDs = new();
             List<ArchiveFile> FlatFileList = GetFlatFileList(Root);
             for (int i = 0; i < FlatFileList.Count; i++)
                 AllIDs.Add(((File)FlatFileList[i])?.ID ?? (short)AllIDs.Count);
@@ -734,7 +736,7 @@ namespace Hack.io.RARC
             int a = AllIDs.OrderBy(x => x).First();
             int b = AllIDs.OrderBy(x => x).Last();
             List<int> LiterallyAllIDs = Enumerable.Range(0, b - a + 1).ToList();
-            List<short> Shorts = new List<short>();
+            List<short> Shorts = new();
             for (int i = 0; i < LiterallyAllIDs.Count; i++)
             {
                 Shorts.Add((short)LiterallyAllIDs[i]);

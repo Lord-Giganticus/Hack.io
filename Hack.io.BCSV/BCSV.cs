@@ -1,6 +1,4 @@
-﻿using Hack.io.Util;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -70,7 +68,7 @@ namespace Hack.io.BCSV
         /// <param name="Filename">filepath</param>
         public BCSV(string Filename)
         {
-            FileStream fs = new FileStream(Filename, FileMode.Open);
+            FileStream fs = new(Filename, FileMode.Open);
             Read(fs);
             fs.Close();
             FileName = Filename;
@@ -87,7 +85,7 @@ namespace Hack.io.BCSV
         /// <param name="Filename"></param>
         public void Save(string Filename)
         {
-            FileStream fs = new FileStream(Filename, FileMode.Create);
+            FileStream fs = new(Filename, FileMode.Create);
             Save(fs);
             fs.Close();
             FileName = Filename;
@@ -102,7 +100,7 @@ namespace Hack.io.BCSV
 
             ushort offset = 0;
             List<KeyValuePair<uint, BCSVField>> FieldList = Fields.ToList();
-            List<KeyValuePair<uint, BCSVField>> OrganizedFieldList = GenerateSortedFields(FieldList);
+            List<KeyValuePair<uint, BCSVField>> OrganizedFieldList = io.BCSV.BCSV.GenerateSortedFields(FieldList);
             for (int i = 0; i < OrganizedFieldList.Count; i++)
             {
                 BCSVField currentfield = OrganizedFieldList[i].Value;
@@ -124,12 +122,12 @@ namespace Hack.io.BCSV
             #endregion
 
             #region Collect the strings
-            List<string> Strings = new List<string>();// { "5324" };
+            List<string> Strings = new();// { "5324" };
             for (int i = 0; i < EntryCount; i++)
             {
                 for (int j = 0; j < Entries[i].Data.Count; j++)
                 {
-                    if (Fields.ContainsKey(Entries[i].Data.ElementAt(j).Key) && Fields[Entries[i].Data.ElementAt(j).Key].DataType == DataTypes.STRING)
+                    if (Fields.TryGetValue(Entries[i].Data.ElementAt(j).Key, out BCSVField value) && value.DataType == DataTypes.STRING)
                     {
                         if (!Strings.Any(O => O.Equals((string)Entries[i].Data.ElementAt(j).Value)))
                             Strings.Add((string)Entries[i].Data.ElementAt(j).Value);
@@ -182,7 +180,7 @@ namespace Hack.io.BCSV
         /// <returns></returns>
         public MemoryStream Save()
         {
-            MemoryStream ms = new MemoryStream();
+            MemoryStream ms = new();
             Save(ms);
             return ms;
         }
@@ -449,7 +447,7 @@ namespace Hack.io.BCSV
             //Console.WriteLine("Loading Fields:");
             for (int i = 0; i < fieldcount; i++)
             {
-                BCSVField currentfield = new BCSVField(BCSV);
+                BCSVField currentfield = new(BCSV);
                 Fields.Add(currentfield.HashName, currentfield);
                 //Console.Write($"\r{Math.Min(((float)(i + 1) / (float)fieldcount) * 100.0f, 100.0f)}%          ");
             }
@@ -458,7 +456,7 @@ namespace Hack.io.BCSV
             //Console.WriteLine("Loading Entries:");
             for (int i = 0; i < entrycount; i++)
             {
-                BCSVEntry currententry = new BCSVEntry(BCSV, Fields, dataoffset + (entrycount * entrysize));
+                BCSVEntry currententry = new(BCSV, Fields, dataoffset + (entrycount * entrysize));
                 Entries.Add(currententry);
                 BCSV.Position += entrysize;
 
@@ -467,14 +465,14 @@ namespace Hack.io.BCSV
             //Console.WriteLine("Complete!");
         }
         
-        private List<KeyValuePair<uint, BCSVField>> GenerateSortedFields(List<KeyValuePair<uint, BCSVField>> original)
+        private static List<KeyValuePair<uint, BCSVField>> GenerateSortedFields(List<KeyValuePair<uint, BCSVField>> original)
         {
-            List<KeyValuePair<uint, BCSVField>> Float = new List<KeyValuePair<uint, BCSVField>>(),
-                Int32 = new List<KeyValuePair<uint, BCSVField>>(),
-                Int16 = new List<KeyValuePair<uint, BCSVField>>(),
-                Byte = new List<KeyValuePair<uint, BCSVField>>(),
-                String = new List<KeyValuePair<uint, BCSVField>>(),
-                Uint32 = new List<KeyValuePair<uint, BCSVField>>();
+            List<KeyValuePair<uint, BCSVField>> Float = new(),
+                Int32 = new(),
+                Int16 = new(),
+                Byte = new(),
+                String = new(),
+                Uint32 = new();
             for (int i = 0; i < original.Count; i++)
             {
                 switch (original[i].Value.DataType)
@@ -504,7 +502,7 @@ namespace Hack.io.BCSV
                 }
             }
 
-            List<KeyValuePair<uint, BCSVField>> result = new List<KeyValuePair<uint, BCSVField>>();
+            List<KeyValuePair<uint, BCSVField>> result = new();
             result.AddRange(Float);
             result.AddRange(Int32);
             result.AddRange(Uint32);
@@ -520,13 +518,13 @@ namespace Hack.io.BCSV
         /// Cast a BCSV to a RARCFile
         /// </summary>
         /// <param name="x"></param>
-        public static implicit operator RARC.RARC.File(BCSV x) => new RARC.RARC.File(x.FileName, x.Save());
+        public static implicit operator RARC.RARC.File(BCSV x) => new(x.FileName, x.Save());
 
         /// <summary>
         /// Cast a RARCFile to a BCSV
         /// </summary>
         /// <param name="x"></param>
-        public static implicit operator BCSV(RARC.RARC.File x) => new BCSV((MemoryStream)x) { FileName = x.Name };
+        public static implicit operator BCSV(RARC.RARC.File x) => new((MemoryStream)x) { FileName = x.Name };
 
         //=====================================================================
     }
@@ -633,23 +631,16 @@ namespace Hack.io.BCSV
         /// <returns>The default value of the DataType</returns>
         public static object GetDefaultValue(DataTypes type)
         {
-            switch (type)
+            return type switch
             {
-                case DataTypes.INT32:
-                    return default(int);
-                case DataTypes.FLOAT:
-                    return default(float);
-                case DataTypes.UINT32:
-                    return default(uint);
-                case DataTypes.INT16:
-                    return default(short);
-                case DataTypes.BYTE:
-                    return default(byte);
-                case DataTypes.STRING:
-                    return "";
-                default:
-                    return null;
-            }
+                DataTypes.INT32 => default(int),
+                DataTypes.FLOAT => default(float),
+                DataTypes.UINT32 => default(uint),
+                DataTypes.INT16 => default(short),
+                DataTypes.BYTE => default(byte),
+                DataTypes.STRING => "",
+                _ => null,
+            };
         }
 
         private void Init(uint hash, DataTypes type, uint bitmask, byte shift, bool Auto)
@@ -665,7 +656,7 @@ namespace Hack.io.BCSV
         /// Returns a string that represents the current object
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => $"0x{HashName.ToString("X8")} - {DataType.ToString()}";
+        public override string ToString() => $"0x{HashName:X8} - {DataType}";
         /// <summary>
         /// Compares this BCSVField to another BCSVField.<para/>NOTE: This check excludes AutoRecalc and the Automatically Calculated Entry Offset variable
         /// </summary>
@@ -699,14 +690,7 @@ namespace Hack.io.BCSV
         /// <returns></returns>
         public override int GetHashCode()
         {
-            var hashCode = -2117134392;
-            hashCode = hashCode * -1521134295 + HashName.GetHashCode();
-            hashCode = hashCode * -1521134295 + DataType.GetHashCode();
-            hashCode = hashCode * -1521134295 + _Bitmask.GetHashCode();
-            hashCode = hashCode * -1521134295 + _ShiftAmount.GetHashCode();
-            hashCode = hashCode * -1521134295 + EntryOffset.GetHashCode();
-            hashCode = hashCode * -1521134295 + AutoRecalc.GetHashCode();
-            return hashCode;
+            return HashCode.Combine(HashName, DataType, _Bitmask, _ShiftAmount, EntryOffset, AutoRecalc);
         }
     }
     /// <summary>
@@ -786,7 +770,7 @@ namespace Hack.io.BCSV
             {
                 BCSV.Position = OriginalPosition + Field.Value.EntryOffset;
                 Encoding enc = Encoding.GetEncoding(932);
-                if (Data.ContainsKey(Field.Key))
+                if (Data.TryGetValue(Field.Key, out object value))
                 {
                     switch (Field.Value.DataType)
                     {
@@ -815,10 +799,10 @@ namespace Hack.io.BCSV
                             }
                             break;
                         case DataTypes.FLOAT:
-                            BCSV.WriteReverse(BitConverter.GetBytes((float)Data[Field.Key]), 0, 4);
+                            BCSV.WriteReverse(BitConverter.GetBytes((float)value), 0, 4);
                             break;
                         case DataTypes.UINT32:
-                            BCSV.WriteReverse(BitConverter.GetBytes((uint)Data[Field.Key]), 0, 4);
+                            BCSV.WriteReverse(BitConverter.GetBytes((uint)value), 0, 4);
                             break;
                         case DataTypes.INT16:
                             BCSV.WriteReverse(BitConverter.GetBytes((short)Data[Field.Key]), 0, 2);
@@ -856,8 +840,8 @@ namespace Hack.io.BCSV
             get { return Data[hash]; }
             set
             {
-                if (!(value is int) && !(value is float) && !(value is uint) && !(value is short) && !(value is byte) && !(value is string))
-                    throw new Exception($"The provided object is not supported by BCSV. Value is of type \"{value.GetType().ToString()}\"");
+                if (value is not int && value is not float && value is not uint && value is not short && value is not byte && value is not string)
+                    throw new Exception($"The provided object is not supported by BCSV. Value is of type \"{value.GetType()}\"");
                 Data[hash] = value;
             }
         }
@@ -897,7 +881,7 @@ namespace Hack.io.BCSV
             if (!input.StartsWith("BCSVEntry|"))
                 return false;
 
-            int DataIndex = 0;
+            int DataIndex;
             Dictionary<uint, object> backup = Data;
             try
             {
@@ -945,7 +929,7 @@ namespace Hack.io.BCSV
         public static BCSVEntry Clone(BCSVEntry SourceEntry)
         {
             string data = SourceEntry.ToClipboard();
-            BCSVEntry entry = new BCSVEntry();
+            BCSVEntry entry = new();
             entry.FromClipboard(data);
             return entry;
         }

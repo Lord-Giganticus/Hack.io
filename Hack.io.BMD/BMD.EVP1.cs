@@ -40,15 +40,14 @@ namespace Hack.io.BMD
                 int ChunkSize = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
                 int entryCount = BitConverter.ToInt16(BMD.ReadReverse(0, 2), 0);
                 BMD.Position += 0x02;
-
-                int weightCountsOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
+                _ = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
                 int boneIndicesOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
                 int weightDataOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
                 int inverseBindMatricesOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
 
-                List<int> counts = new List<int>();
-                List<float> weights = new List<float>();
-                List<int> indices = new List<int>();
+                List<int> counts = new();
+                List<float> weights = new();
+                List<int> indices = new();
 
                 for (int i = 0; i < entryCount; i++)
                     counts.Add(BMD.ReadByte());
@@ -76,7 +75,7 @@ namespace Hack.io.BMD
                 int totalRead = 0;
                 for (int i = 0; i < entryCount; i++)
                 {
-                    Weight weight = new Weight();
+                    Weight weight = new();
 
                     for (int j = 0; j < counts[i]; j++)
                     {
@@ -92,11 +91,11 @@ namespace Hack.io.BMD
 
                 for (int i = 0; i < matrixCount; i++)
                 {
-                    Matrix3x4 invBind = new Matrix3x4(BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0),
+                    Matrix3x4 invBind = new(BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0),
                                                       BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0),
                                                       BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0));
 
-                    Matrix4 BindMatrix = new Matrix4(invBind.Row0, invBind.Row1, invBind.Row2, Vector4.UnitW);
+                    Matrix4 BindMatrix = new(invBind.Row0, invBind.Row1, invBind.Row2, Vector4.UnitW);
                     BindMatrix.Transpose();
                     InverseBindMatrices.Add(BindMatrix);
                 }
@@ -112,7 +111,7 @@ namespace Hack.io.BMD
                     // And these must be set both in the skeleton and the EVP1.
                     for (int i = 0; i < flatSkel.Count; i++)
                     {
-                        Matrix4 newMat = new Matrix4(Vector4.UnitX, Vector4.UnitY, Vector4.UnitZ, Vector4.UnitW);
+                        Matrix4 newMat = new(Vector4.UnitX, Vector4.UnitY, Vector4.UnitZ, Vector4.UnitW);
                         InverseBindMatrices.Add(newMat);
                         flatSkel[i].SetInverseBindMatrix(newMat);
                     }

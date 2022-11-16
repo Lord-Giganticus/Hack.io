@@ -35,7 +35,8 @@ namespace Hack.io.BMD
 
                 int shapeHeaderDataOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
                 int shapeRemapTableOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
-                int StringTableOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
+                int StringTableOffset;
+                _ = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
                 int attributeDataOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
                 int DRW1IndexTableOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
                 int primitiveDataOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
@@ -65,24 +66,24 @@ namespace Hack.io.BMD
                     //Why Nintendo why
 
                     BMD.Position = ChunkStart + shapeHeaderDataOffset + (0x28 * SID);
-                    long ShapeStart = BMD.Position;
-                    Shape CurrentShape = new Shape() { MatrixType = (DisplayFlags)BMD.ReadByte() };
+                    _ = BMD.Position;
+                    Shape CurrentShape = new() { MatrixType = (DisplayFlags)BMD.ReadByte() };
                     BMD.Position++;
                     ushort PacketCount = BitConverter.ToUInt16(BMD.ReadReverse(0, 2), 0);
                     ushort batchAttributeOffset = BitConverter.ToUInt16(BMD.ReadReverse(0, 2), 0);
                     ushort firstMatrixIndex = BitConverter.ToUInt16(BMD.ReadReverse(0, 2), 0);
                     ushort firstPacketIndex = BitConverter.ToUInt16(BMD.ReadReverse(0, 2), 0);
                     BMD.Position += 0x02;
-                    BoundingVolume shapeVol = new BoundingVolume(BMD);
+                    BoundingVolume shapeVol = new(BMD);
 
-                    ShapeVertexDescriptor Desc = new ShapeVertexDescriptor(BMD, BMD.Position = ChunkStart + attributeDataOffset + batchAttributeOffset);
+                    ShapeVertexDescriptor Desc = new(BMD, BMD.Position = ChunkStart + attributeDataOffset + batchAttributeOffset);
                     CurrentShape.Bounds = shapeVol;
                     CurrentShape.Descriptor = Desc;
                     Shapes.Add(CurrentShape);
 
                     for (int PacketID = 0; PacketID < PacketCount; PacketID++)
                     {
-                        Packet Pack = new Packet();
+                        Packet Pack = new();
 
                         // The packets are all stored linearly and then they point to the specific size and offset of the data for this particular packet.
                         BMD.Position = ChunkStart + PacketInfoDataOffset + ((firstPacketIndex + PacketID) * 0x8); /* 0x8 is the size of one Packet entry */
@@ -143,14 +144,14 @@ namespace Hack.io.BMD
                                     }
                                     else
                                     {
-                                        EVP1.Weight vertWeight = new EVP1.Weight();
+                                        EVP1.Weight vertWeight = new();
                                         vertWeight.AddWeight(1.0f, drawList.TransformIndexTable[(int)drw1Index]);
                                         vert.SetWeight(vertWeight);
                                     }
                                 }
                                 else
                                 {
-                                    EVP1.Weight vertWeight = new EVP1.Weight();
+                                    EVP1.Weight vertWeight = new();
                                     vertWeight.AddWeight(1.0f, drawList.TransformIndexTable[Shapes[i].Packets[j].MatrixIndices[0]]);
                                     vert.SetWeight(vertWeight);
                                 }
@@ -172,7 +173,7 @@ namespace Hack.io.BMD
 
             internal List<Vertex> GetAllUsedVertices()
             {
-                List<Vertex> results = new List<Vertex>();
+                List<Vertex> results = new();
                 for (int i = 0; i < Shapes.Count; i++)
                     results.AddRange(Shapes[i].GetAllUsedVertices());
                 return results;
@@ -182,7 +183,7 @@ namespace Hack.io.BMD
             {
                 long start = writer.Position;
 
-                List<byte> RemapTableData = new List<byte>();
+                List<byte> RemapTableData = new();
                 for (int i = 0; i < RemapTable.Count; i++)
                     RemapTableData.AddRange(BitConverter.GetBytes((short)RemapTable[i]).Reverse());
 
@@ -256,8 +257,8 @@ namespace Hack.io.BMD
 
             private List<Tuple<ShapeVertexDescriptor, int>> WriteShapeAttributeDescriptors(Stream writer)
             {
-                List<Tuple<ShapeVertexDescriptor, int>> outList = new List<Tuple<ShapeVertexDescriptor, int>>();
-                List<ShapeVertexDescriptor> written = new List<ShapeVertexDescriptor>();
+                List<Tuple<ShapeVertexDescriptor, int>> outList = new();
+                List<ShapeVertexDescriptor> written = new();
 
                 long start = writer.Position;
 
@@ -277,7 +278,7 @@ namespace Hack.io.BMD
 
             private List<Tuple<Packet, int>> WritePacketMatrixIndices(Stream writer)
             {
-                List<Tuple<Packet, int>> outList = new List<Tuple<Packet, int>>();
+                List<Tuple<Packet, int>> outList = new();
 
                 int indexOffset = 0;
                 foreach (Shape shape in Shapes)
@@ -306,7 +307,7 @@ namespace Hack.io.BMD
 
             private List<Tuple<int, int>> WritePrimitives(Stream writer)
             {
-                List<Tuple<int, int>> outList = new List<Tuple<int, int>>();
+                List<Tuple<int, int>> outList = new();
 
                 long start = writer.Position;
 
@@ -376,7 +377,7 @@ namespace Hack.io.BMD
 
                 internal List<Vertex> GetAllUsedVertices()
                 {
-                    List<Vertex> results = new List<Vertex>();
+                    List<Vertex> results = new();
                     for (int i = 0; i < Packets.Count; i++)
                     {
                         for (int x = 0; x < Packets[i].Primitives.Count; x++)
@@ -399,7 +400,7 @@ namespace Hack.io.BMD
                     Bounds.Write(writer);
                 }
 
-                public override string ToString() => $"Shape: {MatrixType.ToString()}";
+                public override string ToString() => $"Shape: {MatrixType}";
             }
 
             public class ShapeVertexDescriptor
@@ -435,7 +436,7 @@ namespace Hack.io.BMD
                     Attributes.Add(attribute, new Tuple<VertexInputType, int>(inputType, vertexIndex));
                 }
 
-                public List<GXVertexAttribute> GetActiveAttributes() => new List<GXVertexAttribute>(Attributes.Keys);
+                public List<GXVertexAttribute> GetActiveAttributes() => new(Attributes.Keys);
 
                 public int GetAttributeIndex(GXVertexAttribute attribute)
                 {
@@ -542,7 +543,7 @@ namespace Hack.io.BMD
 
                 public override bool Equals(object obj)
                 {
-                    if (!(obj is ShapeVertexDescriptor descriptor) || Attributes.Count != descriptor.Attributes.Count)
+                    if (obj is not ShapeVertexDescriptor descriptor || Attributes.Count != descriptor.Attributes.Count)
                         return false;
                     foreach (KeyValuePair<GXVertexAttribute, Tuple<VertexInputType, int>> item in Attributes)
                     {
@@ -589,7 +590,7 @@ namespace Hack.io.BMD
                         GXPrimitiveType type = (GXPrimitiveType)reader.PeekByte();
                         if (type == 0 || reader.Position >= Size + Location)
                             break;
-                        Primitive prim = new Primitive(reader, desc);
+                        Primitive prim = new(reader, desc);
                         Primitives.Add(prim);
                     }
                 }
@@ -623,7 +624,7 @@ namespace Hack.io.BMD
 
                     for (int i = 0; i < vertCount; i++)
                     {
-                        Vertex vert = new Vertex();
+                        Vertex vert = new();
 
                         foreach (GXVertexAttribute attrib in activeAttribs.Attributes.Keys)
                         {
@@ -657,7 +658,7 @@ namespace Hack.io.BMD
                         vert.Write(writer, desc);
                 }
 
-                public override string ToString() => $"{PrimitiveType.ToString()}, {Vertices.Count} Vertices";
+                public override string ToString() => $"{PrimitiveType}, {Vertices.Count} Vertices";
             }
 
             public class Vertex
@@ -725,53 +726,31 @@ namespace Hack.io.BMD
 
                 public uint GetAttributeIndex(GXVertexAttribute attribute)
                 {
-                    switch (attribute)
+                    return attribute switch
                     {
-                        case GXVertexAttribute.PositionMatrixIdx:
-                            return PositionMatrixIDxIndex;
-                        case GXVertexAttribute.Position:
-                            return PositionIndex;
-                        case GXVertexAttribute.Normal:
-                            return NormalIndex;
-                        case GXVertexAttribute.Color0:
-                            return Color0Index;
-                        case GXVertexAttribute.Color1:
-                            return Color1Index;
-                        case GXVertexAttribute.Tex0:
-                            return TexCoord0Index;
-                        case GXVertexAttribute.Tex1:
-                            return TexCoord1Index;
-                        case GXVertexAttribute.Tex2:
-                            return TexCoord2Index;
-                        case GXVertexAttribute.Tex3:
-                            return TexCoord3Index;
-                        case GXVertexAttribute.Tex4:
-                            return TexCoord4Index;
-                        case GXVertexAttribute.Tex5:
-                            return TexCoord5Index;
-                        case GXVertexAttribute.Tex6:
-                            return TexCoord6Index;
-                        case GXVertexAttribute.Tex7:
-                            return TexCoord7Index;
-                        case GXVertexAttribute.Tex0Mtx:
-                            return Tex0MtxIndex;
-                        case GXVertexAttribute.Tex1Mtx:
-                            return Tex1MtxIndex;
-                        case GXVertexAttribute.Tex2Mtx:
-                            return Tex2MtxIndex;
-                        case GXVertexAttribute.Tex3Mtx:
-                            return Tex3MtxIndex;
-                        case GXVertexAttribute.Tex4Mtx:
-                            return Tex4MtxIndex;
-                        case GXVertexAttribute.Tex5Mtx:
-                            return Tex5MtxIndex;
-                        case GXVertexAttribute.Tex6Mtx:
-                            return Tex6MtxIndex;
-                        case GXVertexAttribute.Tex7Mtx:
-                            return Tex7MtxIndex;
-                        default:
-                            throw new ArgumentException(String.Format("attribute {0}", attribute));
-                    }
+                        GXVertexAttribute.PositionMatrixIdx => PositionMatrixIDxIndex,
+                        GXVertexAttribute.Position => PositionIndex,
+                        GXVertexAttribute.Normal => NormalIndex,
+                        GXVertexAttribute.Color0 => Color0Index,
+                        GXVertexAttribute.Color1 => Color1Index,
+                        GXVertexAttribute.Tex0 => TexCoord0Index,
+                        GXVertexAttribute.Tex1 => TexCoord1Index,
+                        GXVertexAttribute.Tex2 => TexCoord2Index,
+                        GXVertexAttribute.Tex3 => TexCoord3Index,
+                        GXVertexAttribute.Tex4 => TexCoord4Index,
+                        GXVertexAttribute.Tex5 => TexCoord5Index,
+                        GXVertexAttribute.Tex6 => TexCoord6Index,
+                        GXVertexAttribute.Tex7 => TexCoord7Index,
+                        GXVertexAttribute.Tex0Mtx => Tex0MtxIndex,
+                        GXVertexAttribute.Tex1Mtx => Tex1MtxIndex,
+                        GXVertexAttribute.Tex2Mtx => Tex2MtxIndex,
+                        GXVertexAttribute.Tex3Mtx => Tex3MtxIndex,
+                        GXVertexAttribute.Tex4Mtx => Tex4MtxIndex,
+                        GXVertexAttribute.Tex5Mtx => Tex5MtxIndex,
+                        GXVertexAttribute.Tex6Mtx => Tex6MtxIndex,
+                        GXVertexAttribute.Tex7Mtx => Tex7MtxIndex,
+                        _ => throw new ArgumentException(String.Format("attribute {0}", attribute)),
+                    };
                 }
 
                 public void SetAttributeIndex(GXVertexAttribute attribute, uint index)
@@ -855,71 +834,71 @@ namespace Hack.io.BMD
                 {
                     if (desc.CheckAttribute(GXVertexAttribute.PositionMatrixIdx))
                     {
-                        WriteAttributeIndex(writer, PositionMatrixIDxIndex * 3, desc.Attributes[GXVertexAttribute.PositionMatrixIdx].Item1);
+                        Vertex.WriteAttributeIndex(writer, PositionMatrixIDxIndex * 3, desc.Attributes[GXVertexAttribute.PositionMatrixIdx].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Position))
                     {
-                        WriteAttributeIndex(writer, PositionIndex, desc.Attributes[GXVertexAttribute.Position].Item1);
+                        Vertex.WriteAttributeIndex(writer, PositionIndex, desc.Attributes[GXVertexAttribute.Position].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Normal))
                     {
-                        WriteAttributeIndex(writer, NormalIndex, desc.Attributes[GXVertexAttribute.Normal].Item1);
+                        Vertex.WriteAttributeIndex(writer, NormalIndex, desc.Attributes[GXVertexAttribute.Normal].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Color0))
                     {
-                        WriteAttributeIndex(writer, Color0Index, desc.Attributes[GXVertexAttribute.Color0].Item1);
+                        Vertex.WriteAttributeIndex(writer, Color0Index, desc.Attributes[GXVertexAttribute.Color0].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Color1))
                     {
-                        WriteAttributeIndex(writer, Color1Index, desc.Attributes[GXVertexAttribute.Color1].Item1);
+                        Vertex.WriteAttributeIndex(writer, Color1Index, desc.Attributes[GXVertexAttribute.Color1].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex0))
                     {
-                        WriteAttributeIndex(writer, TexCoord0Index, desc.Attributes[GXVertexAttribute.Tex0].Item1);
+                        Vertex.WriteAttributeIndex(writer, TexCoord0Index, desc.Attributes[GXVertexAttribute.Tex0].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex1))
                     {
-                        WriteAttributeIndex(writer, TexCoord1Index, desc.Attributes[GXVertexAttribute.Tex1].Item1);
+                        Vertex.WriteAttributeIndex(writer, TexCoord1Index, desc.Attributes[GXVertexAttribute.Tex1].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex2))
                     {
-                        WriteAttributeIndex(writer, TexCoord2Index, desc.Attributes[GXVertexAttribute.Tex2].Item1);
+                        Vertex.WriteAttributeIndex(writer, TexCoord2Index, desc.Attributes[GXVertexAttribute.Tex2].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex3))
                     {
-                        WriteAttributeIndex(writer, TexCoord3Index, desc.Attributes[GXVertexAttribute.Tex3].Item1);
+                        Vertex.WriteAttributeIndex(writer, TexCoord3Index, desc.Attributes[GXVertexAttribute.Tex3].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex4))
                     {
-                        WriteAttributeIndex(writer, TexCoord4Index, desc.Attributes[GXVertexAttribute.Tex4].Item1);
+                        Vertex.WriteAttributeIndex(writer, TexCoord4Index, desc.Attributes[GXVertexAttribute.Tex4].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex5))
                     {
-                        WriteAttributeIndex(writer, TexCoord5Index, desc.Attributes[GXVertexAttribute.Tex5].Item1);
+                        Vertex.WriteAttributeIndex(writer, TexCoord5Index, desc.Attributes[GXVertexAttribute.Tex5].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex6))
                     {
-                        WriteAttributeIndex(writer, TexCoord6Index, desc.Attributes[GXVertexAttribute.Tex6].Item1);
+                        Vertex.WriteAttributeIndex(writer, TexCoord6Index, desc.Attributes[GXVertexAttribute.Tex6].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex7))
                     {
-                        WriteAttributeIndex(writer, TexCoord7Index, desc.Attributes[GXVertexAttribute.Tex7].Item1);
+                        Vertex.WriteAttributeIndex(writer, TexCoord7Index, desc.Attributes[GXVertexAttribute.Tex7].Item1);
                     }
                 }
 
-                private void WriteAttributeIndex(Stream writer, uint value, VertexInputType type)
+                private static void WriteAttributeIndex(Stream writer, uint value, VertexInputType type)
                 {
                     switch (type)
                     {
@@ -1002,7 +981,7 @@ namespace Hack.io.BMD
                     writer.WriteReverse(BitConverter.GetBytes(MaxBounds.Z), 0, 4);
                 }
 
-                public override string ToString() => $"Min: {MinBounds.ToString()}, Max: {MaxBounds.ToString()}, Radius: {SphereRadius.ToString()}, Center: {Center.ToString()}";
+                public override string ToString() => $"Min: {MinBounds}, Max: {MaxBounds}, Radius: {SphereRadius}, Center: {Center}";
             }
         }
 

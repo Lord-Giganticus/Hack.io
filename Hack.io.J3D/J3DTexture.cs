@@ -1,7 +1,6 @@
 ﻿using Hack.io.Util;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -29,7 +28,7 @@ namespace Hack.io.J3D
             }
             public JUTTexture(string filepath)
             {
-                FileStream fs = new FileStream(filepath, FileMode.Open);
+                FileStream fs = new(filepath, FileMode.Open);
                 Read(fs);
                 fs.Close();
                 FileName = filepath;
@@ -45,7 +44,7 @@ namespace Hack.io.J3D
 
             public virtual void Save(string filepath)
             {
-                FileStream fs = new FileStream(filepath, FileMode.Create);
+                FileStream fs = new(filepath, FileMode.Create);
                 Write(fs);
                 fs.Close();
                 FileName = filepath;
@@ -81,8 +80,8 @@ namespace Hack.io.J3D
                 public float LODBias { get; set; }
                 public bool EnableEdgeLOD { get; set; }
 
-                public Size LargestSize => new Size(this[0].Width, this[0].Height);
-                public Size SmallestSize => new Size(this[Count-1].Width, this[Count-1].Height);
+                public Size LargestSize => new(this[0].Width, this[0].Height);
+                public Size SmallestSize => new(this[Count-1].Width, this[Count-1].Height);
 
                 public TexEntry() { }
                 public TexEntry(Bitmap Image, GXImageFormat ImageFormat = GXImageFormat.CMPR, GXPaletteFormat PaletteFormat = GXPaletteFormat.IA8, GXWrapMode WrapS = 0, GXWrapMode WrapT = 0, GXFilterMode MagFilter = 0, GXFilterMode MinFilter = 0, float Bias = 0.0f, bool EdgeLoD = false)
@@ -156,8 +155,8 @@ namespace Hack.io.J3D
         #region Imaging
         public static Bitmap DecodeImage(Stream TextureFile, byte[] PaletteData, GXImageFormat Format, GXPaletteFormat? PaletteFormat, int? PaletteCount, int ImageWidth, int ImageHeight, int Mipmap)
         {
-            Bitmap Result = null;
-            byte[] ImageData = null;
+            Bitmap Result;
+            byte[] ImageData;
 
             for (int i = 0; i < Mipmap; i++)
             {
@@ -242,7 +241,7 @@ namespace Hack.io.J3D
                     #endregion
                     break;
                 default:
-                    throw new Exception($"Invalid format {Format.ToString()}");
+                    throw new Exception($"Invalid format {Format}");
             }
             return Result;
         }
@@ -261,7 +260,7 @@ namespace Hack.io.J3D
         {
             Color[] PaletteColours = null;
             if (PaletteData != null && PaletteData.Length > 0)
-                PaletteColours = DecodePalette(PaletteData, PaletteFormat, ColourCounts, Format);
+                PaletteColours = DecodePalette(PaletteData, PaletteFormat, ColourCounts);
             return DecodeImage(ImageData, PaletteColours, Format, Width, Height);
         }
         /// <summary>
@@ -276,8 +275,8 @@ namespace Hack.io.J3D
         public static Bitmap DecodeImage(byte[] ImageData, Color[] PaletteColours, GXImageFormat Format, int Width, int Height)
         {
             int BlockWidth = FormatDetails[Format].BlockWidth, BlockHeight = FormatDetails[Format].BlockHeight, BlockDataSize = Format == GXImageFormat.RGBA32 ? 64 : 32,
-                offset = 0, BlockX = 0, BlockY = 0, XInBlock = 0, YInBlock = 0;
-            Bitmap Result = new Bitmap(Width, Height, PixelFormat.Format32bppArgb);
+                offset = 0, BlockX = 0, BlockY = 0;
+            Bitmap Result = new(Width, Height, PixelFormat.Format32bppArgb);
             //Lord why can't Bitmap.SetPixel be fast? :weary:
             BitmapData BitMapData = Result.LockBits(new Rectangle(0, 0, Width, Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
             IntPtr BitmapPointer = BitMapData.Scan0;
@@ -289,8 +288,8 @@ namespace Hack.io.J3D
 
                 for (int i = 0; i < PixelData.Length; i++)
                 {
-                    XInBlock = (i % BlockWidth);
-                    YInBlock = i / BlockWidth;
+                    int XInBlock = (i % BlockWidth);
+                    int YInBlock = i / BlockWidth;
                     int xpos = BlockX + XInBlock;
                     int ypos = BlockY + YInBlock;
                     if (xpos >= Width || ypos >= Height)
@@ -321,11 +320,11 @@ namespace Hack.io.J3D
         /// <param name="PaletteData"></param>
         /// <param name="PaletteFormat"></param>
         /// <param name="Count"></param>
-        /// <param name="Format"></param>
+        /// 
         /// <returns></returns>
-        public static Color[] DecodePalette(byte[] PaletteData, GXPaletteFormat? PaletteFormat, int? Count, GXImageFormat Format)
+        public static Color[] DecodePalette(byte[] PaletteData, GXPaletteFormat? PaletteFormat, int? Count)
         {
-            List<Color> Colours = new List<Color>();
+            List<Color> Colours = new();
             int offset = 0;
             for (int i = 0; i < Count; i++)
             {
@@ -360,7 +359,7 @@ namespace Hack.io.J3D
         /// <returns></returns>
         public static Color[] DecodeBlock(byte[] ImageData, GXImageFormat Format, int Offset, int BlockSize, Color[] Colours)
         {
-            List<Color> Result = new List<Color>();
+            List<Color> Result = new();
             if (Offset >= ImageData.Length)
                 return Result.ToArray();
 
@@ -518,10 +517,10 @@ namespace Hack.io.J3D
             if (!(Format == GXImageFormat.C4 || Format == GXImageFormat.C8 || Format == GXImageFormat.C14X2))
                 return new Tuple<Dictionary<Color, int>, ushort[]>(null, null);
 
-            List<byte[]> ImageData = new List<byte[]>();
-            List<ushort> encoded_colors = new List<ushort>();
-            Dictionary<Color, int> colors_to_color_indexes = new Dictionary<Color, int>();
-            List<Color> colours = new List<Color>();
+            List<byte[]> ImageData = new();
+            List<ushort> encoded_colors = new();
+            Dictionary<Color, int> colors_to_color_indexes = new();
+            List<Color> colours = new();
             for (int i = 0; i < Images.Count; i++)
             {
                 ImageData.Add(Images[i].ToByteArray());
@@ -578,9 +577,9 @@ namespace Hack.io.J3D
             if (!(Format == GXImageFormat.C4 || Format == GXImageFormat.C8 || Format == GXImageFormat.C14X2))
                 return new Tuple<Dictionary<Color, int>, ushort[]>(null, null);
 
-            List<byte> ImageData = new List<byte>();
-            List<ushort> encoded_colors = new List<ushort>();
-            Dictionary<Color, int> colors_to_color_indexes = new Dictionary<Color, int>();
+            List<byte> ImageData = new();
+            List<ushort> encoded_colors = new();
+            Dictionary<Color, int> colors_to_color_indexes = new();
 
             ImageData.AddRange(Image.ToByteArray());
             for (int y = 0; y < Image.Height; y++)
@@ -844,7 +843,7 @@ namespace Hack.io.J3D
                     for (int SubBlock = 0; SubBlock < 4; SubBlock++)
                     {
                         int subblock_x = BlockX + (SubBlock % 2) * 4, subblock_y = BlockY + (int)Math.Floor(SubBlock / 2.0) * 4;
-                        List<Color> AllSubBlockColours = new List<Color>();
+                        List<Color> AllSubBlockColours = new();
                         bool NeedsAlphaColor = false;
                         for (int i = 0; i < 16; i++)
                         {
@@ -905,7 +904,7 @@ namespace Hack.io.J3D
         public static byte[] EncodePalette(ushort[] RawColours, GXImageFormat Format)
         {
             if (!IsPaletteFormat(Format))
-                return new byte[0];
+                return Array.Empty<byte>();
 
             byte[] PaletteData = new byte[RawColours.Length * 2];
             int Offset = 0;
@@ -932,7 +931,7 @@ namespace Hack.io.J3D
 
         public static Color[] CreateLimitedPalette(List<Bitmap> Images, int MaxColours, bool Alpha = true)
         {
-            List<byte[]> ImageData = new List<byte[]>();
+            List<byte[]> ImageData = new();
             for (int i = 0; i < Images.Count; i++)
                 ImageData.Add(Images[i].ToByteArray());
 
@@ -946,7 +945,7 @@ namespace Hack.io.J3D
             else
                 throw new Exception($"Unsupported maximum number of colors to generate a palette for: {MaxColours}");
 
-            List<Color> all_pixel_colors = new List<Color>();
+            List<Color> all_pixel_colors = new();
             bool already_have_zero_alpha_color = false;
             for (int i = 0; i < Images.Count; i++)
                 for (int y = 0; y < Images[i].Height; y++)
@@ -971,7 +970,7 @@ namespace Hack.io.J3D
 
         public static Color[] CreateLimitedPalette(Bitmap Image, int MaxColours, bool Alpha = true)
         {
-            List<byte> ImageData = new List<byte>();
+            List<byte> ImageData = new();
             ImageData.AddRange(Image.ToByteArray());
 
             int depth;
@@ -984,7 +983,7 @@ namespace Hack.io.J3D
             else
                 throw new Exception($"Unsupported maximum number of colors to generate a palette for: {MaxColours}");
 
-            List<Color> all_pixel_colors = new List<Color>();
+            List<Color> all_pixel_colors = new();
             bool already_have_zero_alpha_color = false;
             for (int y = 0; y < Image.Height; y++)
             {
@@ -1025,7 +1024,7 @@ namespace Hack.io.J3D
 
             AllColours = AllColours.OrderBy(C => C.A).ToList();
             AllColours = AllColours.OrderBy(C => channel_index_with_highest_range == 1 ? C.G : (channel_index_with_highest_range == 0 ? C.R : C.B)).ToList();
-            List<Color> Palette = new List<Color>();
+            List<Color> Palette = new();
             int median = (int)Math.Floor(AllColours.Count / 2.0);
             Palette.AddRange(SplitToBuckets(AllColours.GetRange(median, AllColours.Count - median), Depth - 1));
             Palette.AddRange(SplitToBuckets(AllColours.GetRange(0, median), Depth - 1));
@@ -1101,7 +1100,7 @@ namespace Hack.io.J3D
             //return Dist;
         }
 
-        private static int GetColorDistanceNoAlpha(Color Col1, Color Col2) => Math.Abs(Col1.R - Col2.R) + Math.Abs(Col1.G - Col2.G) + Math.Abs(Col1.B - Col2.B);
+        public static int GetColorDistanceNoAlpha(Color Col1, Color Col2) => Math.Abs(Col1.R - Col2.R) + Math.Abs(Col1.G - Col2.G) + Math.Abs(Col1.B - Col2.B);
 
         private static Tuple<Color, Color> GetBestCMPRKeyColours(List<Color> AllColours)
         {
@@ -1302,7 +1301,7 @@ namespace Hack.io.J3D
         /// <summary>
         /// Value.Item1 has the BlockWidth, Value.Item2 has the BlockHeight
         /// </summary>
-        public static readonly Dictionary<GXImageFormat, (int BlockWidth, int BlockHeight)> FormatDetails = new Dictionary<GXImageFormat, (int, int)>()
+        public static readonly Dictionary<GXImageFormat, (int BlockWidth, int BlockHeight)> FormatDetails = new()
         {
             { GXImageFormat.I4, (8, 8) },
             { GXImageFormat.I8, (8, 4) },
@@ -1319,17 +1318,13 @@ namespace Hack.io.J3D
 
         public static int GetMaxColours(this GXImageFormat Format)
         {
-            switch (Format)
+            return Format switch
             {
-                case GXImageFormat.C4:
-                    return 1 << 4; //16
-                case GXImageFormat.C8:
-                    return 1 << 8; //256
-                case GXImageFormat.C14X2:
-                    return 1 << 14; //16384
-                default:
-                    throw new Exception("Not a Palette format!");
-            }
+                GXImageFormat.C4 => 1 << 4,//16
+                GXImageFormat.C8 => 1 << 8,//256
+                GXImageFormat.C14X2 => 1 << 14,//16384
+                _ => throw new Exception("Not a Palette format!"),
+            };
         }
 
         public static bool IsPaletteFormat(this GXImageFormat Format) => Format == GXImageFormat.C4 || Format == GXImageFormat.C8 || Format == GXImageFormat.C14X2;

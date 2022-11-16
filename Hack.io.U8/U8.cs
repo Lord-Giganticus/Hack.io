@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Hack.io.U8
 {
@@ -31,7 +30,7 @@ namespace Hack.io.U8
         /// <param name="filename"></param>
         public U8(string filename)
         {
-            FileStream BTPFile = new FileStream(filename, FileMode.Open);
+            FileStream BTPFile = new(filename, FileMode.Open);
             Read(BTPFile);
             BTPFile.Close();
             FileName = filename;
@@ -53,8 +52,8 @@ namespace Hack.io.U8
                 throw new Exception($"Invalid Magic. Expected \"{Magic}\"");
 
             uint OffsetToNodeSection = BitConverter.ToUInt32(U8File.ReadReverse(0, 4), 0); //usually 0x20
-            uint NodeSectionSize = BitConverter.ToUInt32(U8File.ReadReverse(0, 4), 0); 
-            uint FileDataOffset = BitConverter.ToUInt32(U8File.ReadReverse(0, 4), 0);
+            _ = BitConverter.ToUInt32(U8File.ReadReverse(0, 4), 0); 
+            _ = BitConverter.ToUInt32(U8File.ReadReverse(0, 4), 0);
             U8File.Position += 0x10; //Skip reserved bytes. All are 0xCC
 
             //Node time
@@ -69,18 +68,18 @@ namespace Hack.io.U8
 
             //Root has total number of nodes
             U8File.Position = OffsetToNodeSection;
-            U8Node RootNode = new U8Node(U8File);
+            U8Node RootNode = new(U8File);
 
             //Root has total number of nodes 
             int TotalNodeCount = RootNode.Size;
             long StringTableLocation = OffsetToNodeSection + (TotalNodeCount * 0x0C);
 
             //Read all our entries
-            List<U8Node> entries = new List<U8Node>
+            List<U8Node> entries = new()
             {
                 RootNode
             };
-            List<object> FlatItems = new List<object>();
+            List<object> FlatItems = new();
             //entries.Add(RootNode);
             for (int i = 0; i < TotalNodeCount; i++)
             {
@@ -89,7 +88,7 @@ namespace Hack.io.U8
                 long PausePosition = U8File.Position;
                 if (entries[i].IsDirectory)
                 {
-                    ArchiveDirectory dir = new ArchiveDirectory();
+                    ArchiveDirectory dir = new();
                     U8File.Position = StringTableLocation + entries[i].NameOffset;
                     dir.Name = U8File.ReadString();
                     FlatItems.Add(dir);
@@ -97,7 +96,7 @@ namespace Hack.io.U8
                 }
                 else
                 {
-                    ArchiveFile file = new ArchiveFile();
+                    ArchiveFile file = new();
                     U8File.Position = StringTableLocation + entries[i].NameOffset;
                     file.Name = U8File.ReadString();
                     U8File.Position = entries[i].DataOffset;
@@ -107,14 +106,14 @@ namespace Hack.io.U8
                 U8File.Position = PausePosition;
             }
             entries.RemoveAt(entries.Count - 1);
-            Stack<ArchiveDirectory> DirectoryStack = new Stack<ArchiveDirectory>();
+            Stack<ArchiveDirectory> DirectoryStack = new();
             DirectoryStack.Push((ArchiveDirectory)FlatItems[0]);
             for (int i = 1; i < entries.Count; i++)
             {
                 if (entries[i].IsDirectory)
                 {
                     int parent = entries[i].DataOffset;
-                    int EntryCount = entries[i].Size;
+                    _ = entries[i].Size;
 
                     if (FlatItems[parent] is ArchiveDirectory dir)
                     {
@@ -138,25 +137,25 @@ namespace Hack.io.U8
 
         protected override void Write(Stream U8File)
         {
-            List<dynamic> FlatItems = new List<dynamic>();
+            List<dynamic> FlatItems = new();
 
             AddItems(Root);
             //The archive has been flattened hooray
-            Dictionary<string, uint> StringOffsets = new Dictionary<string, uint>();
-            List<byte> StringBytes = GetStringTableBytes(FlatItems, ref StringOffsets);
+            Dictionary<string, uint> StringOffsets = new();
+            List<byte> StringBytes = U8.GetStringTableBytes(FlatItems, ref StringOffsets);
 
             uint DataOffset = (uint)(0x20 + (FlatItems.Count * 0x0C) + StringBytes.Count);
             DataOffset += 0x20 - (DataOffset % 0x20);
             //while (DataOffset % 16 != 0)
             //    DataOffset++;
-            Dictionary<ArchiveFile, uint> DataOffsets = new Dictionary<ArchiveFile, uint>();
-            List<byte> DataBytes = GetDataBytes(FlatItems, DataOffset, ref DataOffsets);
+            Dictionary<ArchiveFile, uint> DataOffsets = new();
+            List<byte> DataBytes = U8.GetDataBytes(FlatItems, DataOffset, ref DataOffsets);
 
-            List<U8Node> Nodes = new List<U8Node>();
-            Stack<ArchiveDirectory> DirectoryStack = new Stack<ArchiveDirectory>();
+            List<U8Node> Nodes = new();
+            Stack<ArchiveDirectory> DirectoryStack = new();
             for (int i = 0; i < FlatItems.Count; i++)
             {
-                U8Node newnode = new U8Node() { NameOffset = new Int24((int)StringOffsets[FlatItems[i].Name]) };
+                U8Node newnode = new() { NameOffset = new Int24((int)StringOffsets[FlatItems[i].Name]) };
                 if (FlatItems[i] is ArchiveDirectory dir)
                 {
                     if (DirectoryStack.Count > 1)
@@ -217,7 +216,7 @@ namespace Hack.io.U8
             void AddItems(ArchiveDirectory dir)
             {
                 FlatItems.Add(dir);
-                List<ArchiveDirectory> subdirs = new List<ArchiveDirectory>();
+                List<ArchiveDirectory> subdirs = new();
                 foreach (var item in dir.Items)
                 {
                     if (item.Value is ArchiveDirectory d)
@@ -259,15 +258,15 @@ namespace Hack.io.U8
                 U8File.WriteReverse(BitConverter.GetBytes(Size), 0, 4);
             }
 
-            public override string ToString() => $"{(IsDirectory ? "Directory" : "File")}: {NameOffset.ToString()} | {DataOffset.ToString()} | {Size.ToString()}";
+            public override string ToString() => $"{(IsDirectory ? "Directory" : "File")}: {NameOffset} | {DataOffset} | {Size}";
         }
 
-        private List<byte> GetDataBytes(List<dynamic> FlatFileList, uint DataStart, ref Dictionary<ArchiveFile, uint> Offsets)
+        private static List<byte> GetDataBytes(List<dynamic> FlatFileList, uint DataStart, ref Dictionary<ArchiveFile, uint> Offsets)
         {
-            List<byte> FileBytes = new List<byte>();
+            List<byte> FileBytes = new();
             for (int i = 0; i < FlatFileList.Count; i++)
             {
-                if (!(FlatFileList[i] is ArchiveFile file))
+                if (FlatFileList[i] is not ArchiveFile file)
                     continue;
                 
                 if (Offsets.Any(OFF => OFF.Key.FileData.SequenceEqual(file.FileData)))
@@ -285,9 +284,9 @@ namespace Hack.io.U8
             }
             return FileBytes;
         }
-        private List<byte> GetStringTableBytes(List<dynamic> FlatFileList, ref Dictionary<string, uint> Offsets)
+        private static List<byte> GetStringTableBytes(List<dynamic> FlatFileList, ref Dictionary<string, uint> Offsets)
         {
-            List<byte> strings = new List<byte>();
+            List<byte> strings = new();
             Encoding enc = Encoding.GetEncoding(932);
 
             for (int i = 0; i < FlatFileList.Count; i++)

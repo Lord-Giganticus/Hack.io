@@ -93,8 +93,8 @@ namespace Hack.io.Util
             public IntPtr hwnd;
         };
 
-        private static HookProc hookProc;
-        private static EnumChildProc enumProc;
+        private static readonly HookProc hookProc;
+        private static readonly EnumChildProc enumProc;
         [ThreadStatic]
         private static IntPtr hHook;
         [ThreadStatic]
@@ -176,7 +176,7 @@ namespace Hack.io.Util
             if (msg.message == WM_INITDIALOG)
             {
                 int nLength = GetWindowTextLength(msg.hwnd);
-                StringBuilder className = new StringBuilder(10);
+                StringBuilder className = new(10);
                 GetClassName(msg.hwnd, className, className.Capacity);
                 if (className.ToString() == "#32770")
                 {
@@ -196,7 +196,7 @@ namespace Hack.io.Util
 
         private static bool MessageBoxEnumProc(IntPtr hWnd, IntPtr lParam)
         {
-            StringBuilder className = new StringBuilder(10);
+            StringBuilder className = new(10);
             GetClassName(hWnd, className, className.Capacity);
             if (className.ToString() == "Button")
             {

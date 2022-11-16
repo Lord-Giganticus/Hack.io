@@ -32,8 +32,8 @@ namespace Hack.io.BMD
                 int HierarchyOffset = BitConverter.ToInt32(BMD.ReadReverse(0, 4), 0);
                 BMD.Position = ChunkStart + HierarchyOffset;
 
-                Node parent = new Node(BMD, null);
-                Node node = null;
+                Node parent = new(BMD, null);
+                Node node;
 
                 Root = parent;
                 do
@@ -42,7 +42,7 @@ namespace Hack.io.BMD
 
                     if (node.Type == NodeType.OpenChild)
                     {
-                        Node newNode = new Node(BMD, parent);
+                        Node newNode = new(BMD, parent);
                         parent.Children.Add(newNode);
                         parent = newNode;
                     }
@@ -114,8 +114,7 @@ namespace Hack.io.BMD
                     Index = index;
                     Parent = parent;
 
-                    if (Parent != null)
-                        Parent.Children.Add(this);
+                    Parent?.Children.Add(this);
 
                     Children = new List<Node>();
                 }
@@ -203,7 +202,7 @@ namespace Hack.io.BMD
             private class NodeEnumerator : IEnumerator
             {
                 private int index = -1;
-                private List<Node> flatnodes = new List<Node>();
+                private readonly List<Node> flatnodes = new();
                 public NodeEnumerator(Node start)
                 {
                     Flatten(start, ref flatnodes);

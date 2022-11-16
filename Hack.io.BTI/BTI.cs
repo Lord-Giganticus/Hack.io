@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
+using System.Runtime.Versioning;
 using static Hack.io.J3D.JUtility;
 
 namespace Hack.io.BTI
@@ -41,7 +40,7 @@ namespace Hack.io.BTI
         internal BTI() { }
         public BTI(string filename)
         {
-            FileStream BTIFile = new FileStream(filename, FileMode.Open);
+            FileStream BTIFile = new(filename, FileMode.Open);
             Read(BTIFile);
             BTIFile.Close();
             FileName = filename;
@@ -62,7 +61,7 @@ namespace Hack.io.BTI
         public BTI(Bitmap[] Source, GXImageFormat format, GXPaletteFormat palette = GXPaletteFormat.IA8, JUTTransparency Alpha = JUTTransparency.OPAQUE, GXWrapMode S = GXWrapMode.CLAMP, GXWrapMode T = GXWrapMode.CLAMP, GXFilterMode MagFilter = GXFilterMode.Nearest, GXFilterMode MinFilter = GXFilterMode.Nearest)
         {
             AlphaSetting = Alpha;
-            TexEntry entry = new TexEntry()
+            TexEntry entry = new()
             {
                 Format = format,
                 PaletteFormat = palette,
@@ -77,7 +76,7 @@ namespace Hack.io.BTI
 
         public override void Save(string filename)
         {
-            FileStream BTIFile = new FileStream(filename, FileMode.Create);
+            FileStream BTIFile = new(filename, FileMode.Create);
             long BaseDataOffset = 0x20;
             Write(BTIFile, ref BaseDataOffset);
             BTIFile.Close();
@@ -134,7 +133,7 @@ namespace Hack.io.BTI
 
             BTIFile.Position = HeaderStart + ImageDataAddress;
             ushort ogwidth = ImageWidth, ogheight = ImageHeight;
-            TexEntry current = new TexEntry()
+            TexEntry current = new()
             {
                 Format = Format,
                 PaletteFormat = PaletteFormat,
@@ -156,8 +155,8 @@ namespace Hack.io.BTI
         protected override void Write(Stream stream) { throw new Exception("DO NOT CALL THIS"); }
         protected void Write(Stream BTIFile, ref long DataOffset)
         {
-            List<byte> ImageData = new List<byte>();
-            List<byte> PaletteData = new List<byte>();
+            List<byte> ImageData = new();
+            List<byte> PaletteData = new();
             GetImageAndPaletteData(ref ImageData, ref PaletteData, base[0], Format, PaletteFormat);
             long HeaderStart = BTIFile.Position;
             int ImageDataStart = (int)((DataOffset + PaletteData.Count) - HeaderStart), PaletteDataStart = (int)(DataOffset - HeaderStart);
@@ -262,14 +261,14 @@ namespace Hack.io.BTI
             /// Cast a RARCFile to a BTI
             /// </summary>
             /// <param name="x"></param>
-        public static implicit operator BTI(RARC.RARC.File x) => new BTI((MemoryStream)x) { FileName = x.Name };
+        public static implicit operator BTI(RARC.RARC.File x) => new((MemoryStream)x) { FileName = x.Name };
         /// <summary>
         /// Cast a BTI to a RARCfile
         /// </summary>
         /// <param name="x"></param>
         public static implicit operator RARC.RARC.File(BTI x)
         {
-            MemoryStream MS = new MemoryStream();
+            MemoryStream MS = new();
             long temp = 0;
             x.Write(MS, ref temp);
             return new RARC.RARC.File(x.FileName, MS);
@@ -280,7 +279,7 @@ namespace Hack.io.BTI
         /// <param name="Source"></param>
         public static explicit operator BTI(Bitmap Source)
         {
-            BTI NewImage = new BTI { new TexEntry() { Source } };
+            BTI NewImage = new() { new TexEntry() { Source } };
             return NewImage;
         }
         /// <summary>
@@ -289,9 +288,9 @@ namespace Hack.io.BTI
         /// <param name="Source"></param>
         public static explicit operator BTI(Bitmap[] Source)
         {
-            TexEntry entry = new TexEntry() { MaxLOD = Source.Length-1 };
+            TexEntry entry = new() { MaxLOD = Source.Length-1 };
             entry.AddRange(Source);
-            BTI NewImage = new BTI { entry };
+            BTI NewImage = new() { entry };
             return NewImage;
         }
 

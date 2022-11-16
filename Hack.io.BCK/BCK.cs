@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Hack.io.BMD;
-using Hack.io.Util;
 using static Hack.io.J3D.J3DGraph;
 
 namespace Hack.io.BCK
@@ -48,7 +46,7 @@ namespace Hack.io.BCK
         /// <param name="filename"></param>
         public BCK(string filename)
         {
-            FileStream BTPFile = new FileStream(filename, FileMode.Open);
+            FileStream BTPFile = new(filename, FileMode.Open);
             Read(BTPFile);
             BTPFile.Close();
             Name = filename;
@@ -70,7 +68,7 @@ namespace Hack.io.BCK
         /// <param name="filename"></param>
         public void Save(string filename)
         {
-            FileStream BCKFile = new FileStream(filename, FileMode.Create);
+            FileStream BCKFile = new(filename, FileMode.Create);
 
             Write(BCKFile);
 
@@ -83,7 +81,7 @@ namespace Hack.io.BCK
         /// <returns></returns>
         public MemoryStream Save()
         {
-            MemoryStream ms = new MemoryStream();
+            MemoryStream ms = new();
             Write(ms);
             return ms;
         }
@@ -114,8 +112,7 @@ namespace Hack.io.BCK
         {
             if (BCKFile.ReadString(8) != Magic)
                 throw new Exception($"Invalid Magic. Expected \"{Magic}\"");
-
-            uint Filesize = BitConverter.ToUInt32(BCKFile.ReadReverse(0, 4), 0);
+            _ = BitConverter.ToUInt32(BCKFile.ReadReverse(0, 4), 0);
             uint SectionCount = BitConverter.ToUInt32(BCKFile.ReadReverse(0, 4), 0);
             if (SectionCount != 1)
                 throw new Exception(SectionCount > 1 ? "More than 1 section is in this BCK! Please send it to Super Hackio for investigation" : "There are no sections in this BCK!");
@@ -125,8 +122,7 @@ namespace Hack.io.BCK
 
             if (BCKFile.ReadString(4) != Magic2)
                 throw new Exception("Invalid Identifier. Expected \"ANK1\"");
-
-            uint TRK1Length = BitConverter.ToUInt32(BCKFile.ReadReverse(0, 4), 0);
+            _ = BitConverter.ToUInt32(BCKFile.ReadReverse(0, 4), 0);
             Loop = (LoopMode)BCKFile.ReadByte();
             RotationFraction = (byte)BCKFile.ReadByte();
             Duration = BitConverter.ToUInt16(BCKFile.ReadReverse(0, 2), 0);
@@ -137,9 +133,9 @@ namespace Hack.io.BCK
             uint BoneTableOffset = BitConverter.ToUInt32(BCKFile.ReadReverse(0, 4), 0) + TRKStart, ScaleTableOffset = BitConverter.ToUInt32(BCKFile.ReadReverse(0, 4), 0) + TRKStart,
                 RotationTableOffset = BitConverter.ToUInt32(BCKFile.ReadReverse(0, 4), 0) + TRKStart, TranslationTableOffset = BitConverter.ToUInt32(BCKFile.ReadReverse(0, 4), 0) + TRKStart;
 
-            List<float> ScaleTable = new List<float>();
-            List<float> RotationTable = new List<float>();
-            List<float> TranslationTable = new List<float>();
+            List<float> ScaleTable = new();
+            List<float> RotationTable = new();
+            List<float> TranslationTable = new();
 
             BCKFile.Seek(ScaleTableOffset, SeekOrigin.Begin);
             for (int i = 0; i < ScaleCount; i++)
@@ -157,7 +153,7 @@ namespace Hack.io.BCK
             short KeyFrameCount, TargetKeySet, TangentType;
             for (int i = 0; i < BoneCount; i++)
             {
-                BoneAnimation Anim = new BoneAnimation();
+                BoneAnimation Anim = new();
 
                 KeyFrameCount = BitConverter.ToInt16(BCKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BCKFile.ReadReverse(0, 2), 0);
@@ -171,7 +167,7 @@ namespace Hack.io.BCK
                 TangentResult = (TangentType == 0x00 ? 3 : 4);
                 for (int j = TargetKeySet; j < TargetKeySet + TangentResult * KeyFrameCount; j += TangentResult)
                 {
-                    J3DKeyFrame key = new J3DKeyFrame(RotationTable, j, KeyFrameCount, TargetKeySet, TangentType);
+                    J3DKeyFrame key = new(RotationTable, j, KeyFrameCount, TargetKeySet, TangentType);
                     key.ConvertRotation(RotationFraction);
                     Anim.RotationX.Add(key);
                 }
@@ -194,7 +190,7 @@ namespace Hack.io.BCK
                 TangentResult = (TangentType == 0x00 ? 3 : 4);
                 for (int j = TargetKeySet; j < TargetKeySet + TangentResult * KeyFrameCount; j += TangentResult)
                 {
-                    J3DKeyFrame key = new J3DKeyFrame(RotationTable, j, KeyFrameCount, TargetKeySet, TangentType);
+                    J3DKeyFrame key = new(RotationTable, j, KeyFrameCount, TargetKeySet, TangentType);
                     key.ConvertRotation(RotationFraction);
                     Anim.RotationY.Add(key);
                 }
@@ -217,7 +213,7 @@ namespace Hack.io.BCK
                 TangentResult = (TangentType == 0x00 ? 3 : 4);
                 for (int j = TargetKeySet; j < TargetKeySet + TangentResult * KeyFrameCount; j += TangentResult)
                 {
-                    J3DKeyFrame key = new J3DKeyFrame(RotationTable, j, KeyFrameCount, TargetKeySet, TangentType);
+                    J3DKeyFrame key = new(RotationTable, j, KeyFrameCount, TargetKeySet, TangentType);
                     key.ConvertRotation(RotationFraction);
                     Anim.RotationZ.Add(key);
                 }
@@ -234,19 +230,19 @@ namespace Hack.io.BCK
 
         private void Write(Stream BCKFile)
         {
-            List<float> AllTranslations = new List<float>();
-            Dictionary<BoneAnimation, int> TranslationXOffsets = new Dictionary<BoneAnimation, int>();
-            Dictionary<BoneAnimation, int> TranslationYOffsets = new Dictionary<BoneAnimation, int>();
-            Dictionary<BoneAnimation, int> TranslationZOffsets = new Dictionary<BoneAnimation, int>();
-            List<short> AllRotations = new List<short>();
-            Dictionary<BoneAnimation, int> RotationXOffsets = new Dictionary<BoneAnimation, int>();
-            Dictionary<BoneAnimation, int> RotationYOffsets = new Dictionary<BoneAnimation, int>();
-            Dictionary<BoneAnimation, int> RotationZOffsets = new Dictionary<BoneAnimation, int>();
-            List<float> AllScales = new List<float>();
-            Dictionary<BoneAnimation, int> ScaleXOffsets = new Dictionary<BoneAnimation, int>();
-            Dictionary<BoneAnimation, int> ScaleYOffsets = new Dictionary<BoneAnimation, int>();
-            Dictionary<BoneAnimation, int> ScaleZOffsets = new Dictionary<BoneAnimation, int>();
-            List<byte> AnimationTrackData = new List<byte>();
+            List<float> AllTranslations = new();
+            Dictionary<BoneAnimation, int> TranslationXOffsets = new();
+            Dictionary<BoneAnimation, int> TranslationYOffsets = new();
+            Dictionary<BoneAnimation, int> TranslationZOffsets = new();
+            List<short> AllRotations = new();
+            Dictionary<BoneAnimation, int> RotationXOffsets = new();
+            Dictionary<BoneAnimation, int> RotationYOffsets = new();
+            Dictionary<BoneAnimation, int> RotationZOffsets = new();
+            List<float> AllScales = new();
+            Dictionary<BoneAnimation, int> ScaleXOffsets = new();
+            Dictionary<BoneAnimation, int> ScaleYOffsets = new();
+            Dictionary<BoneAnimation, int> ScaleZOffsets = new();
+            List<byte> AnimationTrackData = new();
 
             for (int i = 0; i < JointAnimations.Count; i++)
             {
@@ -346,27 +342,26 @@ namespace Hack.io.BCK
             ref List<short> AllRotations, ref Dictionary<BoneAnimation, int> RotationXOffsets, ref Dictionary<BoneAnimation, int> RotationYOffsets, ref Dictionary<BoneAnimation, int> RotationZOffsets,
             ref List<float> AllScales, ref Dictionary<BoneAnimation, int> ScaleXOffsets, ref Dictionary<BoneAnimation, int> ScaleYOffsets, ref Dictionary<BoneAnimation, int> ScaleZOffsets)
         {
-            RevertAnimationTrack(Animation, Animation.ScaleX, ref AllScales, ref ScaleXOffsets);
-            RevertAnimationTrack(Animation, Animation.ScaleY, ref AllScales, ref ScaleYOffsets);
-            RevertAnimationTrack(Animation, Animation.ScaleZ, ref AllScales, ref ScaleZOffsets);
+            BCK.RevertAnimationTrack(Animation, Animation.ScaleX, ref AllScales, ref ScaleXOffsets);
+            BCK.RevertAnimationTrack(Animation, Animation.ScaleY, ref AllScales, ref ScaleYOffsets);
+            BCK.RevertAnimationTrack(Animation, Animation.ScaleZ, ref AllScales, ref ScaleZOffsets);
 
             RevertAnimationTrack(Animation, Animation.RotationX, ref AllRotations, ref RotationXOffsets);
             RevertAnimationTrack(Animation, Animation.RotationY, ref AllRotations, ref RotationYOffsets);
             RevertAnimationTrack(Animation, Animation.RotationZ, ref AllRotations, ref RotationZOffsets);
 
-            RevertAnimationTrack(Animation, Animation.TranslationX, ref AllTranslations, ref TranslationXOffsets);
-            RevertAnimationTrack(Animation, Animation.TranslationY, ref AllTranslations, ref TranslationYOffsets);
-            RevertAnimationTrack(Animation, Animation.TranslationZ, ref AllTranslations, ref TranslationZOffsets);
+            BCK.RevertAnimationTrack(Animation, Animation.TranslationX, ref AllTranslations, ref TranslationXOffsets);
+            BCK.RevertAnimationTrack(Animation, Animation.TranslationY, ref AllTranslations, ref TranslationYOffsets);
+            BCK.RevertAnimationTrack(Animation, Animation.TranslationZ, ref AllTranslations, ref TranslationZOffsets);
         }
 
-        private void RevertAnimationTrack(BoneAnimation Animation, List<J3DKeyFrame> AnimationTrack, ref List<float> ActiveValues, ref Dictionary<BoneAnimation, int> ActiveOffsets)
+        private static void RevertAnimationTrack(BoneAnimation Animation, List<J3DKeyFrame> AnimationTrack, ref List<float> ActiveValues, ref Dictionary<BoneAnimation, int> ActiveOffsets)
         {
-            List<float> CurrentFloatSequence = new List<float>();
+            List<float> CurrentFloatSequence = new();
             TangentMode TM;
             if (AnimationTrack.Count == 1)
             {
                 CurrentFloatSequence.Add(AnimationTrack[0].Value);
-                TM = TangentMode.SYNC;
             }
             else
             {
@@ -390,13 +385,12 @@ namespace Hack.io.BCK
         }
         private void RevertAnimationTrack(BoneAnimation Animation, List<J3DKeyFrame> AnimationTrack, ref List<short> ActiveValues, ref Dictionary<BoneAnimation, int> ActiveOffsets)
         {
-            List<short> CurrentFloatSequence = new List<short>();
+            List<short> CurrentFloatSequence = new();
             TangentMode TM;
             float RotationMultiplier = (float)(Math.Pow(RotationFraction, 2) * (180.0 / 32768.0));
             if (AnimationTrack.Count == 1)
             {
                 CurrentFloatSequence.Add((short)(AnimationTrack[0].Value / RotationMultiplier));
-                TM = TangentMode.SYNC;
             }
             else
             {
@@ -513,7 +507,7 @@ namespace Hack.io.BCK
             /// <returns></returns>
             public override bool Equals(object obj)
             {
-                if (!(obj is BoneAnimation animation))
+                if (obj is not BoneAnimation animation)
                     return false;
                 bool result = TranslationX.SequenceEqual(animation.TranslationX) &&
                        TranslationY.SequenceEqual(animation.TranslationY) &&
@@ -524,7 +518,7 @@ namespace Hack.io.BCK
                        ScaleX.SequenceEqual(animation.ScaleX) &&
                        ScaleY.SequenceEqual(animation.ScaleY) &&
                        ScaleZ.SequenceEqual(animation.ScaleZ);
-                return result && ((JointName != null && animation.JointName != null) ? JointName.Equals(animation.JointName) : true);
+                return result && (JointName == null || animation.JointName == null || JointName.Equals(animation.JointName));
             }
 
             /// <summary>
@@ -533,27 +527,27 @@ namespace Hack.io.BCK
             /// <returns></returns>
             public override int GetHashCode()
             {
-                var hashCode = -1797774961;
-                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(JointName);
-                hashCode = hashCode * -1521134295 + EqualityComparer<List<J3DKeyFrame>>.Default.GetHashCode(TranslationX);
-                hashCode = hashCode * -1521134295 + EqualityComparer<List<J3DKeyFrame>>.Default.GetHashCode(TranslationY);
-                hashCode = hashCode * -1521134295 + EqualityComparer<List<J3DKeyFrame>>.Default.GetHashCode(TranslationZ);
-                hashCode = hashCode * -1521134295 + EqualityComparer<List<J3DKeyFrame>>.Default.GetHashCode(RotationX);
-                hashCode = hashCode * -1521134295 + EqualityComparer<List<J3DKeyFrame>>.Default.GetHashCode(RotationY);
-                hashCode = hashCode * -1521134295 + EqualityComparer<List<J3DKeyFrame>>.Default.GetHashCode(RotationZ);
-                hashCode = hashCode * -1521134295 + EqualityComparer<List<J3DKeyFrame>>.Default.GetHashCode(ScaleX);
-                hashCode = hashCode * -1521134295 + EqualityComparer<List<J3DKeyFrame>>.Default.GetHashCode(ScaleY);
-                hashCode = hashCode * -1521134295 + EqualityComparer<List<J3DKeyFrame>>.Default.GetHashCode(ScaleZ);
-                hashCode = hashCode * -1521134295 + TranslationXTangent.GetHashCode();
-                hashCode = hashCode * -1521134295 + TranslationYTangent.GetHashCode();
-                hashCode = hashCode * -1521134295 + TranslationZTangent.GetHashCode();
-                hashCode = hashCode * -1521134295 + RotationXTangent.GetHashCode();
-                hashCode = hashCode * -1521134295 + RotationYTangent.GetHashCode();
-                hashCode = hashCode * -1521134295 + RotationZTangent.GetHashCode();
-                hashCode = hashCode * -1521134295 + ScaleXTangent.GetHashCode();
-                hashCode = hashCode * -1521134295 + ScaleYTangent.GetHashCode();
-                hashCode = hashCode * -1521134295 + ScaleZTangent.GetHashCode();
-                return hashCode;
+                HashCode hash = new();
+                hash.Add(JointName);
+                hash.Add(TranslationX);
+                hash.Add(TranslationY);
+                hash.Add(TranslationZ);
+                hash.Add(RotationX);
+                hash.Add(RotationY);
+                hash.Add(RotationZ);
+                hash.Add(ScaleX);
+                hash.Add(ScaleY);
+                hash.Add(ScaleZ);
+                hash.Add(TranslationXTangent);
+                hash.Add(TranslationYTangent);
+                hash.Add(TranslationZTangent);
+                hash.Add(RotationXTangent);
+                hash.Add(RotationYTangent);
+                hash.Add(RotationZTangent);
+                hash.Add(ScaleXTangent);
+                hash.Add(ScaleYTangent);
+                hash.Add(ScaleZTangent);
+                return hash.ToHashCode();
             }
 
             /// <summary>
@@ -592,19 +586,21 @@ namespace Hack.io.BCK
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (!(obj is BCK))
-                return false;
-            BCK BCK = obj as BCK;
-            if (Loop != BCK.Loop || Duration != BCK.Duration || RotationFraction != BCK.RotationFraction || JointAnimations.Count != BCK.JointAnimations.Count)
-                return false;
-            bool IsEqual = true;
-            for (int i = 0; i < JointAnimations.Count; i++)
+            if (obj is BCK BCK)
             {
-                IsEqual = JointAnimations[i] == BCK.JointAnimations[i];
-                if (!IsEqual)
-                    break;
+                if (Loop != BCK.Loop || Duration != BCK.Duration || RotationFraction != BCK.RotationFraction || JointAnimations.Count != BCK.JointAnimations.Count)
+                    return false;
+                bool IsEqual = true;
+                for (int i = 0; i < JointAnimations.Count; i++)
+                {
+                    IsEqual = JointAnimations[i] == BCK.JointAnimations[i];
+                    if (!IsEqual)
+                        break;
+                }
+                return IsEqual;
             }
-            return IsEqual;
+
+            return false;
         }
 
         /// <summary>
@@ -613,13 +609,7 @@ namespace Hack.io.BCK
         /// <returns></returns>
         public override int GetHashCode()
         {
-            var hashCode = -1421908117;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-            hashCode = hashCode * -1521134295 + Loop.GetHashCode();
-            hashCode = hashCode * -1521134295 + Duration.GetHashCode();
-            hashCode = hashCode * -1521134295 + RotationFraction.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<List<BoneAnimation>>.Default.GetHashCode(JointAnimations);
-            return hashCode;
+            return HashCode.Combine(Name, Loop, Duration, RotationFraction, JointAnimations);
         }
 
         /// <summary>

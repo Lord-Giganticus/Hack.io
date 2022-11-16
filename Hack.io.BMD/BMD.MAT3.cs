@@ -15,7 +15,7 @@ namespace Hack.io.BMD
         public class MAT3
         {
             #region Fields and Properties
-            private List<Material> m_Materials;
+            private readonly List<Material> m_Materials;
             public Material this[string MaterialName]
             {
                 get
@@ -42,7 +42,7 @@ namespace Hack.io.BMD
                             return;
                         }
                     }
-                    if (!(value is null))
+                    if (value is not null)
                         m_Materials.Add(value);
                 }
             }
@@ -68,38 +68,38 @@ namespace Hack.io.BMD
 
             public MAT3(Stream reader)
             {
-                List<int> m_RemapIndices = new List<int>();
-                List<string> m_MaterialNames = new List<string>();
+                List<int> m_RemapIndices = new();
+                List<string> m_MaterialNames = new();
 
-                List<Material.IndirectTexturing> m_IndirectTexBlock = new List<Material.IndirectTexturing>();
-                List<CullMode> m_CullModeBlock = new List<CullMode>();
-                List<Color4> m_MaterialColorBlock = new List<Color4>();
-                List<Material.ChannelControl> m_ChannelControlBlock = new List<Material.ChannelControl>();
-                List<Color4> m_AmbientColorBlock = new List<Color4>();
-                List<Color4> m_LightingColorBlock = new List<Color4>();
-                List<Material.TexCoordGen> m_TexCoord1GenBlock = new List<Material.TexCoordGen>();
-                List<Material.TexCoordGen> m_TexCoord2GenBlock = new List<Material.TexCoordGen>();
-                List<Material.TexMatrix> m_TexMatrix1Block = new List<Material.TexMatrix>();
-                List<Material.TexMatrix> m_TexMatrix2Block = new List<Material.TexMatrix>();
-                List<short> m_TexRemapBlock = new List<short>();
-                List<Material.TevOrder> m_TevOrderBlock = new List<Material.TevOrder>();
-                List<Color4> m_TevColorBlock = new List<Color4>();
-                List<Color4> m_TevKonstColorBlock = new List<Color4>();
-                List<Material.TevStage> m_TevStageBlock = new List<Material.TevStage>();
-                List<Material.TevSwapMode> m_SwapModeBlock = new List<Material.TevSwapMode>();
-                List<Material.TevSwapModeTable> m_SwapTableBlock = new List<Material.TevSwapModeTable>();
-                List<Material.Fog> m_FogBlock = new List<Material.Fog>();
-                List<Material.AlphaCompare> m_AlphaCompBlock = new List<Material.AlphaCompare>();
-                List<Material.BlendMode> m_blendModeBlock = new List<Material.BlendMode>();
-                List<Material.NBTScaleHolder> m_NBTScaleBlock = new List<Material.NBTScaleHolder>();
+                List<Material.IndirectTexturing> m_IndirectTexBlock = new();
+                List<CullMode> m_CullModeBlock = new();
+                List<Color4> m_MaterialColorBlock = new();
+                List<Material.ChannelControl> m_ChannelControlBlock = new();
+                List<Color4> m_AmbientColorBlock = new();
+                List<Color4> m_LightingColorBlock = new();
+                List<Material.TexCoordGen> m_TexCoord1GenBlock = new();
+                List<Material.TexCoordGen> m_TexCoord2GenBlock = new();
+                List<Material.TexMatrix> m_TexMatrix1Block = new();
+                List<Material.TexMatrix> m_TexMatrix2Block = new();
+                List<short> m_TexRemapBlock = new();
+                List<Material.TevOrder> m_TevOrderBlock = new();
+                List<Color4> m_TevColorBlock = new();
+                List<Color4> m_TevKonstColorBlock = new();
+                List<Material.TevStage> m_TevStageBlock = new();
+                List<Material.TevSwapMode> m_SwapModeBlock = new();
+                List<Material.TevSwapModeTable> m_SwapTableBlock = new();
+                List<Material.Fog> m_FogBlock = new();
+                List<Material.AlphaCompare> m_AlphaCompBlock = new();
+                List<Material.BlendMode> m_blendModeBlock = new();
+                List<Material.NBTScaleHolder> m_NBTScaleBlock = new();
 
-                List<Material.ZModeHolder> m_zModeBlock = new List<Material.ZModeHolder>();
-                List<bool> m_zCompLocBlock = new List<bool>();
-                List<bool> m_ditherBlock = new List<bool>();
+                List<Material.ZModeHolder> m_zModeBlock = new();
+                List<bool> m_zCompLocBlock = new();
+                List<bool> m_ditherBlock = new();
 
-                List<byte> NumColorChannelsBlock = new List<byte>();
-                List<byte> NumTexGensBlock = new List<byte>();
-                List<byte> NumTevStagesBlock = new List<byte>();
+                List<byte> NumColorChannelsBlock = new();
+                List<byte> NumTexGensBlock = new();
+                List<byte> NumTevStagesBlock = new();
 
 
                 int ChunkStart = (int)reader.Position;
@@ -391,11 +391,11 @@ namespace Hack.io.BMD
 
                 reader.Seek(ChunkStart + mat3Size, SeekOrigin.Begin);
 
-                List<Material> matCopies = new List<Material>();
+                List<Material> matCopies = new();
                 for (int i = 0; i < m_RemapIndices.Count; i++)
                 {
                     Material originalMat = m_Materials[m_RemapIndices[i]];
-                    Material copyMat = new Material(originalMat) { Name = m_MaterialNames[i] };
+                    Material copyMat = new(originalMat) { Name = m_MaterialNames[i] };
                     matCopies.Add(copyMat);
                 }
 
@@ -416,7 +416,7 @@ namespace Hack.io.BMD
             {
                 m_Materials.Sort(comparer);
             }
-            public static Comparison<Material> SortByName => new Comparison<Material>((x, y) => string.Compare(x.Name, y.Name, true));
+            public static Comparison<Material> SortByName => new((x, y) => string.Compare(x.Name, y.Name, true));
             public int IndexOf(Material mat)
             {
                 for (int i = 0; i < m_Materials.Count; i++)
@@ -455,7 +455,7 @@ namespace Hack.io.BMD
             List<Material.BlendMode> m_blendModeBlock, List<Material.NBTScaleHolder> m_NBTScaleBlock, List<Material.ZModeHolder> m_zModeBlock, List<bool> m_zCompLocBlock,
             List<bool> m_ditherBlock, List<byte> NumColorChannelsBlock, List<byte> NumTexGensBlock, List<byte> NumTevStagesBlock)
             {
-                Material mat = new Material
+                Material mat = new()
                 {
                     Name = m_MaterialNames[matindex],
                     Flag = (byte)reader.ReadByte(),
@@ -658,7 +658,7 @@ namespace Hack.io.BMD
             }
             private static List<Color4> ReadColours(Stream reader, int offset, int size, bool IsInt16 = false)
             {
-                List<Color4> colors = new List<Color4>();
+                List<Color4> colors = new();
                 int count = size / (IsInt16 ? 8 : 4);
 
                 if (IsInt16)
@@ -691,7 +691,7 @@ namespace Hack.io.BMD
             }
             private static List<Material.TexCoordGen> ReadTexCoordGens(Stream reader, int offset, int size)
             {
-                List<Material.TexCoordGen> gens = new List<Material.TexCoordGen>();
+                List<Material.TexCoordGen> gens = new();
                 int count = size / 4;
 
                 for (int i = 0; i < count; i++)
@@ -701,7 +701,7 @@ namespace Hack.io.BMD
             }
             private static List<Material.TexMatrix> ReadTexMatrices(Stream reader, int offset, int size)
             {
-                List<Material.TexMatrix> matrices = new List<Material.TexMatrix>();
+                List<Material.TexMatrix> matrices = new();
                 int count = size / 100;
 
                 for (int i = 0; i < count; i++)
@@ -713,41 +713,41 @@ namespace Hack.io.BMD
             public void Write(Stream writer)
             {
                 long start = writer.Position;
-                List<int> m_RemapIndices = new List<int>();
-                List<string> m_MaterialNames = new List<string>();
+                List<int> m_RemapIndices = new();
+                List<string> m_MaterialNames = new();
 
-                List<Material.IndirectTexturing> m_IndirectTexBlock = new List<Material.IndirectTexturing>();
-                List<CullMode> m_CullModeBlock = new List<CullMode>() { CullMode.Back, CullMode.Front, CullMode.None };
-                List<Color4> m_MaterialColorBlock = new List<Color4>();
-                List<Material.ChannelControl> m_ChannelControlBlock = new List<Material.ChannelControl>();
-                List<Color4> m_AmbientColorBlock = new List<Color4>();
-                List<Color4> m_LightingColorBlock = new List<Color4>();
-                List<Material.TexCoordGen> m_TexCoord1GenBlock = new List<Material.TexCoordGen>();
-                List<Material.TexCoordGen> m_TexCoord2GenBlock = new List<Material.TexCoordGen>();
-                List<Material.TexMatrix> m_TexMatrix1Block = new List<Material.TexMatrix>();
-                List<Material.TexMatrix> m_TexMatrix2Block = new List<Material.TexMatrix>();
-                List<short> m_TexRemapBlock = new List<short>();
-                List<Material.TevOrder> m_TevOrderBlock = new List<Material.TevOrder>();
-                List<Color4> m_TevColorBlock = new List<Color4>();
-                List<Color4> m_TevKonstColorBlock = new List<Color4>();
-                List<Material.TevStage> m_TevStageBlock = new List<Material.TevStage>();
-                List<Material.TevSwapMode> m_SwapModeBlock = new List<Material.TevSwapMode>() { new Material.TevSwapMode(0,0), new Material.TevSwapMode(0,0) };
-                List<Material.TevSwapModeTable> m_SwapTableBlock = new List<Material.TevSwapModeTable>();
-                List<Material.Fog> m_FogBlock = new List<Material.Fog>();
-                List<Material.AlphaCompare> m_AlphaCompBlock = new List<Material.AlphaCompare>();
-                List<Material.BlendMode> m_blendModeBlock = new List<Material.BlendMode>();
-                List<Material.NBTScaleHolder> m_NBTScaleBlock = new List<Material.NBTScaleHolder>();
+                List<Material.IndirectTexturing> m_IndirectTexBlock = new();
+                List<CullMode> m_CullModeBlock = new() { CullMode.Back, CullMode.Front, CullMode.None };
+                List<Color4> m_MaterialColorBlock = new();
+                List<Material.ChannelControl> m_ChannelControlBlock = new();
+                List<Color4> m_AmbientColorBlock = new();
+                List<Color4> m_LightingColorBlock = new();
+                List<Material.TexCoordGen> m_TexCoord1GenBlock = new();
+                List<Material.TexCoordGen> m_TexCoord2GenBlock = new();
+                List<Material.TexMatrix> m_TexMatrix1Block = new();
+                List<Material.TexMatrix> m_TexMatrix2Block = new();
+                List<short> m_TexRemapBlock = new();
+                List<Material.TevOrder> m_TevOrderBlock = new();
+                List<Color4> m_TevColorBlock = new();
+                List<Color4> m_TevKonstColorBlock = new();
+                List<Material.TevStage> m_TevStageBlock = new();
+                List<Material.TevSwapMode> m_SwapModeBlock = new() { new Material.TevSwapMode(0,0), new Material.TevSwapMode(0,0) };
+                List<Material.TevSwapModeTable> m_SwapTableBlock = new();
+                List<Material.Fog> m_FogBlock = new();
+                List<Material.AlphaCompare> m_AlphaCompBlock = new();
+                List<Material.BlendMode> m_blendModeBlock = new();
+                List<Material.NBTScaleHolder> m_NBTScaleBlock = new();
 
-                List<Material.ZModeHolder> m_zModeBlock = new List<Material.ZModeHolder>();
-                List<bool> m_zCompLocBlock = new List<bool>() { false, true };
-                List<bool> m_ditherBlock = new List<bool>() { false, true };
+                List<Material.ZModeHolder> m_zModeBlock = new();
+                List<bool> m_zCompLocBlock = new() { false, true };
+                List<bool> m_ditherBlock = new() { false, true };
 
-                List<byte> NumColorChannelsBlock = new List<byte>();
-                List<byte> NumTexGensBlock = new List<byte>();
-                List<byte> NumTevStagesBlock = new List<byte>();
+                List<byte> NumColorChannelsBlock = new();
+                List<byte> NumTexGensBlock = new();
+                List<byte> NumTevStagesBlock = new();
 
                 // Calculate what the unique materials are and update the duplicate remap indices list.
-                List<Material> uniqueMaterials = new List<Material>();
+                List<Material> uniqueMaterials = new();
                 for (int i = 0; i < m_Materials.Count; i++)
                 {
                     Material mat = m_Materials[i];
@@ -796,7 +796,7 @@ namespace Hack.io.BMD
                         continue;
                     else
                     {
-                        WriteMaterialInitData(writer, uniqueMaterials[m_RemapIndices[i]], ref m_CullModeBlock, ref m_MaterialColorBlock, ref m_ChannelControlBlock, ref m_AmbientColorBlock,
+                        MAT3.WriteMaterialInitData(writer, uniqueMaterials[m_RemapIndices[i]], ref m_CullModeBlock, ref m_MaterialColorBlock, ref m_ChannelControlBlock, ref m_AmbientColorBlock,
                         ref m_LightingColorBlock, ref m_TexCoord1GenBlock, ref m_TexCoord2GenBlock, ref m_TexMatrix1Block, ref m_TexMatrix2Block, ref m_TexRemapBlock, ref m_TevOrderBlock, ref m_TevColorBlock,
                         ref m_TevKonstColorBlock, ref m_TevStageBlock, ref m_SwapModeBlock, ref m_SwapTableBlock, ref m_FogBlock, ref m_AlphaCompBlock, ref m_blendModeBlock, ref m_NBTScaleBlock, ref m_zModeBlock,
                         ref m_zCompLocBlock, ref m_ditherBlock, ref NumColorChannelsBlock, ref NumTexGensBlock, ref NumTevStagesBlock);
@@ -1123,7 +1123,7 @@ namespace Hack.io.BMD
                     writer.WriteReverse(BitConverter.GetBytes(Offsets[i]), 0, 4);
                 writer.Position = writer.Length;
             }
-            private void WriteMaterialInitData(Stream writer, Material mat, ref List<CullMode> m_CullModeBlock,
+            private static void WriteMaterialInitData(Stream writer, Material mat, ref List<CullMode> m_CullModeBlock,
             ref List<Color4> m_MaterialColorBlock, ref List<Material.ChannelControl> m_ChannelControlBlock, ref List<Color4> m_AmbientColorBlock, ref List<Color4> m_LightingColorBlock,
             ref List<Material.TexCoordGen> m_TexCoord1GenBlock, ref List<Material.TexCoordGen> m_TexCoord2GenBlock, ref List<Material.TexMatrix> m_TexMatrix1Block, ref List<Material.TexMatrix> m_TexMatrix2Block,
             ref List<short> m_TexRemapBlock, ref List<Material.TevOrder> m_TevOrderBlock, ref List<Color4> m_TevColorBlock, ref List<Color4> m_TevKonstColorBlock, ref List<Material.TevStage> m_TevStageBlock,
@@ -1535,7 +1535,7 @@ namespace Hack.io.BMD
 
                 public void AddChannelControl(TevOrder.GXColorChannelId id, bool enable, ChannelControl.ColorSrc MatSrcColor, ChannelControl.LightId litId, ChannelControl.DiffuseFn diffuse, ChannelControl.J3DAttenuationFn atten, ChannelControl.ColorSrc ambSrcColor)
                 {
-                    ChannelControl control = new ChannelControl
+                    ChannelControl control = new()
                     {
                         Enable = enable,
                         MaterialSrcColor = MatSrcColor,
@@ -1595,7 +1595,7 @@ namespace Hack.io.BMD
 
                 public Material Clone()
                 {
-                    Material Target = new Material()
+                    Material Target = new()
                     {
                         Name = Name,
                         Flag = Flag,
@@ -1723,7 +1723,7 @@ namespace Hack.io.BMD
 
                 public override bool Equals(object obj)
                 {
-                    if (!(obj is Material right))
+                    if (obj is not Material right)
                         return false;
                     if (Flag != right.Flag)
                         return false;
@@ -1843,40 +1843,39 @@ namespace Hack.io.BMD
 
                 public override int GetHashCode()
                 {
-                    var hashCode = 1712440529;
-                    hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-                    hashCode = hashCode * -1521134295 + Flag.GetHashCode();
-                    hashCode = hashCode * -1521134295 + LightChannelCount.GetHashCode();
-                    hashCode = hashCode * -1521134295 + NumTexGensCount.GetHashCode();
-                    hashCode = hashCode * -1521134295 + NumTevStagesCount.GetHashCode();
-                    hashCode = hashCode * -1521134295 + CullMode.GetHashCode();
-                    hashCode = hashCode * -1521134295 + ZCompLoc.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Dither.GetHashCode();
-                    hashCode = hashCode * -1521134295 + EqualityComparer<int[]>.Default.GetHashCode(TextureIndices);
-                    //hashCode = hashCode * -1521134295 + EqualityComparer<string[]>.Default.GetHashCode(TextureNames);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<IndirectTexturing>.Default.GetHashCode(IndTexEntry);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<Color4?[]>.Default.GetHashCode(MaterialColors);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<ChannelControl?[]>.Default.GetHashCode(ChannelControls);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<Color4?[]>.Default.GetHashCode(AmbientColors);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<Color4?[]>.Default.GetHashCode(LightingColors);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<TexCoordGen?[]>.Default.GetHashCode(TexCoord1Gens);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<TexCoordGen?[]>.Default.GetHashCode(PostTexCoordGens);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<TexMatrix?[]>.Default.GetHashCode(TexMatrix1);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<TexMatrix?[]>.Default.GetHashCode(PostTexMatrix);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<TevOrder?[]>.Default.GetHashCode(TevOrders);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<KonstColorSel[]>.Default.GetHashCode(ColorSels);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<KonstAlphaSel[]>.Default.GetHashCode(AlphaSels);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<Color4?[]>.Default.GetHashCode(TevColors);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<Color4?[]>.Default.GetHashCode(KonstColors);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<TevStage?[]>.Default.GetHashCode(TevStages);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<TevSwapMode?[]>.Default.GetHashCode(SwapModes);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<TevSwapModeTable?[]>.Default.GetHashCode(SwapTables);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<Fog>.Default.GetHashCode(FogInfo);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<AlphaCompare>.Default.GetHashCode(AlphCompare);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<BlendMode>.Default.GetHashCode(BMode);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<ZModeHolder>.Default.GetHashCode(ZMode);
-                    hashCode = hashCode * -1521134295 + EqualityComparer<NBTScaleHolder>.Default.GetHashCode(NBTScale);
-                    return hashCode;
+                    HashCode hash = new();
+                    hash.Add(Name);
+                    hash.Add(Flag);
+                    hash.Add(LightChannelCount);
+                    hash.Add(NumTexGensCount);
+                    hash.Add(NumTevStagesCount);
+                    hash.Add(CullMode);
+                    hash.Add(ZCompLoc);
+                    hash.Add(Dither);
+                    hash.Add(TextureIndices);
+                    hash.Add(IndTexEntry);
+                    hash.Add(MaterialColors);
+                    hash.Add(ChannelControls);
+                    hash.Add(AmbientColors);
+                    hash.Add(LightingColors);
+                    hash.Add(TexCoord1Gens);
+                    hash.Add(PostTexCoordGens);
+                    hash.Add(TexMatrix1);
+                    hash.Add(PostTexMatrix);
+                    hash.Add(TevOrders);
+                    hash.Add(ColorSels);
+                    hash.Add(AlphaSels);
+                    hash.Add(TevColors);
+                    hash.Add(KonstColors);
+                    hash.Add(TevStages);
+                    hash.Add(SwapModes);
+                    hash.Add(SwapTables);
+                    hash.Add(FogInfo);
+                    hash.Add(AlphCompare);
+                    hash.Add(BMode);
+                    hash.Add(ZMode);
+                    hash.Add(NBTScale);
+                    return hash.ToHashCode();
                 }
 
                 public class IndirectTexturing
@@ -2020,14 +2019,7 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = -407782791;
-                        hashCode = hashCode * -1521134295 + HasLookup.GetHashCode();
-                        hashCode = hashCode * -1521134295 + IndTexStageNum.GetHashCode();
-                        hashCode = hashCode * -1521134295 + EqualityComparer<IndirectTevOrder[]>.Default.GetHashCode(TevOrders);
-                        hashCode = hashCode * -1521134295 + EqualityComparer<IndirectTexMatrix[]>.Default.GetHashCode(Matrices);
-                        hashCode = hashCode * -1521134295 + EqualityComparer<IndirectTexScale[]>.Default.GetHashCode(Scales);
-                        hashCode = hashCode * -1521134295 + EqualityComparer<IndirectTevStage[]>.Default.GetHashCode(TevStages);
-                        return hashCode;
+                        return HashCode.Combine(HasLookup, IndTexStageNum, TevOrders, Matrices, Scales, TevStages);
                     }
 
                     public struct IndirectTevOrder
@@ -2057,7 +2049,7 @@ namespace Hack.io.BMD
 
                         public override bool Equals(object obj)
                         {
-                            if (!(obj is IndirectTevOrder order))
+                            if (obj is not IndirectTevOrder order)
                                 return false;
 
                             return TexCoord == order.TexCoord &&
@@ -2066,10 +2058,7 @@ namespace Hack.io.BMD
 
                         public override int GetHashCode()
                         {
-                            var hashCode = -584153469;
-                            hashCode = hashCode * -1521134295 + TexCoord.GetHashCode();
-                            hashCode = hashCode * -1521134295 + TexMap.GetHashCode();
-                            return hashCode;
+                            return HashCode.Combine(TexCoord, TexMap);
                         }
 
                         public static bool operator ==(IndirectTevOrder order1, IndirectTevOrder order2) => order1.Equals(order2);
@@ -2122,7 +2111,7 @@ namespace Hack.io.BMD
 
                         public override bool Equals(object obj)
                         {
-                            if (!(obj is IndirectTexMatrix matrix))
+                            if (obj is not IndirectTexMatrix matrix)
                                 return false;
                             
                             return Matrix.Equals(matrix.Matrix) &&
@@ -2131,10 +2120,7 @@ namespace Hack.io.BMD
 
                         public override int GetHashCode()
                         {
-                            var hashCode = 428002898;
-                            hashCode = hashCode * -1521134295 + EqualityComparer<Matrix2x3>.Default.GetHashCode(Matrix);
-                            hashCode = hashCode * -1521134295 + Exponent.GetHashCode();
-                            return hashCode;
+                            return HashCode.Combine(Matrix, Exponent);
                         }
 
                         public static bool operator ==(IndirectTexMatrix matrix1, IndirectTexMatrix matrix2)
@@ -2188,10 +2174,7 @@ namespace Hack.io.BMD
 
                         public override int GetHashCode()
                         {
-                            var hashCode = 302584437;
-                            hashCode = hashCode * -1521134295 + ScaleS.GetHashCode();
-                            hashCode = hashCode * -1521134295 + ScaleT.GetHashCode();
-                            return hashCode;
+                            return HashCode.Combine(ScaleS, ScaleT);
                         }
 
                         public static bool operator ==(IndirectTexScale scale1, IndirectTexScale scale2)
@@ -2260,7 +2243,7 @@ namespace Hack.io.BMD
 
                         public override bool Equals(object obj)
                         {
-                            if (!(obj is IndirectTevStage stage))
+                            if (obj is not IndirectTevStage stage)
                                 return false;
                             
                             return TevStageID == stage.TevStageID &&
@@ -2276,17 +2259,17 @@ namespace Hack.io.BMD
 
                         public override int GetHashCode()
                         {
-                            var hashCode = -1309543118;
-                            hashCode = hashCode * -1521134295 + TevStageID.GetHashCode();
-                            hashCode = hashCode * -1521134295 + IndTexFormat.GetHashCode();
-                            hashCode = hashCode * -1521134295 + IndTexBias.GetHashCode();
-                            hashCode = hashCode * -1521134295 + IndTexMtxId.GetHashCode();
-                            hashCode = hashCode * -1521134295 + IndTexWrapS.GetHashCode();
-                            hashCode = hashCode * -1521134295 + IndTexWrapT.GetHashCode();
-                            hashCode = hashCode * -1521134295 + AddPrev.GetHashCode();
-                            hashCode = hashCode * -1521134295 + UtcLod.GetHashCode();
-                            hashCode = hashCode * -1521134295 + AlphaSel.GetHashCode();
-                            return hashCode;
+                            HashCode hash = new();
+                            hash.Add(TevStageID);
+                            hash.Add(IndTexFormat);
+                            hash.Add(IndTexBias);
+                            hash.Add(IndTexMtxId);
+                            hash.Add(IndTexWrapS);
+                            hash.Add(IndTexWrapT);
+                            hash.Add(AddPrev);
+                            hash.Add(UtcLod);
+                            hash.Add(AlphaSel);
+                            return hash.ToHashCode();
                         }
 
                         public static bool operator ==(IndirectTevStage stage1, IndirectTevStage stage2) => stage1.Equals(stage2);
@@ -2407,11 +2390,11 @@ namespace Hack.io.BMD
                         writer.Write(new byte[2] { 0xFF, 0xFF }, 0, 2);
                     }
 
-                    public ChannelControl Clone() => new ChannelControl(Enable, MaterialSrcColor, LitMask, DiffuseFunction, AttenuationFunction, AmbientSrcColor);
+                    public ChannelControl Clone() => new(Enable, MaterialSrcColor, LitMask, DiffuseFunction, AttenuationFunction, AmbientSrcColor);
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is ChannelControl control))
+                        if (obj is not ChannelControl control)
                             return false;
                         return Enable == control.Enable &&
                                MaterialSrcColor == control.MaterialSrcColor &&
@@ -2423,14 +2406,7 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = -1502031869;
-                        hashCode = hashCode * -1521134295 + Enable.GetHashCode();
-                        hashCode = hashCode * -1521134295 + MaterialSrcColor.GetHashCode();
-                        hashCode = hashCode * -1521134295 + LitMask.GetHashCode();
-                        hashCode = hashCode * -1521134295 + DiffuseFunction.GetHashCode();
-                        hashCode = hashCode * -1521134295 + AttenuationFunction.GetHashCode();
-                        hashCode = hashCode * -1521134295 + AmbientSrcColor.GetHashCode();
-                        return hashCode;
+                        return HashCode.Combine(Enable, MaterialSrcColor, LitMask, DiffuseFunction, AttenuationFunction, AmbientSrcColor);
                     }
 
                     public enum ColorSrc
@@ -2493,11 +2469,11 @@ namespace Hack.io.BMD
                         writer.WriteByte(0xFF);
                     }
 
-                    public TexCoordGen Clone() => new TexCoordGen() { Type = Type, Source = Source, TexMatrixSource = TexMatrixSource };
+                    public TexCoordGen Clone() => new() { Type = Type, Source = Source, TexMatrixSource = TexMatrixSource };
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is TexCoordGen gen))
+                        if (obj is not TexCoordGen gen)
                             return false;
                         return Type == gen.Type &&
                                Source == gen.Source &&
@@ -2506,11 +2482,7 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = -1253954333;
-                        hashCode = hashCode * -1521134295 + Type.GetHashCode();
-                        hashCode = hashCode * -1521134295 + Source.GetHashCode();
-                        hashCode = hashCode * -1521134295 + TexMatrixSource.GetHashCode();
-                        return hashCode;
+                        return HashCode.Combine(Type, Source, TexMatrixSource);
                     }
 
                     public static bool operator ==(TexCoordGen gen1, TexCoordGen gen2) => gen1.Equals(gen2);
@@ -2615,7 +2587,7 @@ namespace Hack.io.BMD
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is TexMatrix matrix))
+                        if (obj is not TexMatrix matrix)
                             return false;
                         
                         return Projection == matrix.Projection &&
@@ -2630,16 +2602,7 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = 1621759504;
-                        hashCode = hashCode * -1521134295 + Projection.GetHashCode();
-                        hashCode = hashCode * -1521134295 + MappingMode.GetHashCode();
-                        hashCode = hashCode * -1521134295 + IsMaya.GetHashCode();
-                        hashCode = hashCode * -1521134295 + EqualityComparer<Vector3>.Default.GetHashCode(Center);
-                        hashCode = hashCode * -1521134295 + EqualityComparer<Vector2>.Default.GetHashCode(Scale);
-                        hashCode = hashCode * -1521134295 + Rotation.GetHashCode();
-                        hashCode = hashCode * -1521134295 + EqualityComparer<Vector2>.Default.GetHashCode(Translation);
-                        hashCode = hashCode * -1521134295 + EqualityComparer<Matrix4>.Default.GetHashCode(ProjectionMatrix);
-                        return hashCode;
+                        return HashCode.Combine(Projection, MappingMode, IsMaya, Center, Scale, Rotation, Translation, ProjectionMatrix);
                     }
 
                     public static bool operator ==(TexMatrix matrix1, TexMatrix matrix2) => matrix1.Equals(matrix2);
@@ -2674,11 +2637,11 @@ namespace Hack.io.BMD
                         writer.WriteByte(0xFF);
                     }
 
-                    public TevOrder Clone() => new TevOrder(TexCoord, TexMap, ChannelId);
+                    public TevOrder Clone() => new(TexCoord, TexMap, ChannelId);
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is TevOrder order))
+                        if (obj is not TevOrder order)
                             return false;
                         return TexCoord == order.TexCoord &&
                                TexMap == order.TexMap &&
@@ -2687,11 +2650,7 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = -1126351388;
-                        hashCode = hashCode * -1521134295 + TexCoord.GetHashCode();
-                        hashCode = hashCode * -1521134295 + TexMap.GetHashCode();
-                        hashCode = hashCode * -1521134295 + ChannelId.GetHashCode();
-                        return hashCode;
+                        return HashCode.Combine(TexCoord, TexMap, ChannelId);
                     }
 
                     public enum GXColorChannelId
@@ -2794,7 +2753,7 @@ namespace Hack.io.BMD
                         writer.WriteByte(0xFF);
                     }
 
-                    public TevStage Clone() => new TevStage()
+                    public TevStage Clone() => new()
                     {
                         ColorInA = ColorInA,
                         ColorInB = ColorInB,
@@ -2855,7 +2814,7 @@ namespace Hack.io.BMD
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is TevStage stage))
+                        if (obj is not TevStage stage)
                             return false;
 
                         return ColorInA == stage.ColorInA &&
@@ -2880,26 +2839,26 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = -411571779;
-                        hashCode = hashCode * -1521134295 + ColorInA.GetHashCode();
-                        hashCode = hashCode * -1521134295 + ColorInB.GetHashCode();
-                        hashCode = hashCode * -1521134295 + ColorInC.GetHashCode();
-                        hashCode = hashCode * -1521134295 + ColorInD.GetHashCode();
-                        hashCode = hashCode * -1521134295 + ColorOp.GetHashCode();
-                        hashCode = hashCode * -1521134295 + ColorBias.GetHashCode();
-                        hashCode = hashCode * -1521134295 + ColorScale.GetHashCode();
-                        hashCode = hashCode * -1521134295 + ColorClamp.GetHashCode();
-                        hashCode = hashCode * -1521134295 + ColorRegId.GetHashCode();
-                        hashCode = hashCode * -1521134295 + AlphaInA.GetHashCode();
-                        hashCode = hashCode * -1521134295 + AlphaInB.GetHashCode();
-                        hashCode = hashCode * -1521134295 + AlphaInC.GetHashCode();
-                        hashCode = hashCode * -1521134295 + AlphaInD.GetHashCode();
-                        hashCode = hashCode * -1521134295 + AlphaOp.GetHashCode();
-                        hashCode = hashCode * -1521134295 + AlphaBias.GetHashCode();
-                        hashCode = hashCode * -1521134295 + AlphaScale.GetHashCode();
-                        hashCode = hashCode * -1521134295 + AlphaClamp.GetHashCode();
-                        hashCode = hashCode * -1521134295 + AlphaRegId.GetHashCode();
-                        return hashCode;
+                        HashCode hash = new();
+                        hash.Add(ColorInA);
+                        hash.Add(ColorInB);
+                        hash.Add(ColorInC);
+                        hash.Add(ColorInD);
+                        hash.Add(ColorOp);
+                        hash.Add(ColorBias);
+                        hash.Add(ColorScale);
+                        hash.Add(ColorClamp);
+                        hash.Add(ColorRegId);
+                        hash.Add(AlphaInA);
+                        hash.Add(AlphaInB);
+                        hash.Add(AlphaInC);
+                        hash.Add(AlphaInD);
+                        hash.Add(AlphaOp);
+                        hash.Add(AlphaBias);
+                        hash.Add(AlphaScale);
+                        hash.Add(AlphaClamp);
+                        hash.Add(AlphaRegId);
+                        return hash.ToHashCode();
                     }
 
                     public enum CombineColorInput
@@ -2996,11 +2955,11 @@ namespace Hack.io.BMD
                         writer.Write(new byte[2] { 0xFF, 0xFF }, 0, 2);
                     }
 
-                    public TevSwapMode Clone() => new TevSwapMode(RasSel, TexSel);
+                    public TevSwapMode Clone() => new(RasSel, TexSel);
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is TevSwapMode mode))
+                        if (obj is not TevSwapMode mode)
                             return false;
                         return RasSel == mode.RasSel &&
                                TexSel == mode.TexSel;
@@ -3008,10 +2967,7 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = 2132594825;
-                        hashCode = hashCode * -1521134295 + RasSel.GetHashCode();
-                        hashCode = hashCode * -1521134295 + TexSel.GetHashCode();
-                        return hashCode;
+                        return HashCode.Combine(RasSel, TexSel);
                     }
 
                     public static bool operator ==(TevSwapMode mode1, TevSwapMode mode2)
@@ -3055,11 +3011,11 @@ namespace Hack.io.BMD
                         writer.WriteByte(A);
                     }
 
-                    public TevSwapModeTable Clone() => new TevSwapModeTable(R, G, B, A);
+                    public TevSwapModeTable Clone() => new(R, G, B, A);
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is TevSwapModeTable table))
+                        if (obj is not TevSwapModeTable table)
                             return false;
                         return R == table.R &&
                                G == table.G &&
@@ -3069,12 +3025,7 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = 1960784236;
-                        hashCode = hashCode * -1521134295 + R.GetHashCode();
-                        hashCode = hashCode * -1521134295 + G.GetHashCode();
-                        hashCode = hashCode * -1521134295 + B.GetHashCode();
-                        hashCode = hashCode * -1521134295 + A.GetHashCode();
-                        return hashCode;
+                        return HashCode.Combine(R, G, B, A);
                     }
 
                     public static bool operator ==(TevSwapModeTable table1, TevSwapModeTable table2)
@@ -3160,7 +3111,7 @@ namespace Hack.io.BMD
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is Fog fog))
+                        if (obj is not Fog fog)
                             return false;
                         return Type == fog.Type &&
                                Enable == fog.Enable &&
@@ -3175,17 +3126,17 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = 1878492404;
-                        hashCode = hashCode * -1521134295 + Type.GetHashCode();
-                        hashCode = hashCode * -1521134295 + Enable.GetHashCode();
-                        hashCode = hashCode * -1521134295 + Center.GetHashCode();
-                        hashCode = hashCode * -1521134295 + StartZ.GetHashCode();
-                        hashCode = hashCode * -1521134295 + EndZ.GetHashCode();
-                        hashCode = hashCode * -1521134295 + NearZ.GetHashCode();
-                        hashCode = hashCode * -1521134295 + FarZ.GetHashCode();
-                        hashCode = hashCode * -1521134295 + EqualityComparer<Color4>.Default.GetHashCode(Color);
-                        hashCode = hashCode * -1521134295 + EqualityComparer<float[]>.Default.GetHashCode(RangeAdjustmentTable);
-                        return hashCode;
+                        HashCode hash = new();
+                        hash.Add(Type);
+                        hash.Add(Enable);
+                        hash.Add(Center);
+                        hash.Add(StartZ);
+                        hash.Add(EndZ);
+                        hash.Add(NearZ);
+                        hash.Add(FarZ);
+                        hash.Add(Color);
+                        hash.Add(RangeAdjustmentTable);
+                        return hash.ToHashCode();
                     }
 
                     public static bool operator ==(Fog fog1, Fog fog2) => fog1.Equals(fog2);
@@ -3235,11 +3186,11 @@ namespace Hack.io.BMD
                         writer.Write(new byte[2] { 0xFF, 0xFF }, 0, 2);
                     }
 
-                    public AlphaCompare Clone() => new AlphaCompare(Comp0, Reference0, Operation, Comp1, Reference1);
+                    public AlphaCompare Clone() => new(Comp0, Reference0, Operation, Comp1, Reference1);
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is AlphaCompare compare))
+                        if (obj is not AlphaCompare compare)
                             return false;
                         return Comp0 == compare.Comp0 &&
                                Reference0 == compare.Reference0 &&
@@ -3250,13 +3201,7 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = 233009852;
-                        hashCode = hashCode * -1521134295 + Comp0.GetHashCode();
-                        hashCode = hashCode * -1521134295 + Reference0.GetHashCode();
-                        hashCode = hashCode * -1521134295 + Operation.GetHashCode();
-                        hashCode = hashCode * -1521134295 + Comp1.GetHashCode();
-                        hashCode = hashCode * -1521134295 + Reference1.GetHashCode();
-                        return hashCode;
+                        return HashCode.Combine(Comp0, Reference0, Operation, Comp1, Reference1);
                     }
 
                     public enum CompareType
@@ -3317,11 +3262,11 @@ namespace Hack.io.BMD
                         write.WriteByte((byte)Operation);
                     }
 
-                    public BlendMode Clone() => new BlendMode(Type, SourceFact, DestinationFact, Operation);
+                    public BlendMode Clone() => new(Type, SourceFact, DestinationFact, Operation);
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is BlendMode mode))
+                        if (obj is not BlendMode mode)
                             return false;
                         return Type == mode.Type &&
                                SourceFact == mode.SourceFact &&
@@ -3331,12 +3276,7 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = -565238750;
-                        hashCode = hashCode * -1521134295 + Type.GetHashCode();
-                        hashCode = hashCode * -1521134295 + SourceFact.GetHashCode();
-                        hashCode = hashCode * -1521134295 + DestinationFact.GetHashCode();
-                        hashCode = hashCode * -1521134295 + Operation.GetHashCode();
-                        return hashCode;
+                        return HashCode.Combine(Type, SourceFact, DestinationFact, Operation);
                     }
 
                     public enum BlendModeID
@@ -3419,20 +3359,16 @@ namespace Hack.io.BMD
                         writer.WriteByte(0xFF);
                     }
 
-                    public ZModeHolder Clone() => new ZModeHolder(Enable, Function, UpdateEnable);
+                    public ZModeHolder Clone() => new(Enable, Function, UpdateEnable);
 
                     public override int GetHashCode()
                     {
-                        var hashCode = -1724780622;
-                        hashCode = hashCode * -1521134295 + Enable.GetHashCode();
-                        hashCode = hashCode * -1521134295 + Function.GetHashCode();
-                        hashCode = hashCode * -1521134295 + UpdateEnable.GetHashCode();
-                        return hashCode;
+                        return HashCode.Combine(Enable, Function, UpdateEnable);
                     }
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is ZModeHolder holder))
+                        if (obj is not ZModeHolder holder)
                             return false;
                         
                         return Enable == holder.Enable &&
@@ -3473,11 +3409,11 @@ namespace Hack.io.BMD
                         writer.WriteReverse(BitConverter.GetBytes(Scale.Z), 0, 4);
                     }
 
-                    public NBTScaleHolder Clone() => new NBTScaleHolder(Unknown1, new Vector3(Scale.X, Scale.Y, Scale.Z));
+                    public NBTScaleHolder Clone() => new(Unknown1, new Vector3(Scale.X, Scale.Y, Scale.Z));
 
                     public override bool Equals(object obj)
                     {
-                        if (!(obj is NBTScaleHolder holder))
+                        if (obj is not NBTScaleHolder holder)
                             return false;
                         return Unknown1 == holder.Unknown1 &&
                                Scale.Equals(holder.Scale);
@@ -3485,10 +3421,7 @@ namespace Hack.io.BMD
 
                     public override int GetHashCode()
                     {
-                        var hashCode = 1461352585;
-                        hashCode = hashCode * -1521134295 + Unknown1.GetHashCode();
-                        hashCode = hashCode * -1521134295 + EqualityComparer<Vector3>.Default.GetHashCode(Scale);
-                        return hashCode;
+                        return HashCode.Combine(Unknown1, Scale);
                     }
 
                     public static bool operator ==(NBTScaleHolder holder1, NBTScaleHolder holder2)

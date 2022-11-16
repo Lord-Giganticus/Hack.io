@@ -42,11 +42,11 @@ namespace Hack.io.BPK
         /// <param name="filename"></param>
         public BPK(string filename)
         {
-            FileStream BPKFile = new FileStream(filename, FileMode.Open);
+            FileStream BPKFile = new(filename, FileMode.Open);
             if (BPKFile.ReadString(8) != Magic)
                 throw new Exception($"Invalid Identifier. Expected \"{Magic}\"");
-
-            uint Filesize = BitConverter.ToUInt32(BPKFile.ReadReverse(0, 4), 0);
+            
+            _ = BitConverter.ToUInt32(BPKFile.ReadReverse(0, 4), 0);
             uint SectionCount = BitConverter.ToUInt32(BPKFile.ReadReverse(0, 4), 0);
             if (SectionCount != 1)
                 throw new Exception(SectionCount > 1 ? "More than 1 section is in this BPK! Please send it to Super Hackio for investigation" : "There are no sections in this BPK!");
@@ -70,7 +70,7 @@ namespace Hack.io.BPK
                 BlueOffset = BitConverter.ToUInt32(BPKFile.ReadReverse(0, 4), 0) + TPT1Start, AlphaOffset = BitConverter.ToUInt32(BPKFile.ReadReverse(0, 4), 0) + TPT1Start;
 
             BPKFile.Seek(NameSTOffset, SeekOrigin.Begin);
-            List<KeyValuePair<ushort, string>> MaterialNames = new List<KeyValuePair<ushort, string>>();
+            List<KeyValuePair<ushort, string>> MaterialNames = new();
             ushort StringCount = BitConverter.ToUInt16(BPKFile.ReadReverse(0, 2), 0);
             BPKFile.Seek(2, SeekOrigin.Current);
             for (int i = 0; i < StringCount; i++)
@@ -83,14 +83,14 @@ namespace Hack.io.BPK
             }
 
             BPKFile.Seek(RemapTableOffset, SeekOrigin.Begin);
-            List<ushort> RemapTable = new List<ushort>();
+            List<ushort> RemapTable = new();
             for (int i = 0; i < ColourAnimationCount; i++)
                 RemapTable.Add(BitConverter.ToUInt16(BPKFile.ReadReverse(0, 2), 0));
 
-            List<short> RedTable = new List<short>();
-            List<short> GreenTable = new List<short>();
-            List<short> BlueTable = new List<short>();
-            List<short> AlphaTable = new List<short>();
+            List<short> RedTable = new();
+            List<short> GreenTable = new();
+            List<short> BlueTable = new();
+            List<short> AlphaTable = new();
 
             BPKFile.Seek(RedOffset, SeekOrigin.Begin);
             for (int i = 0; i < RedCount; i++)
@@ -112,23 +112,23 @@ namespace Hack.io.BPK
             short KeyFrameCount, TargetKeySet, TangentType;
             for (int i = 0; i < ColourAnimationCount; i++)
             {
-                Animation Anim = new Animation() { MaterialName = MaterialNames[i].Value, RemapID = RemapTable[i] };
+                Animation Anim = new() { MaterialName = MaterialNames[i].Value, RemapID = RemapTable[i] };
                 KeyFrameCount = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
-                Anim.RedFrames = ReadKeyframe(RedTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.RedFrames = BPK.ReadKeyframe(RedTable, 1, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
-                Anim.GreenFrames = ReadKeyframe(GreenTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.GreenFrames = BPK.ReadKeyframe(GreenTable, 1, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
-                Anim.BlueFrames = ReadKeyframe(BlueTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.BlueFrames = BPK.ReadKeyframe(BlueTable, 1, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
-                Anim.AlphaFrames = ReadKeyframe(AlphaTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.AlphaFrames = BPK.ReadKeyframe(AlphaTable, 1, KeyFrameCount, TargetKeySet, TangentType);
                 ColourAnimations.Add(Anim);
             }
 
@@ -147,7 +147,7 @@ namespace Hack.io.BPK
                 FileName = Filename;
 
             string Padding = "Hack.io.BPK © Super Hackio Incorporated 2020";
-            FileStream BTPFile = new FileStream(Filename, FileMode.Create);
+            FileStream BTPFile = new(Filename, FileMode.Create);
 
             BTPFile.WriteString(Magic);
             BTPFile.Write(new byte[8] { 0xDD, 0xDD, 0xDD, 0xDD, 0x00, 0x00, 0x00, 0x01 }, 0, 8);
@@ -160,17 +160,17 @@ namespace Hack.io.BPK
             BTPFile.WriteByte(0xFF);
             BTPFile.WriteReverse(BitConverter.GetBytes(Time), 0, 2);
 
-            List<short> RedTable = new List<short>();
-            List<short> GreenTable = new List<short>();
-            List<short> BlueTable = new List<short>();
-            List<short> AlphaTable = new List<short>();
+            List<short> RedTable = new();
+            List<short> GreenTable = new();
+            List<short> BlueTable = new();
+            List<short> AlphaTable = new();
 
             for (int i = 0; i < ColourAnimations.Count; i++)
             {
-                FindMatch(ref RedTable, ColourAnimations[i].RedFrames);
-                FindMatch(ref GreenTable, ColourAnimations[i].GreenFrames);
-                FindMatch(ref BlueTable, ColourAnimations[i].BlueFrames);
-                FindMatch(ref AlphaTable, ColourAnimations[i].AlphaFrames);
+                BPK.FindMatch(ref RedTable, ColourAnimations[i].RedFrames);
+                BPK.FindMatch(ref GreenTable, ColourAnimations[i].GreenFrames);
+                BPK.FindMatch(ref BlueTable, ColourAnimations[i].BlueFrames);
+                BPK.FindMatch(ref AlphaTable, ColourAnimations[i].AlphaFrames);
             }
 
             BTPFile.WriteReverse(BitConverter.GetBytes((ushort)ColourAnimations.Count), 0, 2);
@@ -231,19 +231,19 @@ namespace Hack.io.BPK
             for (int i = 0; i < ColourAnimations.Count; i++)
             {
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)ColourAnimations[i].RedFrames.Count), 0, 2);
-                BTPFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref RedTable, ColourAnimations[i].RedFrames)), 0, 2);
+                BTPFile.WriteReverse(BitConverter.GetBytes(BPK.FindMatch(ref RedTable, ColourAnimations[i].RedFrames)), 0, 2);
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)(ColourAnimations[i].RedFrames.Any(R => R.IngoingTangent != R.OutgoingTangent) ? 1 : 1)), 0, 2);
 
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)ColourAnimations[i].GreenFrames.Count), 0, 2);
-                BTPFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref GreenTable, ColourAnimations[i].GreenFrames)), 0, 2);
+                BTPFile.WriteReverse(BitConverter.GetBytes(BPK.FindMatch(ref GreenTable, ColourAnimations[i].GreenFrames)), 0, 2);
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)(ColourAnimations[i].GreenFrames.Any(G => G.IngoingTangent != G.OutgoingTangent) ? 1 : 1)), 0, 2);
 
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)ColourAnimations[i].BlueFrames.Count), 0, 2);
-                BTPFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref BlueTable, ColourAnimations[i].BlueFrames)), 0, 2);
+                BTPFile.WriteReverse(BitConverter.GetBytes(BPK.FindMatch(ref BlueTable, ColourAnimations[i].BlueFrames)), 0, 2);
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)(ColourAnimations[i].BlueFrames.Any(B => B.IngoingTangent != B.OutgoingTangent) ? 1 : 1)), 0, 2);
 
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)ColourAnimations[i].AlphaFrames.Count), 0, 2);
-                BTPFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref AlphaTable, ColourAnimations[i].AlphaFrames)), 0, 2);
+                BTPFile.WriteReverse(BitConverter.GetBytes(BPK.FindMatch(ref AlphaTable, ColourAnimations[i].AlphaFrames)), 0, 2);
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)(ColourAnimations[i].AlphaFrames.Any(A => A.IngoingTangent != A.OutgoingTangent) ? 1 : 1)), 0, 2);
             }
 
@@ -305,7 +305,7 @@ namespace Hack.io.BPK
             BTPFile.WriteReverse(BitConverter.GetBytes((ushort)matnames.Length), 0, 2);
             BTPFile.Write(new byte[2] { 0xFF, 0xFF }, 0, 2);
             ushort stringofffset = (ushort)(4 + (4 * matnames.Length));
-            List<byte> bytestrings = new List<byte>();
+            List<byte> bytestrings = new();
             for (int i = 0; i < matnames.Length; i++)
             {
                 BTPFile.WriteReverse(BitConverter.GetBytes(StringToHash(matnames[i])), 0, 2);
@@ -404,9 +404,9 @@ namespace Hack.io.BPK
             }
         }
         
-        private List<Animation.Keyframe> ReadKeyframe(List<short> Data, float Scale, double Count, double Index, int TangentType)
+        private static List<Animation.Keyframe> ReadKeyframe(List<short> Data, float Scale, double Count, double Index, int TangentType)
         {
-            List<Animation.Keyframe> keyframes = new List<Animation.Keyframe>();
+            List<Animation.Keyframe> keyframes = new();
 
             if (Count == 1)
                 keyframes.Add(new Animation.Keyframe() { Time = 0, Value = (short)(Data[(int)Index] * Scale), IngoingTangent = 0, OutgoingTangent = 0 });
@@ -431,9 +431,9 @@ namespace Hack.io.BPK
         }
 
 
-        private short FindMatch(ref List<short> FullList, List<Animation.Keyframe> sequence)
+        private static short FindMatch(ref List<short> FullList, List<Animation.Keyframe> sequence)
         {
-            List<short> currentSequence = new List<short>();
+            List<short> currentSequence = new();
             if (sequence.Count == 1)
                 currentSequence.Add(sequence[0].Value);
             else

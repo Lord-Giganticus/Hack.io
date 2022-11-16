@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using static Hack.io.J3D.J3DGraph;
 
 namespace Hack.io.BVA
@@ -43,7 +41,7 @@ namespace Hack.io.BVA
         /// <param name="filename"></param>
         public BVA(string filename)
         {
-            FileStream BVAFile = new FileStream(filename, FileMode.Open);
+            FileStream BVAFile = new(filename, FileMode.Open);
             Read(BVAFile);
             BVAFile.Close();
             Name = filename;
@@ -65,7 +63,7 @@ namespace Hack.io.BVA
             else if (Filename != null)
                 Name = Filename;
             
-            FileStream BRKFile = new FileStream(Name, FileMode.Create);
+            FileStream BRKFile = new(Name, FileMode.Create);
             Write(BRKFile);
             BRKFile.Close();
         }
@@ -75,7 +73,7 @@ namespace Hack.io.BVA
         /// <returns></returns>
         public MemoryStream Save()
         {
-            MemoryStream MS = new MemoryStream();
+            MemoryStream MS = new();
             Write(MS);
             return MS;
         }
@@ -107,7 +105,7 @@ namespace Hack.io.BVA
             if (BVAFile.ReadString(8) != Magic)
                 throw new Exception("Invalid Identifier. Expected \"J3D1bva1\"");
 
-            uint Filesize = BitConverter.ToUInt32(BVAFile.ReadReverse(0, 4), 0);
+            _ = BitConverter.ToUInt32(BVAFile.ReadReverse(0, 4), 0);
             uint SectionCount = BitConverter.ToUInt32(BVAFile.ReadReverse(0, 4), 0);
             if (SectionCount != 1)
                 throw new Exception(SectionCount > 1 ? "More than 1 section is in this BVA! Please send it to Super Hackio for investigation" : "There are no sections in this BVA!");
@@ -117,12 +115,12 @@ namespace Hack.io.BVA
             if (BVAFile.ReadString(4) != Magic2)
                 throw new Exception("Invalid Identifier. Expected \"VAF1\"");
 
-            uint VAF1Length = BitConverter.ToUInt32(BVAFile.ReadReverse(0, 4), 0);
+            _ = BitConverter.ToUInt32(BVAFile.ReadReverse(0, 4), 0);
             Loop = (LoopMode)BVAFile.ReadByte();
             BVAFile.ReadByte();
             Time = BitConverter.ToUInt16(BVAFile.ReadReverse(0, 2), 0);
-
-            ushort VisibilityAnimationCount = BitConverter.ToUInt16(BVAFile.ReadReverse(0, 2), 0), ShowTableCount = BitConverter.ToUInt16(BVAFile.ReadReverse(0, 2), 0);
+            ushort VisibilityAnimationCount = BitConverter.ToUInt16(BVAFile.ReadReverse(0, 2), 0);
+            _ = BitConverter.ToUInt16(BVAFile.ReadReverse(0, 2), 0);
             uint VisibilityAnimTableOffset = BitConverter.ToUInt32(BVAFile.ReadReverse(0, 4), 0) + VAF1Start, ShowTableOffset = BitConverter.ToUInt32(BVAFile.ReadReverse(0, 4), 0) + VAF1Start;
 
             ushort ShowCount, ShowFirstID;
@@ -132,7 +130,7 @@ namespace Hack.io.BVA
                 ShowCount = BitConverter.ToUInt16(BVAFile.ReadReverse(0, 2), 0);
                 ShowFirstID = BitConverter.ToUInt16(BVAFile.ReadReverse(0, 2), 0);
                 long pauseposition = BVAFile.Position;
-                Animation Anim = new Animation();
+                Animation Anim = new();
                 for (int j = 0; j < ShowCount; j++)
                 {
                     BVAFile.Seek(ShowTableOffset + ShowFirstID + j, SeekOrigin.Begin);
@@ -167,7 +165,7 @@ namespace Hack.io.BVA
             BRKFile.Write(new byte[2] { 0xDD, 0xDD }, 0, 2);
             BRKFile.Write(new byte[4] { 0xEE, 0xEE, 0xEE, 0xEE }, 0, 4);
             BRKFile.Write(new byte[4] { 0xFF, 0xFF, 0xFF, 0xFF }, 0, 4);
-            List<bool> ShowList = new List<bool>();
+            List<bool> ShowList = new();
             #region Padding
             int PadCount = 0;
             while (BRKFile.Position % 32 != 0)
@@ -191,7 +189,7 @@ namespace Hack.io.BVA
             }
             #endregion
             long ShowOffset = BRKFile.Position;
-            List<ushort> ShowOffsets = new List<ushort>();
+            List<ushort> ShowOffsets = new();
 
             for (int i = 0; i < VisibilityAnimations.Count; i++)
             {
@@ -203,7 +201,7 @@ namespace Hack.io.BVA
                 }
                 else
                 {
-                    if (MatchFind(ShowList, VisibilityAnimations[i].Keyframes, out int ID))
+                    if (BVA.MatchFind(ShowList, VisibilityAnimations[i].Keyframes, out int ID))
                         ShowOffsets.Add((ushort)ID);
                     else
                     {
@@ -249,7 +247,7 @@ namespace Hack.io.BVA
             }
         }
 
-        private bool MatchFind(List<bool> AllValues, List<bool> CurrentValues, out int StartID)
+        private static bool MatchFind(List<bool> AllValues, List<bool> CurrentValues, out int StartID)
         {
             StartID = 0;
             if (CurrentValues.Count > AllValues.Count)

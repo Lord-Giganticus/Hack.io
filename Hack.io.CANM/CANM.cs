@@ -51,14 +51,14 @@ namespace Hack.io.CANM
         /// <summary>
         /// List of Keyframes
         /// </summary>
-        public List<Keyset> Keys = new List<Keyset>();
+        public List<Keyset> Keys = new();
         /// <summary>
         /// Open a CANM from a file
         /// </summary>
         /// <param name="filename">File to Open</param>
         public CANM(string filename)
         {
-            FileStream canmFile = new FileStream(filename, FileMode.Open);
+            FileStream canmFile = new(filename, FileMode.Open);
             Header = new Header(canmFile);
 
             for (int i = 0; i < 8; i++)
@@ -82,9 +82,9 @@ namespace Hack.io.CANM
             else if (Filename != null)
                 FileName = Filename;
 
-            FileStream canmFile = new FileStream(FileName, FileMode.Create);
+            FileStream canmFile = new(FileName, FileMode.Create);
 
-            byte[] Wright = new byte[4];
+            byte[] Wright;
             canmFile.WriteString("ANDOCKAN");
             canmFile.WriteReverse(BitConverter.GetBytes(Header.Unknown1), 0, 4);
             canmFile.WriteReverse(BitConverter.GetBytes(Header.Unknown2), 0, 4);
@@ -107,7 +107,7 @@ namespace Hack.io.CANM
                 canmFile.Write(new byte[4] { 0x00, 0x00, 0x00, 0x00 }, 0, 4);//Padding
             }
 
-            List<byte> Miles = new List<byte>();
+            List<byte> Miles = new();
             foreach (Keyset K in Keys)
             {
                 for (int i = 0; i < K.Keyframes.Count; i++)
@@ -131,7 +131,7 @@ namespace Hack.io.CANM
                 }
             }
 
-            Wright = new byte[4];
+
             Wright = BitConverter.GetBytes(Miles.Count + 8);
             Array.Reverse(Wright);
             canmFile.Write(Wright, 0, 4);
@@ -257,11 +257,13 @@ namespace Hack.io.CANM
         /// <summary>
         /// 
         /// </summary>
+#pragma warning disable IDE0052
         private readonly int Padding; // 0x00000000
+#pragma warning restore IDE0052
         /// <summary>
         /// 
         /// </summary>
-        public List<Keyframe> Keyframes = new List<Keyframe>();
+        public List<Keyframe> Keyframes = new();
         /// <summary>
         /// 
         /// </summary>

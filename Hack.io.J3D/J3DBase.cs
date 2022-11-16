@@ -1,14 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using Hack.io;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
-using static Hack.io.Util.GenericExtensions;
 
 namespace Hack.io.J3D
 {
@@ -148,12 +140,7 @@ namespace Hack.io.J3D
 
             public override int GetHashCode()
             {
-                var hashCode = 2107829771;
-                hashCode = hashCode * -1521134295 + Time.GetHashCode();
-                hashCode = hashCode * -1521134295 + Value.GetHashCode();
-                hashCode = hashCode * -1521134295 + IngoingTangent.GetHashCode();
-                hashCode = hashCode * -1521134295 + OutgoingTangent.GetHashCode();
-                return hashCode;
+                return HashCode.Combine(Time, Value, IngoingTangent, OutgoingTangent);
             }
 
             public static bool operator ==(J3DKeyFrame frame1, J3DKeyFrame frame2) => EqualityComparer<J3DKeyFrame>.Default.Equals(frame1, frame2);
@@ -208,7 +195,7 @@ namespace Hack.io.J3D
     {
         public static List<string> ReadStringTable(this Stream reader, int offset)
         {
-            List<string> names = new List<string>();
+            List<string> names = new();
 
             reader.Position = offset;
 

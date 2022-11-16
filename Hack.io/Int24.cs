@@ -1,7 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Globalization;
-using System.Runtime.CompilerServices;
 
 namespace Hack.io.Util
 {
@@ -48,56 +45,56 @@ namespace Hack.io.Util
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Int24 operator +(Int24 a, Int24 b) => new Int24(a.Value + b.Value);
+        public static Int24 operator +(Int24 a, Int24 b) => new(a.Value + b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Int24 operator -(Int24 a, Int24 b) => new Int24(a.Value - b.Value);
+        public static Int24 operator -(Int24 a, Int24 b) => new(a.Value - b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Int24 operator *(Int24 a, Int24 b) => new Int24(a.Value * b.Value);
+        public static Int24 operator *(Int24 a, Int24 b) => new(a.Value * b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Int24 operator /(Int24 a, Int24 b) => new Int24(a.Value / b.Value);
+        public static Int24 operator /(Int24 a, Int24 b) => new(a.Value / b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Int24 operator %(Int24 a, Int24 b) => new Int24(a.Value % b.Value);
+        public static Int24 operator %(Int24 a, Int24 b) => new(a.Value % b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Int24 operator &(Int24 a, Int24 b) => new Int24(a.Value & b.Value);
+        public static Int24 operator &(Int24 a, Int24 b) => new(a.Value & b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Int24 operator |(Int24 a, Int24 b) => new Int24(a.Value | b.Value);
+        public static Int24 operator |(Int24 a, Int24 b) => new(a.Value | b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Int24 operator ^(Int24 a, Int24 b) => new Int24(a.Value ^ b.Value);
+        public static Int24 operator ^(Int24 a, Int24 b) => new(a.Value ^ b.Value);
         /// <summary>
         /// 
         /// </summary>
@@ -117,19 +114,19 @@ namespace Hack.io.Util
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static Int24 operator ~(Int24 a) => new Int24(~a.Value);
+        public static Int24 operator ~(Int24 a) => new(~a.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static Int24 operator ++(Int24 a) => new Int24(a.Value+1);
+        public static Int24 operator ++(Int24 a) => new(a.Value+1);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static Int24 operator --(Int24 a) => new Int24(a.Value - 1);
+        public static Int24 operator --(Int24 a) => new(a.Value - 1);
         /// <summary>
         /// 
         /// </summary>
@@ -250,7 +247,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator Int24(byte x) => new Int24(x);
+        public static explicit operator Int24(byte x) => new(x);
         /// <summary>
         /// 
         /// </summary>
@@ -260,7 +257,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator Int24(sbyte x) => new Int24(x);
+        public static explicit operator Int24(sbyte x) => new(x);
         /// <summary>
         /// 
         /// </summary>
@@ -270,7 +267,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator Int24(short x) => new Int24(x);
+        public static explicit operator Int24(short x) => new(x);
         /// <summary>
         /// 
         /// </summary>
@@ -280,7 +277,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator Int24(ushort x) => new Int24(x);
+        public static explicit operator Int24(ushort x) => new(x);
         /// <summary>
         /// 
         /// </summary>
@@ -290,17 +287,17 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator Int24(UInt24 x) => new Int24((int)x.Value);
+        public static explicit operator Int24(UInt24 x) => new((int)x.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator UInt24(Int24 x) => new UInt24((uint)x.Value);
+        public static explicit operator UInt24(Int24 x) => new((uint)x.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator Int24(int x) => new Int24(x);
+        public static explicit operator Int24(int x) => new(x);
         /// <summary>
         /// 
         /// </summary>
@@ -310,7 +307,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator Int24(uint x) => new Int24((int)x);
+        public static explicit operator Int24(uint x) => new((int)x);
         /// <summary>
         /// 
         /// </summary>
@@ -320,7 +317,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator Int24(long x) => new Int24((int)x);
+        public static explicit operator Int24(long x) => new((int)x);
         /// <summary>
         /// 
         /// </summary>
@@ -330,7 +327,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator Int24(ulong x) => new Int24((int)x);
+        public static explicit operator Int24(ulong x) => new((int)x);
         /// <summary>
         /// 
         /// </summary>
@@ -373,56 +370,56 @@ namespace Hack.io.Util
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static UInt24 operator +(UInt24 a, UInt24 b) => new UInt24(a.Value + b.Value);
+        public static UInt24 operator +(UInt24 a, UInt24 b) => new(a.Value + b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static UInt24 operator -(UInt24 a, UInt24 b) => new UInt24(a.Value - b.Value);
+        public static UInt24 operator -(UInt24 a, UInt24 b) => new(a.Value - b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static UInt24 operator *(UInt24 a, UInt24 b) => new UInt24(a.Value * b.Value);
+        public static UInt24 operator *(UInt24 a, UInt24 b) => new(a.Value * b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static UInt24 operator /(UInt24 a, UInt24 b) => new UInt24(a.Value / b.Value);
+        public static UInt24 operator /(UInt24 a, UInt24 b) => new(a.Value / b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static UInt24 operator %(UInt24 a, UInt24 b) => new UInt24(a.Value % b.Value);
+        public static UInt24 operator %(UInt24 a, UInt24 b) => new(a.Value % b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static UInt24 operator &(UInt24 a, UInt24 b) => new UInt24(a.Value & b.Value);
+        public static UInt24 operator &(UInt24 a, UInt24 b) => new(a.Value & b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static UInt24 operator |(UInt24 a, UInt24 b) => new UInt24(a.Value | b.Value);
+        public static UInt24 operator |(UInt24 a, UInt24 b) => new(a.Value | b.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static UInt24 operator ^(UInt24 a, UInt24 b) => new UInt24(a.Value ^ b.Value);
+        public static UInt24 operator ^(UInt24 a, UInt24 b) => new(a.Value ^ b.Value);
         /// <summary>
         /// 
         /// </summary>
@@ -442,19 +439,19 @@ namespace Hack.io.Util
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static UInt24 operator ~(UInt24 a) => new UInt24(~a.Value);
+        public static UInt24 operator ~(UInt24 a) => new(~a.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static UInt24 operator ++(UInt24 a) => new UInt24(a.Value + 1);
+        public static UInt24 operator ++(UInt24 a) => new(a.Value + 1);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static UInt24 operator --(UInt24 a) => new UInt24(a.Value - 1);
+        public static UInt24 operator --(UInt24 a) => new(a.Value - 1);
         /// <summary>
         /// 
         /// </summary>
@@ -533,7 +530,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator UInt24(byte x) => new UInt24(x);
+        public static explicit operator UInt24(byte x) => new(x);
         /// <summary>
         /// 
         /// </summary>
@@ -543,7 +540,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator UInt24(sbyte x) => new UInt24((uint)x);
+        public static explicit operator UInt24(sbyte x) => new((uint)x);
         /// <summary>
         /// 
         /// </summary>
@@ -553,7 +550,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator UInt24(short x) => new UInt24((uint)x);
+        public static explicit operator UInt24(short x) => new((uint)x);
         /// <summary>
         /// 
         /// </summary>
@@ -563,7 +560,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator UInt24(ushort x) => new UInt24(x);
+        public static explicit operator UInt24(ushort x) => new(x);
         /// <summary>
         /// 
         /// </summary>
@@ -573,17 +570,17 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator UInt24(Int24 x) => new UInt24((uint)x.Value);
+        public static explicit operator UInt24(Int24 x) => new((uint)x.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator Int24(UInt24 x) => new Int24((int)x.Value);
+        public static explicit operator Int24(UInt24 x) => new((int)x.Value);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator UInt24(int x) => new UInt24((uint)x);
+        public static explicit operator UInt24(int x) => new((uint)x);
         /// <summary>
         /// 
         /// </summary>
@@ -593,7 +590,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator UInt24(uint x) => new UInt24(x);
+        public static explicit operator UInt24(uint x) => new(x);
         /// <summary>
         /// 
         /// </summary>
@@ -603,7 +600,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator UInt24(long x) => new UInt24((uint)x);
+        public static explicit operator UInt24(long x) => new((uint)x);
         /// <summary>
         /// 
         /// </summary>
@@ -613,7 +610,7 @@ namespace Hack.io.Util
         /// 
         /// </summary>
         /// <param name="x"></param>
-        public static explicit operator UInt24(ulong x) => new UInt24((uint)x);
+        public static explicit operator UInt24(ulong x) => new((uint)x);
         /// <summary>
         /// 
         /// </summary>
