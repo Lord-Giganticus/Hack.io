@@ -283,41 +283,41 @@ namespace Hack.io.BTK
                 KeyFrameCount = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
-                Anim.ScaleUFrames = BTK.ReadKeyframe(ScaleTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.ScaleUFrames = ReadKeyframe(ScaleTable, 1, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
-                Anim.RotationUFrames = BTK.ReadKeyframe(RotationTable, RotationMultiplier, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.RotationUFrames = ReadKeyframe(RotationTable, RotationMultiplier, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
-                Anim.TranslationUFrames = BTK.ReadKeyframe(TranslationTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.TranslationUFrames = ReadKeyframe(TranslationTable, 1, KeyFrameCount, TargetKeySet, TangentType);
 
                 KeyFrameCount = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
-                Anim.ScaleVFrames = BTK.ReadKeyframe(ScaleTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.ScaleVFrames = ReadKeyframe(ScaleTable, 1, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
-                Anim.RotationVFrames = BTK.ReadKeyframe(RotationTable, RotationMultiplier, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.RotationVFrames = ReadKeyframe(RotationTable, RotationMultiplier, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
-                Anim.TranslationVFrames = BTK.ReadKeyframe(TranslationTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.TranslationVFrames = ReadKeyframe(TranslationTable, 1, KeyFrameCount, TargetKeySet, TangentType);
 
                 KeyFrameCount = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
-                Anim.ScaleWFrames = BTK.ReadKeyframe(ScaleTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.ScaleWFrames = ReadKeyframe(ScaleTable, 1, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
-                Anim.RotationWFrames = BTK.ReadKeyframe(RotationTable, RotationMultiplier, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.RotationWFrames = ReadKeyframe(RotationTable, RotationMultiplier, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BTKFile.ReadReverse(0, 2), 0);
-                Anim.TranslationWFrames = BTK.ReadKeyframe(TranslationTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.TranslationWFrames = ReadKeyframe(TranslationTable, 1, KeyFrameCount, TargetKeySet, TangentType);
 
                 TextureAnimations.Add(Anim);
             }
@@ -469,15 +469,15 @@ namespace Hack.io.BTK
 
             for (int i = 0; i < TextureAnimations.Count; i++)
             {
-                BTK.FindMatch(ref ScaleTable, TextureAnimations[i].ScaleUFrames, 1);
-                BTK.FindMatch(ref ScaleTable, TextureAnimations[i].ScaleVFrames, 1);
-                BTK.FindMatch(ref ScaleTable, TextureAnimations[i].ScaleWFrames, 1);
-                BTK.FindMatch(ref RotationTable, TextureAnimations[i].RotationUFrames, RotationMultiplier);
-                BTK.FindMatch(ref RotationTable, TextureAnimations[i].RotationVFrames, RotationMultiplier);
-                BTK.FindMatch(ref RotationTable, TextureAnimations[i].RotationWFrames, RotationMultiplier);
-                BTK.FindMatch(ref TranslationTable, TextureAnimations[i].TranslationUFrames, 1);
-                BTK.FindMatch(ref TranslationTable, TextureAnimations[i].TranslationVFrames, 1);
-                BTK.FindMatch(ref TranslationTable, TextureAnimations[i].TranslationWFrames, 1);
+                FindMatch(ref ScaleTable, TextureAnimations[i].ScaleUFrames, 1);
+                FindMatch(ref ScaleTable, TextureAnimations[i].ScaleVFrames, 1);
+                FindMatch(ref ScaleTable, TextureAnimations[i].ScaleWFrames, 1);
+                FindMatch(ref RotationTable, TextureAnimations[i].RotationUFrames, RotationMultiplier);
+                FindMatch(ref RotationTable, TextureAnimations[i].RotationVFrames, RotationMultiplier);
+                FindMatch(ref RotationTable, TextureAnimations[i].RotationWFrames, RotationMultiplier);
+                FindMatch(ref TranslationTable, TextureAnimations[i].TranslationUFrames, 1);
+                FindMatch(ref TranslationTable, TextureAnimations[i].TranslationVFrames, 1);
+                FindMatch(ref TranslationTable, TextureAnimations[i].TranslationWFrames, 1);
             }
             long ScaleTableOffset = BTKFile.Position;
             for (int i = 0; i < ScaleTable.Count; i++)
@@ -530,41 +530,41 @@ namespace Hack.io.BTK
             for (int i = 0; i < TextureAnimations.Count; i++)
             {
                 BTKFile.Position += 2;
-                BTKFile.WriteReverse(BitConverter.GetBytes(BTK.FindMatch(ref ScaleTable, TextureAnimations[i].ScaleUFrames, 1)), 0, 2);
+                BTKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref ScaleTable, TextureAnimations[i].ScaleUFrames, 1)), 0, 2);
                 BTKFile.Position += 2;
 
                 BTKFile.Position += 2;
-                BTKFile.WriteReverse(BitConverter.GetBytes(BTK.FindMatch(ref RotationTable, TextureAnimations[i].RotationUFrames, RotationMultiplier)), 0, 2);
+                BTKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref RotationTable, TextureAnimations[i].RotationUFrames, RotationMultiplier)), 0, 2);
                 BTKFile.Position += 2;
 
                 BTKFile.Position += 2;
-                BTKFile.WriteReverse(BitConverter.GetBytes(BTK.FindMatch(ref TranslationTable, TextureAnimations[i].TranslationUFrames, 1)), 0, 2);
-                BTKFile.Position += 2;
-
-
-                BTKFile.Position += 2;
-                BTKFile.WriteReverse(BitConverter.GetBytes(BTK.FindMatch(ref ScaleTable, TextureAnimations[i].ScaleVFrames, 1)), 0, 2);
-                BTKFile.Position += 2;
-
-                BTKFile.Position += 2;
-                BTKFile.WriteReverse(BitConverter.GetBytes(BTK.FindMatch(ref RotationTable, TextureAnimations[i].RotationVFrames, RotationMultiplier)), 0, 2);
-                BTKFile.Position += 2;
-
-                BTKFile.Position += 2;
-                BTKFile.WriteReverse(BitConverter.GetBytes(BTK.FindMatch(ref TranslationTable, TextureAnimations[i].TranslationVFrames, 1)), 0, 2);
+                BTKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref TranslationTable, TextureAnimations[i].TranslationUFrames, 1)), 0, 2);
                 BTKFile.Position += 2;
 
 
                 BTKFile.Position += 2;
-                BTKFile.WriteReverse(BitConverter.GetBytes(BTK.FindMatch(ref ScaleTable, TextureAnimations[i].ScaleWFrames, 1)), 0, 2);
+                BTKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref ScaleTable, TextureAnimations[i].ScaleVFrames, 1)), 0, 2);
                 BTKFile.Position += 2;
 
                 BTKFile.Position += 2;
-                BTKFile.WriteReverse(BitConverter.GetBytes(BTK.FindMatch(ref RotationTable, TextureAnimations[i].RotationWFrames, RotationMultiplier)), 0, 2);
+                BTKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref RotationTable, TextureAnimations[i].RotationVFrames, RotationMultiplier)), 0, 2);
                 BTKFile.Position += 2;
 
                 BTKFile.Position += 2;
-                BTKFile.WriteReverse(BitConverter.GetBytes(BTK.FindMatch(ref TranslationTable, TextureAnimations[i].TranslationWFrames, 1)), 0, 2);
+                BTKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref TranslationTable, TextureAnimations[i].TranslationVFrames, 1)), 0, 2);
+                BTKFile.Position += 2;
+
+
+                BTKFile.Position += 2;
+                BTKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref ScaleTable, TextureAnimations[i].ScaleWFrames, 1)), 0, 2);
+                BTKFile.Position += 2;
+
+                BTKFile.Position += 2;
+                BTKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref RotationTable, TextureAnimations[i].RotationWFrames, RotationMultiplier)), 0, 2);
+                BTKFile.Position += 2;
+
+                BTKFile.Position += 2;
+                BTKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref TranslationTable, TextureAnimations[i].TranslationWFrames, 1)), 0, 2);
                 BTKFile.Position += 2;
             }
         }

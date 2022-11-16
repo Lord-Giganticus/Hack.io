@@ -405,22 +405,22 @@ namespace Hack.io.BRK
                 KeyFrameCount = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
-                Anim.RedFrames = BRK.ReadKeyframe(RegisterRedTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.RedFrames = ReadKeyframe(RegisterRedTable, 1, KeyFrameCount, TargetKeySet, TangentType);
 
                 KeyFrameCount = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
-                Anim.GreenFrames = BRK.ReadKeyframe(RegisterGreenTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.GreenFrames = ReadKeyframe(RegisterGreenTable, 1, KeyFrameCount, TargetKeySet, TangentType);
 
                 KeyFrameCount = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
-                Anim.BlueFrames = BRK.ReadKeyframe(RegisterBlueTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.BlueFrames = ReadKeyframe(RegisterBlueTable, 1, KeyFrameCount, TargetKeySet, TangentType);
 
                 KeyFrameCount = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
-                Anim.AlphaFrames = BRK.ReadKeyframe(RegisterAlphaTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.AlphaFrames = ReadKeyframe(RegisterAlphaTable, 1, KeyFrameCount, TargetKeySet, TangentType);
 
                 Anim.RegisterID = (byte)BRKFile.ReadByte();
                 while (BRKFile.Position % 4 != 0)
@@ -436,22 +436,22 @@ namespace Hack.io.BRK
                 KeyFrameCount = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
-                Anim.RedFrames = BRK.ReadKeyframe(ConstantRedTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.RedFrames = ReadKeyframe(ConstantRedTable, 1, KeyFrameCount, TargetKeySet, TangentType);
 
                 KeyFrameCount = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
-                Anim.GreenFrames = BRK.ReadKeyframe(ConstantGreenTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.GreenFrames = ReadKeyframe(ConstantGreenTable, 1, KeyFrameCount, TargetKeySet, TangentType);
 
                 KeyFrameCount = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
-                Anim.BlueFrames = BRK.ReadKeyframe(ConstantBlueTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.BlueFrames = ReadKeyframe(ConstantBlueTable, 1, KeyFrameCount, TargetKeySet, TangentType);
 
                 KeyFrameCount = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BRKFile.ReadReverse(0, 2), 0);
-                Anim.AlphaFrames = BRK.ReadKeyframe(ConstantAlphaTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.AlphaFrames = ReadKeyframe(ConstantAlphaTable, 1, KeyFrameCount, TargetKeySet, TangentType);
 
                 Anim.RegisterID = (byte)BRKFile.ReadByte();
                 while (BRKFile.Position % 4 != 0)
@@ -551,10 +551,10 @@ namespace Hack.io.BRK
 
             for (int i = 0; i < RegisterColourAnimations.Count; i++)
             {
-                BRK.FindMatch(ref RegisterRedTable, RegisterColourAnimations[i].RedFrames);
-                BRK.FindMatch(ref RegisterGreenTable, RegisterColourAnimations[i].GreenFrames);
-                BRK.FindMatch(ref RegisterBlueTable, RegisterColourAnimations[i].BlueFrames);
-                BRK.FindMatch(ref RegisterAlphaTable, RegisterColourAnimations[i].AlphaFrames);
+                FindMatch(ref RegisterRedTable, RegisterColourAnimations[i].RedFrames);
+                FindMatch(ref RegisterGreenTable, RegisterColourAnimations[i].GreenFrames);
+                FindMatch(ref RegisterBlueTable, RegisterColourAnimations[i].BlueFrames);
+                FindMatch(ref RegisterAlphaTable, RegisterColourAnimations[i].AlphaFrames);
             }
             long RegisterRedOffset = BRKFile.Position;
             for (int i = 0; i < RegisterRedTable.Count; i++)
@@ -619,10 +619,10 @@ namespace Hack.io.BRK
 
             for (int i = 0; i < ConstantColourAnimations.Count; i++)
             {
-                BRK.FindMatch(ref ConstantRedTable, ConstantColourAnimations[i].RedFrames);
-                BRK.FindMatch(ref ConstantGreenTable, ConstantColourAnimations[i].GreenFrames);
-                BRK.FindMatch(ref ConstantBlueTable, ConstantColourAnimations[i].BlueFrames);
-                BRK.FindMatch(ref ConstantAlphaTable, ConstantColourAnimations[i].AlphaFrames);
+                FindMatch(ref ConstantRedTable, ConstantColourAnimations[i].RedFrames);
+                FindMatch(ref ConstantGreenTable, ConstantColourAnimations[i].GreenFrames);
+                FindMatch(ref ConstantBlueTable, ConstantColourAnimations[i].BlueFrames);
+                FindMatch(ref ConstantAlphaTable, ConstantColourAnimations[i].AlphaFrames);
             }
             long ConstantRedOffset = BRKFile.Position;
             for (int i = 0; i < ConstantRedTable.Count; i++)
@@ -714,7 +714,7 @@ namespace Hack.io.BRK
             BRKFile.Write(new byte[2] { 0xFF, 0xFF }, 0, 2);
             for (int i = 0; i < RegisterStrings.Count; i++)
             {
-                BRKFile.WriteReverse(BitConverter.GetBytes(BRK.StringToHash(RegisterStrings[i])), 0, 2);
+                BRKFile.WriteReverse(BitConverter.GetBytes(StringToHash(RegisterStrings[i])), 0, 2);
                 int StringOffset = RegisterStrings.Count * 4 + 4;
                 for (int j = 0; j < i; j++)
                 {
@@ -743,7 +743,7 @@ namespace Hack.io.BRK
             BRKFile.Write(new byte[2] { 0xFF, 0xFF }, 0, 2);
             for (int i = 0; i < ConstantStrings.Count; i++)
             {
-                BRKFile.WriteReverse(BitConverter.GetBytes(BRK.StringToHash(ConstantStrings[i])), 0, 2);
+                BRKFile.WriteReverse(BitConverter.GetBytes(StringToHash(ConstantStrings[i])), 0, 2);
                 int StringOffset = ConstantStrings.Count * 4 + 4;
                 for (int j = 0; j < i; j++)
                 {
@@ -842,19 +842,19 @@ namespace Hack.io.BRK
             for (int i = 0; i < RegisterColourAnimations.Count; i++)
             {
                 BRKFile.Position += 2;
-                BRKFile.WriteReverse(BitConverter.GetBytes(BRK.FindMatch(ref RegisterRedTable, RegisterColourAnimations[i].RedFrames)), 0, 2);
+                BRKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref RegisterRedTable, RegisterColourAnimations[i].RedFrames)), 0, 2);
                 BRKFile.Position += 2;
 
                 BRKFile.Position += 2;
-                BRKFile.WriteReverse(BitConverter.GetBytes(BRK.FindMatch(ref RegisterGreenTable, RegisterColourAnimations[i].GreenFrames)), 0, 2);
+                BRKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref RegisterGreenTable, RegisterColourAnimations[i].GreenFrames)), 0, 2);
                 BRKFile.Position += 2;
 
                 BRKFile.Position += 2;
-                BRKFile.WriteReverse(BitConverter.GetBytes(BRK.FindMatch(ref RegisterBlueTable, RegisterColourAnimations[i].BlueFrames)), 0, 2);
+                BRKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref RegisterBlueTable, RegisterColourAnimations[i].BlueFrames)), 0, 2);
                 BRKFile.Position += 2;
 
                 BRKFile.Position += 2;
-                BRKFile.WriteReverse(BitConverter.GetBytes(BRK.FindMatch(ref RegisterAlphaTable, RegisterColourAnimations[i].AlphaFrames)), 0, 2);
+                BRKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref RegisterAlphaTable, RegisterColourAnimations[i].AlphaFrames)), 0, 2);
                 BRKFile.Position += 3;
 
                 while (BRKFile.Position % 4 != 0)
@@ -865,19 +865,19 @@ namespace Hack.io.BRK
             for (int i = 0; i < ConstantColourAnimations.Count; i++)
             {
                 BRKFile.Position += 2;
-                BRKFile.WriteReverse(BitConverter.GetBytes(BRK.FindMatch(ref ConstantRedTable, ConstantColourAnimations[i].RedFrames)), 0, 2);
+                BRKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref ConstantRedTable, ConstantColourAnimations[i].RedFrames)), 0, 2);
                 BRKFile.Position += 2;
 
                 BRKFile.Position += 2;
-                BRKFile.WriteReverse(BitConverter.GetBytes(BRK.FindMatch(ref ConstantGreenTable, ConstantColourAnimations[i].GreenFrames)), 0, 2);
+                BRKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref ConstantGreenTable, ConstantColourAnimations[i].GreenFrames)), 0, 2);
                 BRKFile.Position += 2;
 
                 BRKFile.Position += 2;
-                BRKFile.WriteReverse(BitConverter.GetBytes(BRK.FindMatch(ref ConstantBlueTable, ConstantColourAnimations[i].BlueFrames)), 0, 2);
+                BRKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref ConstantBlueTable, ConstantColourAnimations[i].BlueFrames)), 0, 2);
                 BRKFile.Position += 2;
 
                 BRKFile.Position += 2;
-                BRKFile.WriteReverse(BitConverter.GetBytes(BRK.FindMatch(ref ConstantAlphaTable, ConstantColourAnimations[i].AlphaFrames)), 0, 2);
+                BRKFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref ConstantAlphaTable, ConstantColourAnimations[i].AlphaFrames)), 0, 2);
                 BRKFile.Position += 3;
 
                 while (BRKFile.Position % 4 != 0)

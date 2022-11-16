@@ -33,11 +33,11 @@ namespace Hack.io.BMD
 
                 IsPartialWeight = new List<bool>();
 
-                BMD.Seek(ChunkStart + boolDataOffset, System.IO.SeekOrigin.Begin);
+                BMD.Seek(ChunkStart + boolDataOffset, SeekOrigin.Begin);
                 for (int i = 0; i < entryCount; i++)
                     IsPartialWeight.Add(BMD.ReadByte() > 0);
 
-                BMD.Seek(ChunkStart + indexDataOffset, System.IO.SeekOrigin.Begin);
+                BMD.Seek(ChunkStart + indexDataOffset, SeekOrigin.Begin);
                 for (int i = 0; i < entryCount; i++)
                     TransformIndexTable.Add(BitConverter.ToInt16(BMD.ReadReverse(0, 2), 0));
 

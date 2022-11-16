@@ -342,17 +342,17 @@ namespace Hack.io.BCK
             ref List<short> AllRotations, ref Dictionary<BoneAnimation, int> RotationXOffsets, ref Dictionary<BoneAnimation, int> RotationYOffsets, ref Dictionary<BoneAnimation, int> RotationZOffsets,
             ref List<float> AllScales, ref Dictionary<BoneAnimation, int> ScaleXOffsets, ref Dictionary<BoneAnimation, int> ScaleYOffsets, ref Dictionary<BoneAnimation, int> ScaleZOffsets)
         {
-            BCK.RevertAnimationTrack(Animation, Animation.ScaleX, ref AllScales, ref ScaleXOffsets);
-            BCK.RevertAnimationTrack(Animation, Animation.ScaleY, ref AllScales, ref ScaleYOffsets);
-            BCK.RevertAnimationTrack(Animation, Animation.ScaleZ, ref AllScales, ref ScaleZOffsets);
+            RevertAnimationTrack(Animation, Animation.ScaleX, ref AllScales, ref ScaleXOffsets);
+            RevertAnimationTrack(Animation, Animation.ScaleY, ref AllScales, ref ScaleYOffsets);
+            RevertAnimationTrack(Animation, Animation.ScaleZ, ref AllScales, ref ScaleZOffsets);
 
             RevertAnimationTrack(Animation, Animation.RotationX, ref AllRotations, ref RotationXOffsets);
             RevertAnimationTrack(Animation, Animation.RotationY, ref AllRotations, ref RotationYOffsets);
             RevertAnimationTrack(Animation, Animation.RotationZ, ref AllRotations, ref RotationZOffsets);
 
-            BCK.RevertAnimationTrack(Animation, Animation.TranslationX, ref AllTranslations, ref TranslationXOffsets);
-            BCK.RevertAnimationTrack(Animation, Animation.TranslationY, ref AllTranslations, ref TranslationYOffsets);
-            BCK.RevertAnimationTrack(Animation, Animation.TranslationZ, ref AllTranslations, ref TranslationZOffsets);
+            RevertAnimationTrack(Animation, Animation.TranslationX, ref AllTranslations, ref TranslationXOffsets);
+            RevertAnimationTrack(Animation, Animation.TranslationY, ref AllTranslations, ref TranslationYOffsets);
+            RevertAnimationTrack(Animation, Animation.TranslationZ, ref AllTranslations, ref TranslationZOffsets);
         }
 
         private static void RevertAnimationTrack(BoneAnimation Animation, List<J3DKeyFrame> AnimationTrack, ref List<float> ActiveValues, ref Dictionary<BoneAnimation, int> ActiveOffsets)

@@ -201,7 +201,7 @@ namespace Hack.io.BVA
                 }
                 else
                 {
-                    if (BVA.MatchFind(ShowList, VisibilityAnimations[i].Keyframes, out int ID))
+                    if (MatchFind(ShowList, VisibilityAnimations[i].Keyframes, out int ID))
                         ShowOffsets.Add((ushort)ID);
                     else
                     {

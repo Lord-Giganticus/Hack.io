@@ -67,7 +67,7 @@ namespace Hack.io.MSBF
                         ReadFLW2(MSBFFile);
                         break;
                     case "FEN1":
-                        MSBF.ReadFEN1(MSBFFile, ref FlowMSBTHookNames);
+                        ReadFEN1(MSBFFile, ref FlowMSBTHookNames);
                         break;
                     default:
                         throw new Exception($"{CurrentSectionMagic} section found, but this is not supported.");
@@ -275,7 +275,7 @@ namespace Hack.io.MSBF
             {
                 if (Nodes[i] is EntryNode EN)
                 {
-                    SortingGroups.Add((MSBF.LabelChecksum(EN.MSBTEntryTag, GroupCount), EN));
+                    SortingGroups.Add((LabelChecksum(EN.MSBTEntryTag, GroupCount), EN));
                 }
             }
             SortingGroups = SortingGroups.OrderBy(EN => EN.Hash).ToList();

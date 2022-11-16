@@ -11,6 +11,8 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using SixLabors.ImageSharp.PixelFormats;
+using BGRAImage = SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Bgra32>;
 
 namespace Hack.ConsoleEx
 {
@@ -60,13 +62,13 @@ namespace Hack.ConsoleEx
         /// <param name="ErrorMsg">The error message</param>
         public static void Quit(int ExitCode = 0, string ErrorMsg = "An error has occured")
         {
-            System.Console.WriteLine();
+            Console.WriteLine();
             WriteColoured($"ERROR: {ErrorMsg}", ConsoleColor.Red, newline: true);
             WriteColoured($"[Error Code 0x{ExitCode.ToString().PadLeft(4, '0')}]", ConsoleColor.DarkRed);
-            System.Console.WriteLine();
-            System.Console.WriteLine();
-            System.Console.WriteLine("Press any key to exit");
-            System.Console.ReadKey();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("Press any key to exit");
+            Console.ReadKey();
             Environment.Exit(ExitCode);
         }
     }
@@ -647,6 +649,19 @@ namespace Hack.io.Util
                 output.Add(InitValue);
             }
             return output;
+        }
+
+        /// <summary>
+        /// Converts a <see cref="Bitmap"/> to a BGRA image (check SixLabor's docs)
+        /// </summary>
+        /// <param name="map">The bitmap to use.</param>
+        /// <returns>A cloned copy of the bitmap.</returns>
+        [SupportedOSPlatform("windows")]
+        public static BGRAImage ToBGRAImage(this Bitmap map)
+        {
+            using MemoryStream ms = new();
+            map.Save(ms, ImageFormat.Png);
+            return SixLabors.ImageSharp.Image.Load<Bgra32>(ms);
         }
     }
 }

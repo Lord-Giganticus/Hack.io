@@ -167,7 +167,7 @@ namespace Hack.io.BTP
             BTPFile.WriteReverse(BitConverter.GetBytes((ushort)TextureAnimations.Count), 0, 2);
             List<ushort> FullTexIDList = new();
             for (int i = 0; i < TextureAnimations.Count; i++)
-                BTP.FindMatch(ref FullTexIDList, TextureAnimations[i].TextureFrames);
+                FindMatch(ref FullTexIDList, TextureAnimations[i].TextureFrames);
             BTPFile.WriteReverse(BitConverter.GetBytes((ushort)FullTexIDList.Count), 0, 2);
             _ = BTPFile.Position;
             int offs = 0x20;
@@ -196,7 +196,7 @@ namespace Hack.io.BTP
             for (int i = 0; i < TextureAnimations.Count; i++)
             {
                 BTPFile.WriteReverse(BitConverter.GetBytes((ushort)TextureAnimations[i].TextureFrames.Count), 0, 2);
-                BTPFile.WriteReverse(BitConverter.GetBytes((ushort)BTP.FindMatch(ref FullTexIDList, TextureAnimations[i].TextureFrames)), 0, 2);
+                BTPFile.WriteReverse(BitConverter.GetBytes((ushort)FindMatch(ref FullTexIDList, TextureAnimations[i].TextureFrames)), 0, 2);
                 BTPFile.WriteByte(TextureAnimations[i].TexMapIndex);
                 BTPFile.WriteByte(0xFF);
                 BTPFile.WriteByte(0xFF);

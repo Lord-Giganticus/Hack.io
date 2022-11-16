@@ -82,11 +82,11 @@ namespace Hack.io.KCL
                 //Vector3 normalB = Vector3.Cross(triangle[1] - triangle[0], triangle[3]).Unit();
                 //Vector3 normalC = Vector3.Cross(triangle[2] - triangle[1], triangle[3]).Unit();
                 face.Length = Vector3.Dot(triangle[1] - triangle[0], normalC);
-                face.PositionIndex = (ushort)KCL.IndexOfVertex(triangle[0], Positions, positionTable);
-                face.DirectionIndex = (ushort)KCL.IndexOfVertex(triangle[3], Normals, normalTable);
-                face.NormalAIndex = (ushort)KCL.IndexOfVertex(normalA, Normals, normalTable);
-                face.NormalBIndex = (ushort)KCL.IndexOfVertex(normalB, Normals, normalTable);
-                face.NormalCIndex = (ushort)KCL.IndexOfVertex(normalC, Normals, normalTable);
+                face.PositionIndex = (ushort)IndexOfVertex(triangle[0], Positions, positionTable);
+                face.DirectionIndex = (ushort)IndexOfVertex(triangle[3], Normals, normalTable);
+                face.NormalAIndex = (ushort)IndexOfVertex(normalA, Normals, normalTable);
+                face.NormalBIndex = (ushort)IndexOfVertex(normalB, Normals, normalTable);
+                face.NormalCIndex = (ushort)IndexOfVertex(normalC, Normals, normalTable);
                 face.GroupIndex = (ushort)triangle.GroupIndex;
                 Triangles.Add(face);
                 triangledict.Add((ushort)triangledict.Count, triangle);

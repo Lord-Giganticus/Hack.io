@@ -54,8 +54,8 @@ namespace Hack.io.BMD
                     BMD.Position += 0x03;
                     long curPos = BMD.Position;
 
-                    int attribOffset = VTX1.GetAttributeDataOffset(attribDataOffsets, ChunkSize, attrib, VertexCount, out int attribDataSize);
-                    int attribCount = VTX1.GetAttributeDataCount(attribDataSize, attrib, componentType, componentCount);
+                    int attribOffset = GetAttributeDataOffset(attribDataOffsets, ChunkSize, attrib, VertexCount, out int attribDataSize);
+                    int attribCount = GetAttributeDataCount(attribDataSize, attrib, componentType, componentCount);
                     Attributes.SetAttributeData(attrib, LoadAttributeData(BMD, (int)(ChunkStart + attribOffset), attribCount, fractionalBitCount, attrib, componentType, componentCount));
 
                     BMD.Position = curPos;
@@ -75,10 +75,10 @@ namespace Hack.io.BMD
                         switch (compCount)
                         {
                             case GXComponentCount.Position_XY:
-                                final = VTX1.LoadVec2Data(BMD, frac, count, dataType);
+                                final = LoadVec2Data(BMD, frac, count, dataType);
                                 break;
                             case GXComponentCount.Position_XYZ:
-                                final = VTX1.LoadVec3Data(BMD, frac, count, dataType);
+                                final = LoadVec3Data(BMD, frac, count, dataType);
                                 break;
                         }
                         break;
@@ -86,7 +86,7 @@ namespace Hack.io.BMD
                         switch (compCount)
                         {
                             case GXComponentCount.Normal_XYZ:
-                                final = VTX1.LoadVec3Data(BMD, frac, count, dataType);
+                                final = LoadVec3Data(BMD, frac, count, dataType);
                                 break;
                             case GXComponentCount.Normal_NBT:
                                 break;
@@ -96,7 +96,7 @@ namespace Hack.io.BMD
                         break;
                     case GXVertexAttribute.Color0:
                     case GXVertexAttribute.Color1:
-                        final = VTX1.LoadColorData(BMD, count, dataType);
+                        final = LoadColorData(BMD, count, dataType);
                         break;
                     case GXVertexAttribute.Tex0:
                     case GXVertexAttribute.Tex1:
@@ -109,10 +109,10 @@ namespace Hack.io.BMD
                         switch (compCount)
                         {
                             case GXComponentCount.TexCoord_S:
-                                final = VTX1.LoadSingleFloat(BMD, frac, count, dataType);
+                                final = LoadSingleFloat(BMD, frac, count, dataType);
                                 break;
                             case GXComponentCount.TexCoord_ST:
-                                final = VTX1.LoadVec2Data(BMD, frac, count, dataType);
+                                final = LoadVec2Data(BMD, frac, count, dataType);
                                 break;
                         }
                         break;

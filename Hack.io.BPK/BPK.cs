@@ -116,19 +116,19 @@ namespace Hack.io.BPK
                 KeyFrameCount = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
-                Anim.RedFrames = BPK.ReadKeyframe(RedTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.RedFrames = ReadKeyframe(RedTable, 1, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
-                Anim.GreenFrames = BPK.ReadKeyframe(GreenTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.GreenFrames = ReadKeyframe(GreenTable, 1, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
-                Anim.BlueFrames = BPK.ReadKeyframe(BlueTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.BlueFrames = ReadKeyframe(BlueTable, 1, KeyFrameCount, TargetKeySet, TangentType);
                 KeyFrameCount = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TargetKeySet = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
                 TangentType = BitConverter.ToInt16(BPKFile.ReadReverse(0, 2), 0);
-                Anim.AlphaFrames = BPK.ReadKeyframe(AlphaTable, 1, KeyFrameCount, TargetKeySet, TangentType);
+                Anim.AlphaFrames = ReadKeyframe(AlphaTable, 1, KeyFrameCount, TargetKeySet, TangentType);
                 ColourAnimations.Add(Anim);
             }
 
@@ -167,10 +167,10 @@ namespace Hack.io.BPK
 
             for (int i = 0; i < ColourAnimations.Count; i++)
             {
-                BPK.FindMatch(ref RedTable, ColourAnimations[i].RedFrames);
-                BPK.FindMatch(ref GreenTable, ColourAnimations[i].GreenFrames);
-                BPK.FindMatch(ref BlueTable, ColourAnimations[i].BlueFrames);
-                BPK.FindMatch(ref AlphaTable, ColourAnimations[i].AlphaFrames);
+                FindMatch(ref RedTable, ColourAnimations[i].RedFrames);
+                FindMatch(ref GreenTable, ColourAnimations[i].GreenFrames);
+                FindMatch(ref BlueTable, ColourAnimations[i].BlueFrames);
+                FindMatch(ref AlphaTable, ColourAnimations[i].AlphaFrames);
             }
 
             BTPFile.WriteReverse(BitConverter.GetBytes((ushort)ColourAnimations.Count), 0, 2);
@@ -231,19 +231,19 @@ namespace Hack.io.BPK
             for (int i = 0; i < ColourAnimations.Count; i++)
             {
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)ColourAnimations[i].RedFrames.Count), 0, 2);
-                BTPFile.WriteReverse(BitConverter.GetBytes(BPK.FindMatch(ref RedTable, ColourAnimations[i].RedFrames)), 0, 2);
+                BTPFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref RedTable, ColourAnimations[i].RedFrames)), 0, 2);
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)(ColourAnimations[i].RedFrames.Any(R => R.IngoingTangent != R.OutgoingTangent) ? 1 : 1)), 0, 2);
 
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)ColourAnimations[i].GreenFrames.Count), 0, 2);
-                BTPFile.WriteReverse(BitConverter.GetBytes(BPK.FindMatch(ref GreenTable, ColourAnimations[i].GreenFrames)), 0, 2);
+                BTPFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref GreenTable, ColourAnimations[i].GreenFrames)), 0, 2);
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)(ColourAnimations[i].GreenFrames.Any(G => G.IngoingTangent != G.OutgoingTangent) ? 1 : 1)), 0, 2);
 
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)ColourAnimations[i].BlueFrames.Count), 0, 2);
-                BTPFile.WriteReverse(BitConverter.GetBytes(BPK.FindMatch(ref BlueTable, ColourAnimations[i].BlueFrames)), 0, 2);
+                BTPFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref BlueTable, ColourAnimations[i].BlueFrames)), 0, 2);
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)(ColourAnimations[i].BlueFrames.Any(B => B.IngoingTangent != B.OutgoingTangent) ? 1 : 1)), 0, 2);
 
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)ColourAnimations[i].AlphaFrames.Count), 0, 2);
-                BTPFile.WriteReverse(BitConverter.GetBytes(BPK.FindMatch(ref AlphaTable, ColourAnimations[i].AlphaFrames)), 0, 2);
+                BTPFile.WriteReverse(BitConverter.GetBytes(FindMatch(ref AlphaTable, ColourAnimations[i].AlphaFrames)), 0, 2);
                 BTPFile.WriteReverse(BitConverter.GetBytes((short)(ColourAnimations[i].AlphaFrames.Any(A => A.IngoingTangent != A.OutgoingTangent) ? 1 : 1)), 0, 2);
             }
 

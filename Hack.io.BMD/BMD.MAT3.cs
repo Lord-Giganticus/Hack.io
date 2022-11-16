@@ -421,7 +421,7 @@ namespace Hack.io.BMD
             {
                 for (int i = 0; i < m_Materials.Count; i++)
                 {
-                    if (object.ReferenceEquals(mat, m_Materials[i]))
+                    if (ReferenceEquals(mat, m_Materials[i]))
                     {
                         return i;
                     }
@@ -796,7 +796,7 @@ namespace Hack.io.BMD
                         continue;
                     else
                     {
-                        MAT3.WriteMaterialInitData(writer, uniqueMaterials[m_RemapIndices[i]], ref m_CullModeBlock, ref m_MaterialColorBlock, ref m_ChannelControlBlock, ref m_AmbientColorBlock,
+                        WriteMaterialInitData(writer, uniqueMaterials[m_RemapIndices[i]], ref m_CullModeBlock, ref m_MaterialColorBlock, ref m_ChannelControlBlock, ref m_AmbientColorBlock,
                         ref m_LightingColorBlock, ref m_TexCoord1GenBlock, ref m_TexCoord2GenBlock, ref m_TexMatrix1Block, ref m_TexMatrix2Block, ref m_TexRemapBlock, ref m_TevOrderBlock, ref m_TevColorBlock,
                         ref m_TevKonstColorBlock, ref m_TevStageBlock, ref m_SwapModeBlock, ref m_SwapTableBlock, ref m_FogBlock, ref m_AlphaCompBlock, ref m_blendModeBlock, ref m_NBTScaleBlock, ref m_zModeBlock,
                         ref m_zCompLocBlock, ref m_ditherBlock, ref NumColorChannelsBlock, ref NumTexGensBlock, ref NumTevStagesBlock);

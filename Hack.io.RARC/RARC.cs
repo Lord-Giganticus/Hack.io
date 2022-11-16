@@ -461,9 +461,9 @@ namespace Hack.io.RARC
             List<RARCFileEntry> FlatFileList = GetFlatFileList(Root, FileOffsets, ref FileID, 0, ref NextFolderID, -1);
             uint FirstFileOffset = 0;
             List<RARCDirEntry> FlatDirectoryList = GetFlatDirectoryList(Root, ref FirstFileOffset);
-            FlatDirectoryList.Insert(0, new RARCDirEntry() { FileCount = (ushort)(Root.Items.Count + 2), FirstFileOffset = 0, Name = Root.Name, NameHash = RARC.StringToHash(Root.Name), NameOffset = 0, Type = "ROOT" });
+            FlatDirectoryList.Insert(0, new RARCDirEntry() { FileCount = (ushort)(Root.Items.Count + 2), FirstFileOffset = 0, Name = Root.Name, NameHash = StringToHash(Root.Name), NameOffset = 0, Type = "ROOT" });
             Dictionary<string, uint> StringLocations = new();
-            byte[] StringDataBuffer = RARC.GetStringTableBytes(FlatFileList, Root.Name, ref StringLocations).ToArray();
+            byte[] StringDataBuffer = GetStringTableBytes(FlatFileList, Root.Name, ref StringLocations).ToArray();
 
             #region File Writing
             RARCFile.WriteString(Magic);
@@ -505,7 +505,7 @@ namespace Hack.io.RARC
             for (int i = 0; i < FlatFileList.Count; i++)
             {
                 RARCFile.WriteReverse(BitConverter.GetBytes(FlatFileList[i].FileID), 0, 2);
-                RARCFile.WriteReverse(BitConverter.GetBytes(RARC.StringToHash(FlatFileList[i].Name)), 0, 2);
+                RARCFile.WriteReverse(BitConverter.GetBytes(StringToHash(FlatFileList[i].Name)), 0, 2);
                 RARCFile.WriteReverse(BitConverter.GetBytes(FlatFileList[i].Type), 0, 2);
                 RARCFile.WriteReverse(BitConverter.GetBytes((ushort)StringLocations[FlatFileList[i].Name]), 0, 2);
                 RARCFile.WriteReverse(BitConverter.GetBytes(FlatFileList[i].ModularA), 0, 4);
@@ -690,7 +690,7 @@ namespace Hack.io.RARC
             {
                 if (item.Value is Directory Currentdir)
                 {
-                    FlatDirectoryList.Add(new RARCDirEntry() { FileCount = (ushort)(Currentdir.Items.Count + 2), FirstFileOffset = FirstFileOffset, Name = Currentdir.Name, NameHash = RARC.StringToHash(Currentdir.Name), NameOffset = 0xFFFFFFFF, Type = Currentdir.ToTypeString() });
+                    FlatDirectoryList.Add(new RARCDirEntry() { FileCount = (ushort)(Currentdir.Items.Count + 2), FirstFileOffset = FirstFileOffset, Name = Currentdir.Name, NameHash = StringToHash(Currentdir.Name), NameOffset = 0xFFFFFFFF, Type = Currentdir.ToTypeString() });
                     TemporaryList.AddRange(GetFlatDirectoryList(Currentdir, ref FirstFileOffset));
                 }
             }

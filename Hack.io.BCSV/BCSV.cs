@@ -100,7 +100,7 @@ namespace Hack.io.BCSV
 
             ushort offset = 0;
             List<KeyValuePair<uint, BCSVField>> FieldList = Fields.ToList();
-            List<KeyValuePair<uint, BCSVField>> OrganizedFieldList = io.BCSV.BCSV.GenerateSortedFields(FieldList);
+            List<KeyValuePair<uint, BCSVField>> OrganizedFieldList = GenerateSortedFields(FieldList);
             for (int i = 0; i < OrganizedFieldList.Count; i++)
             {
                 BCSVField currentfield = OrganizedFieldList[i].Value;
@@ -952,7 +952,7 @@ namespace Hack.io.BCSV
         /// </summary>
         /// <param name="obj">Object to compare to</param>
         /// <returns></returns>
-        public override bool Equals(object obj) => obj is BCSVEntry entry && Hack.io.Util.GenericExtensions.Equals(Data, entry.Data);
+        public override bool Equals(object obj) => obj is BCSVEntry entry && Util.GenericExtensions.Equals(Data, entry.Data);
 
         /// <summary>
         /// Auto-Generated

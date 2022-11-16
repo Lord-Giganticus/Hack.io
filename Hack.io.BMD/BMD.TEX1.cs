@@ -119,7 +119,7 @@ namespace Hack.io.BMD
 
                 List<string> names = new();
 
-                BMDFile.Seek(ChunkStart + textureNameTableOffset, System.IO.SeekOrigin.Begin);
+                BMDFile.Seek(ChunkStart + textureNameTableOffset, SeekOrigin.Begin);
 
                 short stringCount = BitConverter.ToInt16(BMDFile.ReadReverse(0, 2), 0);
                 BMDFile.Position += 0x02;

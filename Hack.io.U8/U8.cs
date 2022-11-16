@@ -142,14 +142,14 @@ namespace Hack.io.U8
             AddItems(Root);
             //The archive has been flattened hooray
             Dictionary<string, uint> StringOffsets = new();
-            List<byte> StringBytes = U8.GetStringTableBytes(FlatItems, ref StringOffsets);
+            List<byte> StringBytes = GetStringTableBytes(FlatItems, ref StringOffsets);
 
             uint DataOffset = (uint)(0x20 + (FlatItems.Count * 0x0C) + StringBytes.Count);
             DataOffset += 0x20 - (DataOffset % 0x20);
             //while (DataOffset % 16 != 0)
             //    DataOffset++;
             Dictionary<ArchiveFile, uint> DataOffsets = new();
-            List<byte> DataBytes = U8.GetDataBytes(FlatItems, DataOffset, ref DataOffsets);
+            List<byte> DataBytes = GetDataBytes(FlatItems, DataOffset, ref DataOffsets);
 
             List<U8Node> Nodes = new();
             Stack<ArchiveDirectory> DirectoryStack = new();
@@ -159,7 +159,7 @@ namespace Hack.io.U8
                 if (FlatItems[i] is ArchiveDirectory dir)
                 {
                     if (DirectoryStack.Count > 1)
-                        while (!object.ReferenceEquals(DirectoryStack.Peek(), dir.Parent))
+                        while (!ReferenceEquals(DirectoryStack.Peek(), dir.Parent))
                         {
                             Nodes[FlatItems.IndexOf(DirectoryStack.Peek())].Size = i;
                             DirectoryStack.Pop();

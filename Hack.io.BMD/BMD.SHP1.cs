@@ -834,67 +834,67 @@ namespace Hack.io.BMD
                 {
                     if (desc.CheckAttribute(GXVertexAttribute.PositionMatrixIdx))
                     {
-                        Vertex.WriteAttributeIndex(writer, PositionMatrixIDxIndex * 3, desc.Attributes[GXVertexAttribute.PositionMatrixIdx].Item1);
+                        WriteAttributeIndex(writer, PositionMatrixIDxIndex * 3, desc.Attributes[GXVertexAttribute.PositionMatrixIdx].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Position))
                     {
-                        Vertex.WriteAttributeIndex(writer, PositionIndex, desc.Attributes[GXVertexAttribute.Position].Item1);
+                        WriteAttributeIndex(writer, PositionIndex, desc.Attributes[GXVertexAttribute.Position].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Normal))
                     {
-                        Vertex.WriteAttributeIndex(writer, NormalIndex, desc.Attributes[GXVertexAttribute.Normal].Item1);
+                        WriteAttributeIndex(writer, NormalIndex, desc.Attributes[GXVertexAttribute.Normal].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Color0))
                     {
-                        Vertex.WriteAttributeIndex(writer, Color0Index, desc.Attributes[GXVertexAttribute.Color0].Item1);
+                        WriteAttributeIndex(writer, Color0Index, desc.Attributes[GXVertexAttribute.Color0].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Color1))
                     {
-                        Vertex.WriteAttributeIndex(writer, Color1Index, desc.Attributes[GXVertexAttribute.Color1].Item1);
+                        WriteAttributeIndex(writer, Color1Index, desc.Attributes[GXVertexAttribute.Color1].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex0))
                     {
-                        Vertex.WriteAttributeIndex(writer, TexCoord0Index, desc.Attributes[GXVertexAttribute.Tex0].Item1);
+                        WriteAttributeIndex(writer, TexCoord0Index, desc.Attributes[GXVertexAttribute.Tex0].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex1))
                     {
-                        Vertex.WriteAttributeIndex(writer, TexCoord1Index, desc.Attributes[GXVertexAttribute.Tex1].Item1);
+                        WriteAttributeIndex(writer, TexCoord1Index, desc.Attributes[GXVertexAttribute.Tex1].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex2))
                     {
-                        Vertex.WriteAttributeIndex(writer, TexCoord2Index, desc.Attributes[GXVertexAttribute.Tex2].Item1);
+                        WriteAttributeIndex(writer, TexCoord2Index, desc.Attributes[GXVertexAttribute.Tex2].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex3))
                     {
-                        Vertex.WriteAttributeIndex(writer, TexCoord3Index, desc.Attributes[GXVertexAttribute.Tex3].Item1);
+                        WriteAttributeIndex(writer, TexCoord3Index, desc.Attributes[GXVertexAttribute.Tex3].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex4))
                     {
-                        Vertex.WriteAttributeIndex(writer, TexCoord4Index, desc.Attributes[GXVertexAttribute.Tex4].Item1);
+                        WriteAttributeIndex(writer, TexCoord4Index, desc.Attributes[GXVertexAttribute.Tex4].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex5))
                     {
-                        Vertex.WriteAttributeIndex(writer, TexCoord5Index, desc.Attributes[GXVertexAttribute.Tex5].Item1);
+                        WriteAttributeIndex(writer, TexCoord5Index, desc.Attributes[GXVertexAttribute.Tex5].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex6))
                     {
-                        Vertex.WriteAttributeIndex(writer, TexCoord6Index, desc.Attributes[GXVertexAttribute.Tex6].Item1);
+                        WriteAttributeIndex(writer, TexCoord6Index, desc.Attributes[GXVertexAttribute.Tex6].Item1);
                     }
 
                     if (desc.CheckAttribute(GXVertexAttribute.Tex7))
                     {
-                        Vertex.WriteAttributeIndex(writer, TexCoord7Index, desc.Attributes[GXVertexAttribute.Tex7].Item1);
+                        WriteAttributeIndex(writer, TexCoord7Index, desc.Attributes[GXVertexAttribute.Tex7].Item1);
                     }
                 }
 

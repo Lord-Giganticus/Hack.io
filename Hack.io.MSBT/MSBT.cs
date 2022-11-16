@@ -124,7 +124,7 @@ namespace Hack.io.MSBT
                     foreach (KeyValuePair<string, Label> lbl in SortedLabels)
                     {
                         uint previousChecksum = lbl.Value.Checksum;
-                        lbl.Value.Checksum = MSBT.LabelChecksum(lbl.Value.Name, (uint)Groups.Count);
+                        lbl.Value.Checksum = LabelChecksum(lbl.Value.Name, (uint)Groups.Count);
 
                         if (previousChecksum != lbl.Value.Checksum)
                         {
@@ -298,7 +298,7 @@ namespace Hack.io.MSBT
             uint Offset = 4 + (8 * GroupCount);
             for (int i = 0; i < Messages.Count; i++)
             {
-                Groups.Add((MSBT.LabelChecksum(Messages[i].Name, GroupCount), Offset));
+                Groups.Add((LabelChecksum(Messages[i].Name, GroupCount), Offset));
                 Offset += (uint)(Messages[i].Name.Length + 1 + 4);
                 LabelData.Add((byte)Messages[i].Name.Length);
                 LabelData.AddRange(Encoding.UTF8.GetBytes(Messages[i].Name));
