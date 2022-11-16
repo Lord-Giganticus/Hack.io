@@ -129,27 +129,27 @@ namespace Hack.io.BMD
                 {
                     switch (dataType)
                     {
-                        case GXDataType.Unsigned8:
+                        case GXDataType.RGB565:
                             byte compu81 = (byte)BMD.ReadByte();
                             float compu81Float = (float)compu81 / (float)(1 << frac);
                             floatList.Add(compu81Float);
                             break;
-                        case GXDataType.Signed8:
+                        case GXDataType.RGB8:
                             sbyte comps81 = (sbyte)BMD.ReadByte();
                             float comps81Float = (float)comps81 / (float)(1 << frac);
                             floatList.Add(comps81Float);
                             break;
-                        case GXDataType.Unsigned16:
+                        case GXDataType.RGBX8:
                             ushort compu161 = BitConverter.ToUInt16(BMD.ReadReverse(0, 2), 0);
                             float compu161Float = (float)compu161 / (float)(1 << frac);
                             floatList.Add(compu161Float);
                             break;
-                        case GXDataType.Signed16:
+                        case GXDataType.RGBA4:
                             short comps161 = BitConverter.ToInt16(BMD.ReadReverse(0, 2), 0);
                             float comps161Float = (float)comps161 / (float)(1 << frac);
                             floatList.Add(comps161Float);
                             break;
-                        case GXDataType.Float32:
+                        case GXDataType.RGBA6:
                             floatList.Add(BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0));
                             break;
                     }
@@ -166,35 +166,35 @@ namespace Hack.io.BMD
                 {
                     switch (dataType)
                     {
-                        case GXDataType.Unsigned8:
+                        case GXDataType.RGB565:
                             byte compu81 = (byte)BMD.ReadByte();
                             byte compu82 = (byte)BMD.ReadByte();
                             float compu81Float = (float)compu81 / (float)(1 << frac);
                             float compu82Float = (float)compu82 / (float)(1 << frac);
                             vec2List.Add(new Vector2(compu81Float, compu82Float));
                             break;
-                        case GXDataType.Signed8:
+                        case GXDataType.RGB8:
                             sbyte comps81 = (sbyte)BMD.ReadByte();
                             sbyte comps82 = (sbyte)BMD.ReadByte();
                             float comps81Float = (float)comps81 / (float)(1 << frac);
                             float comps82Float = (float)comps82 / (float)(1 << frac);
                             vec2List.Add(new Vector2(comps81Float, comps82Float));
                             break;
-                        case GXDataType.Unsigned16:
+                        case GXDataType.RGBX8:
                             ushort compu161 = BitConverter.ToUInt16(BMD.ReadReverse(0, 2), 0);
                             ushort compu162 = BitConverter.ToUInt16(BMD.ReadReverse(0, 2), 0);
                             float compu161Float = (float)compu161 / (float)(1 << frac);
                             float compu162Float = (float)compu162 / (float)(1 << frac);
                             vec2List.Add(new Vector2(compu161Float, compu162Float));
                             break;
-                        case GXDataType.Signed16:
+                        case GXDataType.RGBA4:
                             short comps161 = BitConverter.ToInt16(BMD.ReadReverse(0, 2), 0);
                             short comps162 = BitConverter.ToInt16(BMD.ReadReverse(0, 2), 0);
                             float comps161Float = (float)comps161 / (float)(1 << frac);
                             float comps162Float = (float)comps162 / (float)(1 << frac);
                             vec2List.Add(new Vector2(comps161Float, comps162Float));
                             break;
-                        case GXDataType.Float32:
+                        case GXDataType.RGBA6:
                             vec2List.Add(new Vector2(BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0)));
                             break;
                     }
@@ -211,7 +211,7 @@ namespace Hack.io.BMD
                 {
                     switch (dataType)
                     {
-                        case GXDataType.Unsigned8:
+                        case GXDataType.RGB565:
                             byte compu81 = (byte)BMD.ReadByte();
                             byte compu82 = (byte)BMD.ReadByte();
                             byte compu83 = (byte)BMD.ReadByte();
@@ -220,7 +220,7 @@ namespace Hack.io.BMD
                             float compu83Float = (float)compu83 / (float)(1 << frac);
                             vec3List.Add(new Vector3(compu81Float, compu82Float, compu83Float));
                             break;
-                        case GXDataType.Signed8:
+                        case GXDataType.RGB8:
                             sbyte comps81 = (sbyte)BMD.ReadByte();
                             sbyte comps82 = (sbyte)BMD.ReadByte();
                             sbyte comps83 = (sbyte)BMD.ReadByte();
@@ -229,7 +229,7 @@ namespace Hack.io.BMD
                             float comps83Float = (float)comps83 / (float)(1 << frac);
                             vec3List.Add(new Vector3(comps81Float, comps82Float, comps83Float));
                             break;
-                        case GXDataType.Unsigned16:
+                        case GXDataType.RGBX8:
                             ushort compu161 = BitConverter.ToUInt16(BMD.ReadReverse(0, 2), 0);
                             ushort compu162 = BitConverter.ToUInt16(BMD.ReadReverse(0, 2), 0);
                             ushort compu163 = BitConverter.ToUInt16(BMD.ReadReverse(0, 2), 0);
@@ -238,7 +238,7 @@ namespace Hack.io.BMD
                             float compu163Float = (float)compu163 / (float)(1 << frac);
                             vec3List.Add(new Vector3(compu161Float, compu162Float, compu163Float));
                             break;
-                        case GXDataType.Signed16:
+                        case GXDataType.RGBA4:
                             short comps161 = BitConverter.ToInt16(BMD.ReadReverse(0, 2), 0);
                             short comps162 = BitConverter.ToInt16(BMD.ReadReverse(0, 2), 0);
                             short comps163 = BitConverter.ToInt16(BMD.ReadReverse(0, 2), 0);
@@ -247,7 +247,7 @@ namespace Hack.io.BMD
                             float comps163Float = (float)comps163 / (float)(1 << frac);
                             vec3List.Add(new Vector3(comps161Float, comps162Float, comps163Float));
                             break;
-                        case GXDataType.Float32:
+                        case GXDataType.RGBA6:
                             vec3List.Add(new Vector3(BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0), BitConverter.ToSingle(BMD.ReadReverse(0, 4), 0)));
                             break;
                     }
@@ -422,15 +422,15 @@ namespace Hack.io.BMD
                 {
                     switch (dataType)
                     {
-                        case GXDataType.Unsigned8:
-                        case GXDataType.Signed8:
+                        case GXDataType.RGB565:
+                        case GXDataType.RGB8:
                             compStride = 1;
                             break;
-                        case GXDataType.Unsigned16:
-                        case GXDataType.Signed16:
+                        case GXDataType.RGBX8:
+                        case GXDataType.RGBA4:
                             compStride = 2;
                             break;
-                        case GXDataType.Float32:
+                        case GXDataType.RGBA6:
                             compStride = 4;
                             break;
                     }
@@ -565,27 +565,27 @@ namespace Hack.io.BMD
                             {
                                 switch (StorageFormats[attrib].Item1)
                                 {
-                                    case GXDataType.Unsigned8:
+                                    case GXDataType.RGB565:
                                         writer.WriteByte((byte)Math.Round(posVec.X * (1 << StorageFormats[attrib].Item2)));
                                         writer.WriteByte((byte)Math.Round(posVec.Y * (1 << StorageFormats[attrib].Item2)));
                                         writer.WriteByte((byte)Math.Round(posVec.Z * (1 << StorageFormats[attrib].Item2)));
                                         break;
-                                    case GXDataType.Signed8:
+                                    case GXDataType.RGB8:
                                         writer.WriteByte((byte)((sbyte)Math.Round(posVec.X * (1 << StorageFormats[attrib].Item2))));
                                         writer.WriteByte((byte)((sbyte)Math.Round(posVec.Y * (1 << StorageFormats[attrib].Item2))));
                                         writer.WriteByte((byte)((sbyte)Math.Round(posVec.Z * (1 << StorageFormats[attrib].Item2))));
                                         break;
-                                    case GXDataType.Unsigned16:
+                                    case GXDataType.RGBX8:
                                         writer.WriteReverse(BitConverter.GetBytes((ushort)Math.Round(posVec.X * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         writer.WriteReverse(BitConverter.GetBytes((ushort)Math.Round(posVec.Y * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         writer.WriteReverse(BitConverter.GetBytes((ushort)Math.Round(posVec.Z * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         break;
-                                    case GXDataType.Signed16:
+                                    case GXDataType.RGBA4:
                                         writer.WriteReverse(BitConverter.GetBytes((short)Math.Round(posVec.X * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         writer.WriteReverse(BitConverter.GetBytes((short)Math.Round(posVec.Y * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         writer.WriteReverse(BitConverter.GetBytes((short)Math.Round(posVec.Z * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         break;
-                                    case GXDataType.Float32:
+                                    case GXDataType.RGBA6:
                                         writer.WriteReverse(BitConverter.GetBytes(posVec.X), 0, 4);
                                         writer.WriteReverse(BitConverter.GetBytes(posVec.Y), 0, 4);
                                         writer.WriteReverse(BitConverter.GetBytes(posVec.Z), 0, 4);
@@ -602,27 +602,27 @@ namespace Hack.io.BMD
                             {
                                 switch (StorageFormats[attrib].Item1)
                                 {
-                                    case GXDataType.Unsigned8:
+                                    case GXDataType.RGB565:
                                         writer.WriteByte((byte)Math.Round(normVec.X * (1 << StorageFormats[attrib].Item2)));
                                         writer.WriteByte((byte)Math.Round(normVec.Y * (1 << StorageFormats[attrib].Item2)));
                                         writer.WriteByte((byte)Math.Round(normVec.Z * (1 << StorageFormats[attrib].Item2)));
                                         break;
-                                    case GXDataType.Signed8:
+                                    case GXDataType.RGB8:
                                         writer.WriteByte((byte)((sbyte)Math.Round(normVec.X * (1 << StorageFormats[attrib].Item2))));
                                         writer.WriteByte((byte)((sbyte)Math.Round(normVec.Y * (1 << StorageFormats[attrib].Item2))));
                                         writer.WriteByte((byte)((sbyte)Math.Round(normVec.Z * (1 << StorageFormats[attrib].Item2))));
                                         break;
-                                    case GXDataType.Unsigned16:
+                                    case GXDataType.RGBX8:
                                         writer.WriteReverse(BitConverter.GetBytes((ushort)Math.Round(normVec.X * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         writer.WriteReverse(BitConverter.GetBytes((ushort)Math.Round(normVec.Y * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         writer.WriteReverse(BitConverter.GetBytes((ushort)Math.Round(normVec.Z * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         break;
-                                    case GXDataType.Signed16:
+                                    case GXDataType.RGBA4:
                                         writer.WriteReverse(BitConverter.GetBytes((short)Math.Round(normVec.X * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         writer.WriteReverse(BitConverter.GetBytes((short)Math.Round(normVec.Y * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         writer.WriteReverse(BitConverter.GetBytes((short)Math.Round(normVec.Z * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         break;
-                                    case GXDataType.Float32:
+                                    case GXDataType.RGBA6:
                                         writer.WriteReverse(BitConverter.GetBytes(normVec.X), 0, 4);
                                         writer.WriteReverse(BitConverter.GetBytes(normVec.Y), 0, 4);
                                         writer.WriteReverse(BitConverter.GetBytes(normVec.Z), 0, 4);
@@ -660,23 +660,23 @@ namespace Hack.io.BMD
                             {
                                 switch (StorageFormats[attrib].Item1)
                                 {
-                                    case GXDataType.Unsigned8:
+                                    case GXDataType.RGB565:
                                         writer.WriteByte((byte)Math.Round(texVec.X * (1 << StorageFormats[attrib].Item2)));
                                         writer.WriteByte((byte)Math.Round(texVec.Y * (1 << StorageFormats[attrib].Item2)));
                                         break;
-                                    case GXDataType.Signed8:
+                                    case GXDataType.RGB8:
                                         writer.WriteByte((byte)((sbyte)Math.Round(texVec.X * (1 << StorageFormats[attrib].Item2))));
                                         writer.WriteByte((byte)((sbyte)Math.Round(texVec.Y * (1 << StorageFormats[attrib].Item2))));
                                         break;
-                                    case GXDataType.Unsigned16:
+                                    case GXDataType.RGBX8:
                                         writer.WriteReverse(BitConverter.GetBytes((ushort)Math.Round(texVec.X * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         writer.WriteReverse(BitConverter.GetBytes((ushort)Math.Round(texVec.Y * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         break;
-                                    case GXDataType.Signed16:
+                                    case GXDataType.RGBA4:
                                         writer.WriteReverse(BitConverter.GetBytes((short)Math.Round(texVec.X * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         writer.WriteReverse(BitConverter.GetBytes((short)Math.Round(texVec.Y * (1 << StorageFormats[attrib].Item2))), 0, 2);
                                         break;
-                                    case GXDataType.Float32:
+                                    case GXDataType.RGBA6:
                                         writer.WriteReverse(BitConverter.GetBytes(texVec.X), 0, 4);
                                         writer.WriteReverse(BitConverter.GetBytes(texVec.Y), 0, 4);
                                         break;

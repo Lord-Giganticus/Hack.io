@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hack.io.BCK\Hack.io.BCK.csproj" />
+    <ProjectReference Include="..\Hack.io.BCSV\Hack.io.BCSV.csproj" />
+    <ProjectReference Include="..\Hack.io.BMD\Hack.io.BMD.csproj" />
+    <ProjectReference Include="..\Hack.io.BPK\Hack.io.BPK.csproj" />
+    <ProjectReference Include="..\Hack.io.BRK\Hack.io.BRK.csproj" />
+    <ProjectReference Include="..\Hack.io.BTI\Hack.io.BTI.csproj" />
+    <ProjectReference Include="..\Hack.io.BTK\Hack.io.BTK.csproj" />
+    <ProjectReference Include="..\Hack.io.BTP\Hack.io.BTP.csproj" />
+    <ProjectReference Include="..\Hack.io.BVA\Hack.io.BVA.csproj" />
+    <ProjectReference Include="..\Hack.io.CANM\Hack.io.CANM.csproj" />
+    <ProjectReference Include="..\Hack.io.CIT\Hack.io.CIT.csproj" />
+    <ProjectReference Include="..\Hack.io.J3D\Hack.io.J3D.csproj" />
+    <ProjectReference Include="..\Hack.io.KCL\Hack.io.KCL.csproj" />
+    <ProjectReference Include="..\Hack.io.MSBF\Hack.io.MSBF.csproj" />
+    <ProjectReference Include="..\Hack.io.MSBT\Hack.io.MSBT.csproj" />
+    <ProjectReference Include="..\Hack.io.RARC\Hack.io.RARC.csproj" />
+    <ProjectReference Include="..\Hack.io.TPL\Hack.io.TPL.csproj" />
+    <ProjectReference Include="..\Hack.io.U8\Hack.io.U8.csproj" />
+    <ProjectReference Include="..\Hack.io.YAY0\Hack.io.YAY0.csproj" />
+    <ProjectReference Include="..\Hack.io.YAZ0\Hack.io.YAZ0.csproj" />
+    <ProjectReference Include="..\Hack.io\Hack.io.csproj" />
+  </ItemGroup>
+
+</Project>
